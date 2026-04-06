@@ -1,0 +1,185 @@
+@import "tailwindcss";
+
+/* Base */
+body {
+  background: #f8f9fb;
+}
+
+/* Hide number input spinners globally across all browsers */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Match theme - button glow */
+.glow-primary {
+  box-shadow: 0 10px 15px -3px rgba(27, 49, 80, 0.15);
+}
+
+.glow-primary:hover {
+  box-shadow: 0 20px 25px -5px rgba(27, 49, 80, 0.25);
+}
+
+.glow-red {
+  box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.15);
+}
+
+.glow-red:hover {
+  box-shadow: 0 20px 25px -5px rgba(239, 68, 68, 0.25);
+}
+
+/* Thin custom scrollbar */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 9999px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+/* Firefox */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
+
+/* Completely hidden scrollbar (still scrollable) */
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Global scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.22);
+}
+
+/* Print styles for statement */
+@media print {
+  @page {
+    margin: 0.5cm;
+    size: A4;
+  }
+  
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100%;
+    height: auto;
+  }
+  
+  body > div,
+  body > div > div {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  header,
+  aside,
+  main > div:not(#bet-receipt):not(#statement-slip),
+  .print\\:hidden {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+    margin-left: 0 !important;
+    padding-top: 0 !important;
+  }
+  
+  body * {
+    visibility: hidden;
+  }
+  
+  #statement-slip,
+  #statement-slip *,
+  #bet-receipt,
+  #bet-receipt * {
+    visibility: visible;
+  }
+  
+  #statement-slip,
+  #bet-receipt {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: auto;
+    margin: 0 !important;
+    padding: 0 !important;
+    page-break-inside: avoid;
+    page-break-after: avoid;
+  }
+  
+  #bet-receipt > div,
+  #statement-slip > div {
+    margin: 0 !important;
+    padding: 0.5cm !important;
+  }
+  
+  .print\\:hidden {
+    display: none !important;
+  }
+  
+  .print\\:p-8 {
+    padding: 2rem !important;
+  }
+  
+  .print\\:p-4 {
+    padding: 1rem !important;
+  }
+  
+  .print\\:p-3 {
+    padding: 0.75rem !important;
+  }
+  
+  .print\\:max-w-none {
+    max-width: none !important;
+  }
+  
+  .print\\:border-gray-800 {
+    border-color: #1f2937 !important;
+  }
+  
+  .print\\:rounded-none {
+    border-radius: 0 !important;
+  }
+  
+  /* Prevent page breaks inside table */
+  .receipt-table thead,
+  .receipt-table tbody,
+  .receipt-table tfoot {
+    page-break-inside: avoid;
+  }
+  
+  .receipt-table tr {
+    page-break-inside: avoid;
+  }
+}

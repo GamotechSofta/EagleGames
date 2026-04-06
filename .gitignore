@@ -1,0 +1,91 @@
+# ==============================
+# Node Modules (ALL projects)
+# ==============================
+node_modules/
+*/node_modules/
+
+# ==============================
+# Build Outputs (ALL apps)
+# ==============================
+build/
+dist/
+*/build/
+*/dist/
+
+# ==============================
+# Backend (backend folder)
+# ==============================
+backend/logs/
+backend/*.log
+backend/pids/
+backend/*.pid
+
+# ==============================
+# Environment Variables (IMPORTANT)
+# ==============================
+.env
+.env.*
+!.env.example
+
+# ==============================
+# Logs (global)
+# ==============================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ==============================
+# Cache / Framework Files
+# ==============================
+.cache/
+.next/
+.vite/
+out/
+*.tsbuildinfo
+
+# ==============================
+# Testing
+# ==============================
+coverage/
+.nyc_output/
+
+# ==============================
+# OS Files
+# ==============================
+.DS_Store
+Thumbs.db
+
+# ==============================
+# IDE / Editor
+# ==============================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ==============================
+# MongoDB Local Data
+# ==============================
+data/
+*.mongodb
+
+# ==============================
+# Temp Files
+# ==============================
+*.local
+*.tmp
+*.temp
+
+# ==============================
+# Docker (if used)
+# ==============================
+docker-compose.override.yml
+
+# ==============================
+# Optional Lock Files (team decision)
+# ==============================
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
