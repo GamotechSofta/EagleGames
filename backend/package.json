@@ -11,6 +11,7 @@
     "dev": "nodemon index.js",
     "create-admin": "node scripts/createAdmin.js",
     "create-bookie": "node scripts/createBookie.js",
+    "seed-users": "node scripts/seedUsers.js",
     "check-env": "node scripts/checkEnv.js"
   },
   "dependencies": {
