@@ -157,12 +157,12 @@ export const userHeartbeat = async (req, res) => {
 
 export const userSignup = async (req, res) => {
     try {
-        const { username, email, password, phone } = req.body;
+        const { username, password, phone } = req.body;
 
-        if (!username || !email || !password) {
+        if (!username || !password) {
             return res.status(400).json({
                 success: false,
-                message: 'Username, email and password are required',
+                message: 'Username and password are required',
             });
         }
 
@@ -188,11 +188,14 @@ export const userSignup = async (req, res) => {
             });
         }
 
-        // Check if user already exists (username, email or phone)
+        // Self-signup does not ask for email. Generate a deterministic unique email from phone.
+        const generatedEmail = `${trimmedPhone}@player.local`;
+
+        // Check if user already exists (username, phone or generated email)
         const existingUser = await User.findOne({
             $or: [
                 { username: username.trim() },
-                { email: email.toLowerCase() },
+                { email: generatedEmail },
                 { phone: trimmedPhone },
             ],
         });
@@ -201,9 +204,6 @@ export const userSignup = async (req, res) => {
             if (existingUser.phone === trimmedPhone) {
                 return res.status(409).json({ success: false, message: 'A player with this phone number already exists' });
             }
-            if (existingUser.email === email.toLowerCase()) {
-                return res.status(409).json({ success: false, message: 'A player with this email already exists' });
-            }
             return res.status(409).json({ success: false, message: 'Username already exists' });
         }
 
@@ -211,18 +211,19 @@ export const userSignup = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Direct frontend signup: referredBy = null → super_admin's user. Via bookie link: referredBy = bookie ID → bookie's user.
+        // Direct frontend signup: referredBy = null -> self_signup user under admin pool.
+        // Via bookie link: referredBy = bookie ID -> bookie's user.
         const referredByRaw = req.body.referredBy || null;
         // Convert referredBy string to ObjectId for proper MongoDB matching
         let referredBy = null;
         if (referredByRaw && mongoose.Types.ObjectId.isValid(referredByRaw)) {
             referredBy = new mongoose.Types.ObjectId(referredByRaw);
         }
-        const source = referredBy ? 'bookie' : 'super_admin';
+        const source = referredBy ? 'bookie' : 'self_signup';
         const now = new Date();
         const userDoc = {
             username: username.trim(),
-            email: email.toLowerCase(),
+            email: generatedEmail,
             password: hashedPassword,
             phone: trimmedPhone,
             role: 'user',
@@ -244,8 +245,8 @@ export const userSignup = async (req, res) => {
             performedByType: 'user',
             targetType: 'user',
             targetId: userId.toString(),
-            details: `Player "${username}" signed up (${source === 'bookie' ? 'via bookie link' : 'direct frontend'})`,
-            meta: { email: userDoc.email, source },
+            details: `Player "${username}" signed up (${source === 'bookie' ? 'via bookie link' : 'self signup'})`,
+            meta: { source },
             ip: getClientIp(req),
         });
 
@@ -426,7 +427,8 @@ export const createUser = async (req, res) => {
 /**
  * Get users with optional filter.
  * filter=all (default): all users; super_admin sees all, bookie sees only their users.
- * filter=super_admin: users where source=super_admin or (referredBy=null) - super admin's users only.
+ * filter=super_admin: users where source=super_admin - admin-created users only.
+ * filter=self_signup: users where source=self_signup - players who signed up themselves.
  * filter=bookie: users where source=bookie or (referredBy!=null) - bookie's users; sorted by bookie username then createdAt.
  */
 export const getUsers = async (req, res) => {
@@ -440,7 +442,9 @@ export const getUsers = async (req, res) => {
         }
 
         if (filter === 'super_admin') {
-            query.$or = [{ referredBy: null }, { referredBy: { $exists: false } }];
+            query.source = 'super_admin';
+        } else if (filter === 'self_signup') {
+            query.source = 'self_signup';
         } else if (filter === 'bookie') {
             query.referredBy = { $ne: null, $exists: true };
         }

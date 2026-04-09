@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../components/AdminLayout';
 import { useNavigate, Link } from 'react-router-dom';
-import { FaUserSlash, FaUserCheck, FaUserPlus, FaSearch } from 'react-icons/fa';
+import { FaUserSlash, FaUserCheck, FaUserPlus, FaSearch, FaWallet, FaKey, FaExternalLinkAlt } from 'react-icons/fa';
 import useModalBackHandler from '../hooks/useModalBackHandler';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3010/api/v1';
@@ -18,16 +18,18 @@ const TABS = [
     { id: 'super_admins', label: 'All Super Admins', value: 'super_admins' },
     { id: 'all_bookies', label: 'All Bookies', value: 'all_bookies' },
     { id: 'bookie_users', label: 'All Bookies Players', value: 'bookie_users' },
+    { id: 'self_signup_users', label: 'Self Signup Players', value: 'self_signup_users' },
     { id: 'super_admin_users', label: 'Super Admin Players', value: 'super_admin_users' },
 ];
 
-const AllUsers = () => {
+const AllUsers = ({ defaultTab = 'all', title = 'All Players' }) => {
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('all');
+    const [activeTab, setActiveTab] = useState(defaultTab);
     const [expandedBookieId, setExpandedBookieId] = useState(null);
     const [allUsers, setAllUsers] = useState([]);
     const [superAdminUsersList, setSuperAdminUsersList] = useState([]);
     const [bookieUsersList, setBookieUsersList] = useState([]);
+    const [selfSignupUsersList, setSelfSignupUsersList] = useState([]);
     const [allBookies, setAllBookies] = useState([]);
     const [superAdminsList, setSuperAdminsList] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -41,41 +43,81 @@ const AllUsers = () => {
     const [secretPassword, setSecretPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [pendingAction, setPendingAction] = useState(null);
+    const [showManageModal, setShowManageModal] = useState(false);
+    const [manageUser, setManageUser] = useState(null);
+    const [walletAdjustAmount, setWalletAdjustAmount] = useState('');
+    const [walletActionLoading, setWalletActionLoading] = useState(false);
+    const [walletActionError, setWalletActionError] = useState('');
+    const [newPlayerPassword, setNewPlayerPassword] = useState('');
+    const [confirmPlayerPassword, setConfirmPlayerPassword] = useState('');
+    const [playerPasswordLoading, setPlayerPasswordLoading] = useState(false);
+    const [playerPasswordError, setPlayerPasswordError] = useState('');
     const closePasswordModal = useModalBackHandler(showPasswordModal, () => {
         setShowPasswordModal(false);
         setPendingAction(null);
         setSecretPassword('');
         setPasswordError('');
     });
+    const closeManageModal = useModalBackHandler(showManageModal, () => {
+        setShowManageModal(false);
+        setManageUser(null);
+        setWalletAdjustAmount('');
+        setWalletActionError('');
+        setNewPlayerPassword('');
+        setConfirmPlayerPassword('');
+        setPlayerPasswordError('');
+    });
 
     const fetchData = async (showLoader = true) => {
         if (showLoader) setLoading(true);
         if (showLoader) setError('');
         try {
-            const [allRes, superAdminRes, bookieRes, bookiesRes, adminsRes] = await Promise.all([
+            const requests = await Promise.allSettled([
                 fetchWithAuth(`${API_BASE_URL}/users`),
                 fetchWithAuth(`${API_BASE_URL}/users?filter=super_admin`),
+                fetchWithAuth(`${API_BASE_URL}/users?filter=self_signup`),
                 fetchWithAuth(`${API_BASE_URL}/users?filter=bookie`),
                 fetchWithAuth(`${API_BASE_URL}/admin/bookies`),
                 fetchWithAuth(`${API_BASE_URL}/admin/super-admins`),
             ]);
-            if (allRes.status === 401 || superAdminRes.status === 401 || bookieRes.status === 401 || bookiesRes.status === 401 || adminsRes.status === 401) return;
-            const allData = await allRes.json();
-            const superAdminData = await superAdminRes.json();
-            const bookieData = await bookieRes.json();
-            const bookiesData = await bookiesRes.json();
-            const adminsData = await adminsRes.json();
-            if (allData.success) setAllUsers(allData.data || []);
-            if (superAdminData.success) setSuperAdminUsersList(superAdminData.data || []);
-            if (bookieData.success) setBookieUsersList(bookieData.data || []);
-            if (bookiesData.success) setAllBookies(bookiesData.data || []);
-            if (adminsData.success) setSuperAdminsList(adminsData.data || []);
+
+            const responses = requests.map((entry) => (entry.status === 'fulfilled' ? entry.value : null));
+            if (responses.some((res) => res?.status === 401)) return;
+
+            const readJsonSafe = async (res) => {
+                if (!res) return null;
+                try {
+                    return await res.json();
+                } catch (_) {
+                    return null;
+                }
+            };
+
+            const [allData, superAdminData, selfSignupData, bookieData, bookiesData, adminsData] = await Promise.all([
+                readJsonSafe(responses[0]),
+                readJsonSafe(responses[1]),
+                readJsonSafe(responses[2]),
+                readJsonSafe(responses[3]),
+                readJsonSafe(responses[4]),
+                readJsonSafe(responses[5]),
+            ]);
+
+            if (allData?.success) setAllUsers(allData.data || []);
+            if (superAdminData?.success) setSuperAdminUsersList(superAdminData.data || []);
+            if (selfSignupData?.success) setSelfSignupUsersList(selfSignupData.data || []);
+            if (bookieData?.success) setBookieUsersList(bookieData.data || []);
+            if (bookiesData?.success) setAllBookies(bookiesData.data || []);
+            if (adminsData?.success) setSuperAdminsList(adminsData.data || []);
         } catch (err) {
             if (showLoader) setError('Failed to fetch data');
         } finally {
             if (showLoader) setLoading(false);
         }
     };
+
+    useEffect(() => {
+        setActiveTab(defaultTab);
+    }, [defaultTab]);
 
     useEffect(() => {
         const admin = localStorage.getItem('admin');
@@ -204,6 +246,7 @@ const AllUsers = () => {
     const getCurrentList = () => {
         if (activeTab === 'all') return allUsers;
         if (activeTab === 'super_admin_users') return superAdminUsersList;
+        if (activeTab === 'self_signup_users') return selfSignupUsersList;
         if (activeTab === 'bookie_users') return bookieUsersList;
         if (activeTab === 'all_bookies') return allBookies;
         if (activeTab === 'super_admins') return superAdminsList;
@@ -211,7 +254,7 @@ const AllUsers = () => {
     };
 
     const list = getCurrentList();
-    const isUserList = ['all', 'super_admin_users', 'bookie_users'].includes(activeTab);
+    const isUserList = ['all', 'super_admin_users', 'bookie_users', 'self_signup_users'].includes(activeTab);
 
     const q = searchQuery.trim().toLowerCase();
     const filteredList = q
@@ -228,10 +271,91 @@ const AllUsers = () => {
         );
     };
 
+    const openManageUserModal = (user) => {
+        setManageUser(user);
+        setWalletAdjustAmount('');
+        setWalletActionError('');
+        setNewPlayerPassword('');
+        setConfirmPlayerPassword('');
+        setPlayerPasswordError('');
+        setShowManageModal(true);
+    };
+
+    const handleWalletAdjust = async (type) => {
+        if (!manageUser?._id) return;
+        const amount = Number(walletAdjustAmount);
+        if (!Number.isFinite(amount) || amount <= 0) {
+            setWalletActionError('Enter a valid positive amount');
+            return;
+        }
+        if (type === 'debit' && Number(manageUser.walletBalance ?? 0) < amount) {
+            setWalletActionError('Insufficient balance to deduct');
+            return;
+        }
+        setWalletActionError('');
+        setWalletActionLoading(true);
+        try {
+            const res = await fetchWithAuth(`${API_BASE_URL}/wallet/adjust`, {
+                method: 'POST',
+                body: JSON.stringify({ userId: manageUser._id, amount, type }),
+            });
+            if (res.status === 401) return;
+            const data = await res.json();
+            if (data.success) {
+                setSuccess(`Wallet ${type === 'credit' ? 'credited' : 'debited'} successfully`);
+                setWalletAdjustAmount('');
+                setShowManageModal(false);
+                fetchData(false);
+                setTimeout(() => setSuccess(''), 3000);
+            } else {
+                setWalletActionError(data.message || 'Failed to update wallet');
+            }
+        } catch (_) {
+            setWalletActionError('Network error. Please try again.');
+        } finally {
+            setWalletActionLoading(false);
+        }
+    };
+
+    const handlePlayerPasswordSubmit = async () => {
+        if (!manageUser?._id) return;
+        const pwd = newPlayerPassword.trim();
+        const confirmPwd = confirmPlayerPassword.trim();
+        if (!pwd || pwd.length < 6) {
+            setPlayerPasswordError('Password must be at least 6 characters');
+            return;
+        }
+        if (pwd !== confirmPwd) {
+            setPlayerPasswordError('Passwords do not match');
+            return;
+        }
+        setPlayerPasswordError('');
+        setPlayerPasswordLoading(true);
+        try {
+            const res = await fetchWithAuth(`${API_BASE_URL}/users/${manageUser._id}/password`, {
+                method: 'PATCH',
+                body: JSON.stringify({ password: pwd }),
+            });
+            if (res.status === 401) return;
+            const data = await res.json();
+            if (data.success) {
+                setSuccess('Player password updated successfully');
+                setShowManageModal(false);
+                setTimeout(() => setSuccess(''), 3000);
+            } else {
+                setPlayerPasswordError(data.message || 'Failed to update password');
+            }
+        } catch (_) {
+            setPlayerPasswordError('Network error. Please try again.');
+        } finally {
+            setPlayerPasswordLoading(false);
+        }
+    };
+
     return (
-        <AdminLayout onLogout={handleLogout} title="All Players">
+        <AdminLayout onLogout={handleLogout} title={title}>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
-                <h1 className="text-2xl sm:text-3xl font-bold">All Players</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold">{title}</h1>
                 <button
                     type="button"
                     onClick={() => navigate('/add-user')}
@@ -556,12 +680,14 @@ const AllUsers = () => {
                     </div>
                 ) : (
                     <div>
-                        {(activeTab === 'bookie_users' || activeTab === 'super_admin_users') && (
+                        {(activeTab === 'bookie_users' || activeTab === 'super_admin_users' || activeTab === 'self_signup_users') && (
                             <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 text-sm text-gray-600">
                                 {activeTab === 'bookie_users' ? (
                                     <><strong className="text-orange-500">All Bookies Players</strong> – Players who signed up via a bookie&apos;s link.</>
+                                ) : activeTab === 'self_signup_users' ? (
+                                    <><strong className="text-orange-500">Self Signup Players</strong> – Players who signed up by themselves from user side.</>
                                 ) : (
-                                    <><strong className="text-orange-500">Super Admin Players</strong> – Players who signed up directly or were created by super admin.</>
+                                    <><strong className="text-orange-500">Super Admin Players</strong> – Players created by super admin.</>
                                 )}
                             </div>
                         )}
@@ -658,6 +784,51 @@ const AllUsers = () => {
                                         <td className="px-2 sm:px-3 py-2 sm:py-3 whitespace-nowrap">
                                             {(activeTab === 'super_admins') ? (
                                                 <span className="text-gray-400">—</span>
+                                            ) : activeTab === 'self_signup_users' ? (
+                                                <div className="flex items-center gap-1.5">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => openManageUserModal(item)}
+                                                        className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white"
+                                                        title="Manage wallet and password"
+                                                    >
+                                                        <FaWallet className="w-3 h-3" />
+                                                        Manage
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleTogglePlayerStatus(item._id)}
+                                                        disabled={togglingId === item._id}
+                                                        className={`inline-flex items-center gap-1 sm:gap-1.5 px-2 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                                                            item.isActive !== false
+                                                                ? 'bg-rose-600 hover:bg-rose-500 text-white'
+                                                                : 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                                                        }`}
+                                                        title={item.isActive !== false ? 'Suspend' : 'Unsuspend'}
+                                                    >
+                                                        {togglingId === item._id ? (
+                                                            <span className="animate-spin">⏳</span>
+                                                        ) : item.isActive !== false ? (
+                                                            <>
+                                                                <FaUserSlash className="w-3.5 h-3.5 shrink-0" />
+                                                                Suspend
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <FaUserCheck className="w-3.5 h-3.5 shrink-0" />
+                                                                Unsuspend
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                    <Link
+                                                        to={`/all-users/${item._id}`}
+                                                        className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700"
+                                                        title="Open full player profile"
+                                                    >
+                                                        <FaExternalLinkAlt className="w-3 h-3" />
+                                                        Open
+                                                    </Link>
+                                                </div>
                                             ) : (
                                                 <button
                                                     type="button"
@@ -735,6 +906,88 @@ const AllUsers = () => {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {showManageModal && manageUser && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/30">
+                    <div className="bg-white rounded-xl border border-gray-200 shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                        <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+                            <h3 className="text-lg font-semibold text-orange-500">Manage Self Signup Player</h3>
+                            <button type="button" onClick={closeManageModal} className="text-gray-400 hover:text-gray-800 p-1">×</button>
+                        </div>
+                        <div className="p-4 space-y-5">
+                            <div className="rounded-lg bg-gray-50 border border-gray-200 p-3">
+                                <p className="text-sm text-gray-700 font-semibold">{manageUser.username}</p>
+                                <p className="text-xs text-gray-500 mt-0.5">{manageUser.phone || '—'}</p>
+                                <p className="text-xs text-green-700 mt-1">Current wallet: ₹{Number(manageUser.walletBalance ?? 0).toLocaleString('en-IN')}</p>
+                            </div>
+
+                            <div>
+                                <p className="text-sm font-semibold text-gray-700 mb-2 inline-flex items-center gap-2">
+                                    <FaWallet className="w-4 h-4" /> Wallet
+                                </p>
+                                <div className="flex flex-col sm:flex-row gap-2">
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step="1"
+                                        value={walletAdjustAmount}
+                                        onChange={(e) => setWalletAdjustAmount(e.target.value.replace(/\D/g, '').slice(0, 12))}
+                                        placeholder="Amount"
+                                        className="w-full sm:flex-1 px-3 py-2 rounded-lg bg-gray-100 border border-gray-200 text-gray-800"
+                                    />
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <button type="button" onClick={() => handleWalletAdjust('credit')} disabled={walletActionLoading} className="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold disabled:opacity-50">Add</button>
+                                        <button type="button" onClick={() => handleWalletAdjust('debit')} disabled={walletActionLoading} className="px-3 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-sm font-semibold disabled:opacity-50">Deduct</button>
+                                    </div>
+                                </div>
+                                {walletActionError && <p className="text-red-600 text-sm mt-2">{walletActionError}</p>}
+                            </div>
+
+                            <div>
+                                <p className="text-sm font-semibold text-gray-700 mb-2 inline-flex items-center gap-2">
+                                    <FaKey className="w-4 h-4" /> Set Password
+                                </p>
+                                <div className="space-y-2">
+                                    <input
+                                        type="password"
+                                        value={newPlayerPassword}
+                                        onChange={(e) => { setNewPlayerPassword(e.target.value); setPlayerPasswordError(''); }}
+                                        placeholder="New password (min 6 chars)"
+                                        className="w-full px-3 py-2 rounded-lg bg-gray-100 border border-gray-200 text-gray-800"
+                                    />
+                                    <input
+                                        type="password"
+                                        value={confirmPlayerPassword}
+                                        onChange={(e) => { setConfirmPlayerPassword(e.target.value); setPlayerPasswordError(''); }}
+                                        placeholder="Confirm password"
+                                        className="w-full px-3 py-2 rounded-lg bg-gray-100 border border-gray-200 text-gray-800"
+                                    />
+                                    {playerPasswordError && <p className="text-red-600 text-sm">{playerPasswordError}</p>}
+                                    <button
+                                        type="button"
+                                        onClick={handlePlayerPasswordSubmit}
+                                        disabled={playerPasswordLoading}
+                                        className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold disabled:opacity-50"
+                                    >
+                                        {playerPasswordLoading ? 'Updating...' : 'Update Password'}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="pt-1">
+                                <Link
+                                    to={`/all-users/${manageUser._id}`}
+                                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-semibold"
+                                    onClick={() => setShowManageModal(false)}
+                                >
+                                    <FaExternalLinkAlt className="w-3 h-3" />
+                                    Open Full Player Profile
+                                </Link>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}

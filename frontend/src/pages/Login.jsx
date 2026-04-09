@@ -5,13 +5,18 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const Login = () => {
   const navigate = useNavigate();
+  const [mode, setMode] = useState('signin');
   const [formData, setFormData] = useState({
+    username: '',
     phone: '',
     password: '',
+    confirmPassword: '',
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isAbove18, setIsAbove18] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -28,11 +33,13 @@ const Login = () => {
       [name]: processedValue,
     });
     setError('');
+    setSuccess('');
   };
 
-  const handleSubmit = async (e) => {
+  const handleSignInSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
 
     if (!isAbove18) {
       setError('You must be above 18 years to continue');
@@ -121,14 +128,100 @@ const Login = () => {
     }
   };
 
+  const handleSignUpSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (!isAbove18) {
+      setError('You must be above 18 years to continue');
+      return;
+    }
+    if (!formData.username.trim()) {
+      setError('Name is required');
+      return;
+    }
+    if (!formData.phone) {
+      setError('Phone number is required');
+      return;
+    }
+    if (!formData.password) {
+      setError('Password is required');
+      return;
+    }
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: formData.username.trim(),
+          phone: formData.phone,
+          password: formData.password,
+        }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setSuccess('Sign up successful. Please sign in with phone and password.');
+        setMode('signin');
+        setFormData((prev) => ({
+          ...prev,
+          password: '',
+          confirmPassword: '',
+        }));
+      } else {
+        setError(data.message || 'Unable to create account');
+      }
+    } catch (_) {
+      setError('Network error. Please check if the server is running.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-md items-center">
         <div className="w-full rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-[#1B3150] sm:text-3xl">Sign In</h1>
-            <p className="mt-1 text-sm text-gray-600">Access your account to continue.</p>
+            <h1 className="text-2xl font-bold text-[#1B3150] sm:text-3xl">{mode === 'signin' ? 'Sign In' : 'Sign Up'}</h1>
+            <p className="mt-1 text-sm text-gray-600">
+              {mode === 'signin' ? 'Access your account to continue.' : 'Create your own player account.'}
+            </p>
+            <div className="mt-4 grid grid-cols-2 rounded-lg border border-gray-300 p-1">
+              <button
+                type="button"
+                onClick={() => { setMode('signin'); setError(''); setSuccess(''); }}
+                className={`rounded-md py-2 text-sm font-semibold transition ${mode === 'signin' ? 'bg-[#1B3150] text-white' : 'text-gray-700 hover:bg-gray-100'}`}
+              >
+                Sign In
+              </button>
+              <button
+                type="button"
+                onClick={() => { setMode('signup'); setError(''); setSuccess(''); }}
+                className={`rounded-md py-2 text-sm font-semibold transition ${mode === 'signup' ? 'bg-[#1B3150] text-white' : 'text-gray-700 hover:bg-gray-100'}`}
+              >
+                Sign Up
+              </button>
+            </div>
           </div>
+
+          {success && (
+            <div className="mb-4 flex items-start gap-2 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+              <span>{success}</span>
+            </div>
+          )}
 
           {error && (
             <div className="mb-4 flex items-start gap-2 rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -139,7 +232,26 @@ const Login = () => {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={mode === 'signin' ? handleSignInSubmit : handleSignUpSubmit} className="space-y-4">
+            {mode === 'signup' && (
+              <>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                    Full Name <span className="text-[#1B3150]">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleChange}
+                    className="w-full rounded-lg border border-gray-300 bg-white py-2.5 px-3 text-sm text-gray-900 placeholder-gray-400 focus:border-[#1B3150] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
+                    placeholder="Enter your full name"
+                    required
+                  />
+                </div>
+              </>
+            )}
+
             <div>
               <label className="mb-1.5 block text-sm font-medium text-gray-700">
                 Phone Number <span className="text-[#1B3150]">*</span>
@@ -193,6 +305,33 @@ const Login = () => {
               </div>
             </div>
 
+            {mode === 'signup' && (
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                  Confirm Password <span className="text-[#1B3150]">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className="w-full rounded-lg border border-gray-300 bg-white py-2.5 px-3 pr-10 text-sm text-gray-900 placeholder-gray-400 focus:border-[#1B3150] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
+                    placeholder="Re-enter your password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-[#1B3150]"
+                    aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                  >
+                    {showConfirmPassword ? <FaEyeSlash className="h-5 w-5" /> : <FaEye className="h-5 w-5" />}
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div>
               <label className="flex cursor-pointer items-start gap-2">
                 <input
@@ -223,7 +362,7 @@ const Login = () => {
                   Please wait...
                 </span>
               ) : (
-                'Sign In'
+                mode === 'signin' ? 'Sign In' : 'Create Account'
               )}
             </button>
           </form>

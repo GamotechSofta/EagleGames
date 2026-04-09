@@ -205,6 +205,14 @@ const App = () => {
                     }
                 />
                 <Route
+                    path="/self-signup-players"
+                    element={
+                        <PrivateRoute>
+                            <AllUsers defaultTab="self_signup_users" title="Self Signup Players" />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
                     path="/all-users/:userId"
                     element={
                         <PrivateRoute>

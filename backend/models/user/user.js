@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema({
     /** Super admin's user: direct frontend signup or created by super admin. Bookie's user: created by bookie or came via bookie link. */
     source: {
         type: String,
-        enum: ['super_admin', 'bookie'],
+        enum: ['super_admin', 'bookie', 'self_signup'],
         default: 'super_admin',
     },
     referredBy: {

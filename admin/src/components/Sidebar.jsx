@@ -38,6 +38,7 @@ const Sidebar = ({ onLogout, isOpen = true, onClose }) => {
     const menuItems = [
         { path: '/dashboard', label: 'Dashboard', icon: FaTachometerAlt },
         { path: '/all-users', label: 'All Players', icon: FaUserFriends },
+        { path: '/self-signup-players', label: 'Self Signup Players', icon: FaUserFriends },
         { path: '/bookie-management', label: 'Bookie Accounts', icon: FaUsers },
         { path: '/markets', label: 'Markets', icon: FaChartBar },
         { path: '/add-result', label: 'Add Result', icon: FaEdit },
@@ -56,7 +57,7 @@ const Sidebar = ({ onLogout, isOpen = true, onClose }) => {
     }
 
     const isActive = (path) => {
-        if (path === '/all-users' || path === '/markets') {
+        if (path === '/all-users' || path === '/self-signup-players' || path === '/markets') {
             return location.pathname === path || location.pathname.startsWith(path + '/');
         }
         if (path === '/revenue') {
