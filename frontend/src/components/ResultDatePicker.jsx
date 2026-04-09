@@ -43,7 +43,7 @@ export default function ResultDatePicker({
   maxDate,
   label = 'Select Date',
   buttonClassName = '',
-  labelClassName = 'text-gray-600',
+  labelClassName = 'text-gray-300',
 }) {
   const max = useMemo(() => maxDate || new Date(), [maxDate]);
   const safeValue = useMemo(() => clampToMax(value || new Date(), max), [value, max]);
@@ -129,7 +129,7 @@ export default function ResultDatePicker({
           onClick={() => setOpen(true)}
           className={
             buttonClassName ||
-            'px-5 py-2.5 rounded-full bg-gray-50 border-2 border-gray-300 text-gray-800 font-bold shadow-sm hover:border-[#1B3150] transition-colors'
+            'px-5 py-2.5 rounded-full bg-[#1f2937] border-2 border-[#374151] text-white font-bold shadow-sm hover:border-[#1a74e5] transition-colors'
           }
           aria-label="Open calendar"
         >
@@ -154,7 +154,7 @@ export default function ResultDatePicker({
                 <div className="text-white text-3xl sm:text-4xl font-light">
                   {draft.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                 </div>
-                <div className="w-10 h-10 rounded-full bg-white/20 border border-white/30 flex items-center justify-center text-white">
+                <div className="w-10 h-10 rounded-full bg-[#111827]/20 border border-white/30 flex items-center justify-center text-white">
                   {/* pencil icon */}
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 4h2m-1 0v0m8.485 2.515a2.121 2.121 0 010 3L9 21H4v-5L16.485 6.515a2.121 2.121 0 013 0z" />
@@ -164,7 +164,7 @@ export default function ResultDatePicker({
             </div>
 
             {/* Calendar */}
-            <div className="bg-white text-black px-5 py-4">
+            <div className="bg-[#111827] text-black px-5 py-4">
               <div className="flex items-center justify-between mb-4">
                 <button
                   type="button"
@@ -176,7 +176,7 @@ export default function ResultDatePicker({
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                   </svg>
                 </button>
-                <div className="text-lg font-semibold text-gray-700">{monthLabel(viewYear, viewMonth)}</div>
+                <div className="text-lg font-semibold text-gray-200">{monthLabel(viewYear, viewMonth)}</div>
                 <button
                   type="button"
                   onClick={handleNext}
@@ -192,7 +192,7 @@ export default function ResultDatePicker({
                 </button>
               </div>
 
-              <div className="grid grid-cols-7 text-center text-xs text-gray-500 font-semibold mb-2">
+              <div className="grid grid-cols-7 text-center text-xs text-gray-400 font-semibold mb-2">
                 {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d) => (
                   <div key={d} className="py-1">
                     {d}
@@ -213,10 +213,10 @@ export default function ResultDatePicker({
                       onClick={() => setDraft(d)}
                       className={`h-10 w-10 mx-auto rounded-full flex items-center justify-center text-sm transition-colors ${
                         selected
-                          ? 'bg-[#1B3150] text-white'
+                          ? 'bg-[#1a74e5] text-white'
                           : disabled
                             ? 'text-gray-300 cursor-not-allowed'
-                            : 'text-gray-700 hover:bg-gray-100'
+                            : 'text-gray-200 hover:bg-[#374151]'
                       }`}
                       aria-label={`Day ${d.getDate()}`}
                     >
@@ -228,11 +228,11 @@ export default function ResultDatePicker({
             </div>
 
             {/* Actions */}
-            <div className="bg-white px-5 py-4 flex items-center justify-end gap-6">
+            <div className="bg-[#111827] px-5 py-4 flex items-center justify-end gap-6">
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="text-[#1B3150] font-semibold tracking-wide hover:opacity-80"
+                className="text-[#1a74e5] font-semibold tracking-wide hover:opacity-80"
               >
                 CANCEL
               </button>
@@ -243,7 +243,7 @@ export default function ResultDatePicker({
                   onChange?.(next);
                   setOpen(false);
                 }}
-                className="text-[#1B3150] font-semibold tracking-wide hover:opacity-80"
+                className="text-[#1a74e5] font-semibold tracking-wide hover:opacity-80"
               >
                 OK
               </button>

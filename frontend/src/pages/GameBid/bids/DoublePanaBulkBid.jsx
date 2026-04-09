@@ -214,7 +214,7 @@ const DoublePanaBulkBid = ({ market, title }) => {
 
     const submitBtnClass = (enabled) =>
         enabled
-            ? 'w-full bg-[#1B3150] text-white font-bold py-3.5 min-h-[52px] rounded-lg shadow-lg transition-all active:scale-[0.98]'
+            ? 'w-full bg-[#1a74e5] text-white font-bold py-3.5 min-h-[52px] rounded-lg shadow-lg transition-all active:scale-[0.98]'
             : 'w-full bg-gray-400 text-white font-bold py-3.5 min-h-[52px] rounded-lg shadow-lg opacity-50 cursor-not-allowed';
 
     return (
@@ -235,7 +235,7 @@ const DoublePanaBulkBid = ({ market, title }) => {
                     disabled={!canSubmit}
                     className={`hidden md:inline-flex items-center justify-center font-bold min-h-[44px] min-w-[220px] px-6 rounded-full shadow-lg transition-all whitespace-nowrap ${
                         canSubmit
-                            ? 'bg-[#1B3150] text-white hover:bg-[#152842] active:scale-[0.98]'
+                            ? 'bg-[#1a74e5] text-white hover:bg-[#152842] active:scale-[0.98]'
                             : 'bg-gray-400 text-white opacity-50 cursor-not-allowed'
                     }`}
                 >
@@ -255,13 +255,13 @@ const DoublePanaBulkBid = ({ market, title }) => {
                 )}
 
                 <div className="grid grid-cols-2 gap-1.5 md:gap-2 px-1 mb-3">
-                    <div className="rounded-xl border border-gray-300 bg-white px-2 py-1.5 md:px-3 md:py-2 text-center">
-                        <div className="text-[11px] text-gray-600 font-medium">Count</div>
-                        <div className="text-base font-bold text-[#1B3150] leading-tight">{specialCount}</div>
+                    <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
+                        <div className="text-[11px] text-gray-300 font-medium">Count</div>
+                        <div className="text-base font-bold text-white leading-tight">{specialCount}</div>
                     </div>
-                    <div className="rounded-xl border border-gray-300 bg-white px-2 py-1.5 md:px-3 md:py-2 text-center">
-                        <div className="text-[11px] text-gray-600 font-medium">Bet Amount</div>
-                        <div className="text-base font-bold text-[#1B3150] leading-tight">{selectedTotalPoints}</div>
+                    <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
+                        <div className="text-[11px] text-gray-300 font-medium">Bet Amount</div>
+                        <div className="text-base font-bold text-white leading-tight">{selectedTotalPoints}</div>
                     </div>
                 </div>
 
@@ -298,7 +298,7 @@ const DoublePanaBulkBid = ({ market, title }) => {
                             <div key={groupKey} className="space-y-3 pb-1">
                                 {/* Group header: same "box + input" style */}
                                 <div className="flex items-center gap-2">
-                                    <div className="w-10 h-9 bg-[#1B3150] border-2 border-gray-300 text-white flex items-center justify-center rounded-l-md font-bold text-xs shrink-0">
+                                    <div className="w-10 h-9 bg-[#1a74e5] border-2 border-[#374151] text-white flex items-center justify-center rounded-l-md font-bold text-xs shrink-0">
                                         {groupKey}
                                     </div>
                                     <input
@@ -315,7 +315,7 @@ const DoublePanaBulkBid = ({ market, title }) => {
                                             if (e.key === 'Enter' && groupBulk[groupKey]) applyGroup(groupBulk[groupKey]);
                                         }}
                                         placeholder="All pts"
-                                        className="no-spinner w-[86px] sm:w-[96px] md:w-[72px] lg:w-[80px] h-9 bg-white border-2 border-gray-300 text-gray-800 placeholder-gray-400 rounded focus:outline-none focus:border-[#1B3150] px-2 text-xs md:text-[11px] font-semibold text-center"
+                                        className="no-spinner w-[86px] sm:w-[96px] md:w-[72px] lg:w-[80px] h-9 bg-[#111827] border-2 border-[#374151] text-white placeholder-gray-400 rounded focus:outline-none focus:border-[#1a74e5] px-2 text-xs md:text-[11px] font-semibold text-center"
                                     />
                                     <button
                                         type="button"
@@ -323,8 +323,8 @@ const DoublePanaBulkBid = ({ market, title }) => {
                                         disabled={!groupBulk[groupKey]}
                                         className={`h-9 px-3 rounded-md font-bold text-xs border-2 transition-colors ${
                                             groupBulk[groupKey]
-                                                ? 'bg-white border-gray-400 text-[#1B3150] hover:border-gray-500 hover:bg-gray-100'
-                                                : 'bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed'
+                                                ? 'bg-[#111827] border-[#4b5563] text-white hover:border-gray-500 hover:bg-[#374151]'
+                                                : 'bg-[#374151] border-[#374151] text-gray-400 cursor-not-allowed'
                                         }`}
                                         title="Apply points to all numbers in this group"
                                     >
@@ -333,14 +333,14 @@ const DoublePanaBulkBid = ({ market, title }) => {
                                     <button
                                         type="button"
                                         onClick={clearGroup}
-                                        className="h-9 px-3 rounded-md font-bold text-xs border-2 border-gray-300 text-gray-600 bg-white hover:bg-gray-100 transition-colors"
+                                        className="h-9 px-3 rounded-md font-bold text-xs border-2 border-[#374151] text-gray-300 bg-[#111827] hover:bg-[#374151] transition-colors"
                                         title="Clear this group"
                                     >
                                         Clear
                                     </button>
                                 </div>
                                 <div className="flex items-center gap-2 w-full">
-                                    <span className="text-[11px] font-semibold text-gray-700 shrink-0 leading-tight flex flex-col">
+                                    <span className="text-[11px] font-semibold text-gray-200 shrink-0 leading-tight flex flex-col">
                                         <span>Quick</span>
                                         <span>Points :</span>
                                     </span>
@@ -350,7 +350,7 @@ const DoublePanaBulkBid = ({ market, title }) => {
                                             key={`${groupKey}-${pts}`}
                                             type="button"
                                             onClick={() => applyGroup(String(pts))}
-                                            className="h-7 rounded-md font-semibold text-[11px] border border-gray-300 text-[#1B3150] bg-white hover:bg-gray-100 transition-colors"
+                                            className="h-7 rounded-md font-semibold text-[11px] border border-[#374151] text-white bg-[#111827] hover:bg-[#374151] transition-colors"
                                         >
                                             {pts}
                                         </button>
@@ -362,7 +362,7 @@ const DoublePanaBulkBid = ({ market, title }) => {
                                 <div className="grid grid-cols-2 gap-3 md:grid-cols-[max-content_max-content] md:justify-start md:gap-x-4 md:gap-y-2">
                                     {list.map((num) => (
                                         <div key={num} className="flex items-center gap-1.5">
-                                            <div className="w-10 h-9 bg-[#1B3150] border-2 border-gray-300 text-white flex items-center justify-center rounded-l-md font-bold text-xs shrink-0">
+                                            <div className="w-10 h-9 bg-[#1a74e5] border-2 border-[#374151] text-white flex items-center justify-center rounded-l-md font-bold text-xs shrink-0">
                                                 {num}
                                             </div>
                                             <input
@@ -376,7 +376,7 @@ const DoublePanaBulkBid = ({ market, title }) => {
                                                         [num]: sanitizePoints(e.target.value),
                                                     }))
                                                 }
-                                                className="no-spinner w-full md:w-[64px] lg:w-[72px] h-9 bg-white border-2 border-gray-300 text-gray-800 placeholder-gray-400 rounded-r-md focus:outline-none focus:border-[#1B3150] px-2 text-xs md:text-[11px] font-semibold text-center"
+                                                className="no-spinner w-full md:w-[64px] lg:w-[72px] h-9 bg-[#111827] border-2 border-[#374151] text-white placeholder-gray-400 rounded-r-md focus:outline-none focus:border-[#1a74e5] px-2 text-xs md:text-[11px] font-semibold text-center"
                                             />
                                         </div>
                                     ))}

@@ -64,23 +64,23 @@ const GameRate = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#E8ECEF] px-3 sm:px-4 md:px-6 py-4 sm:py-6">
+    <div className="min-h-screen bg-[#1f2937] px-3 sm:px-4 md:px-6 py-4 sm:py-6">
       <div className="w-full max-w-2xl mx-auto">
-        <div className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm overflow-hidden">
-          <div className="grid grid-cols-[80px_1fr_120px] sm:grid-cols-[110px_1fr_140px] border-b border-gray-300 bg-gray-100">
-            <div className="px-4 py-3 text-[12px] sm:text-sm font-bold text-[#1B3150]">SR NO</div>
-            <div className="px-4 py-3 text-[12px] sm:text-sm font-bold text-[#1B3150]">GAME</div>
-            <div className="px-4 py-3 text-[12px] sm:text-sm font-bold text-[#1B3150] text-right">RATE (1 =)</div>
+        <div className="bg-[#111827] border-2 border-[#374151] rounded-2xl shadow-sm overflow-hidden">
+          <div className="grid grid-cols-[80px_1fr_120px] sm:grid-cols-[110px_1fr_140px] border-b border-[#374151] bg-[#374151]">
+            <div className="px-4 py-3 text-[12px] sm:text-sm font-bold text-[#1a74e5]">SR NO</div>
+            <div className="px-4 py-3 text-[12px] sm:text-sm font-bold text-[#1a74e5]">GAME</div>
+            <div className="px-4 py-3 text-[12px] sm:text-sm font-bold text-[#1a74e5] text-right">RATE (1 =)</div>
           </div>
 
           {GAME_RATE_ROWS.map((row, idx) => (
             <div
               key={row.game}
-              className="grid grid-cols-[80px_1fr_120px] sm:grid-cols-[110px_1fr_140px] border-b border-gray-200 last:border-b-0"
+              className="grid grid-cols-[80px_1fr_120px] sm:grid-cols-[110px_1fr_140px] border-b border-[#374151] last:border-b-0"
             >
-              <div className="px-4 py-3 text-base sm:text-xl leading-none font-medium text-gray-700">{idx + 1}</div>
+              <div className="px-4 py-3 text-base sm:text-xl leading-none font-medium text-gray-200">{idx + 1}</div>
               <div className="px-4 py-3 text-lg sm:text-2xl leading-none font-semibold text-gray-900">{row.game}</div>
-              <div className="px-4 py-3 text-lg sm:text-2xl leading-none font-bold text-[#1B3150] text-right">{row.rate}</div>
+              <div className="px-4 py-3 text-lg sm:text-2xl leading-none font-bold text-[#1a74e5] text-right">{row.rate}</div>
             </div>
           ))}
         </div>

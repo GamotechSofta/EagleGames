@@ -123,45 +123,45 @@ const SupportNew = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-800 px-3 sm:px-6 md:px-8 pb-[calc(6rem+env(safe-area-inset-bottom,0px))]">
+    <div className="min-h-screen bg-[#374151] text-white px-3 sm:px-6 md:px-8 pb-[calc(6rem+env(safe-area-inset-bottom,0px))]">
       <div className="w-full max-w-xl mx-auto">
         <div className="flex items-center gap-3 pt-4 pb-3">
           <button
             type="button"
             onClick={() => navigate('/support')}
-            className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center text-gray-800 hover:opacity-80 active:scale-95 transition touch-manipulation"
+            className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center text-white hover:opacity-80 active:scale-95 transition touch-manipulation"
             aria-label="Back"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
           </button>
-          <h1 className="text-xl sm:text-2xl font-semibold text-[#1B3150]">Raise help ticket</h1>
+          <h1 className="text-xl sm:text-2xl font-semibold text-[#1a74e5]">Raise help ticket</h1>
         </div>
-        <p className="text-gray-600 text-sm sm:text-base mb-6">Describe your problem and attach screenshots if needed.</p>
+        <p className="text-gray-300 text-sm sm:text-base mb-6">Describe your problem and attach screenshots if needed.</p>
 
         {!userId && (
-          <div className="mb-6 p-4 bg-white border-2 border-gray-200 rounded-2xl text-[#1B3150] shadow-sm text-center">
+          <div className="mb-6 p-4 bg-[#111827] border-2 border-[#374151] rounded-2xl text-[#1a74e5] shadow-sm text-center">
             Please login to submit a support request.
           </div>
         )}
 
-        <div className="bg-white rounded-2xl border-2 border-gray-200 p-4 sm:p-6 shadow-sm w-full">
+        <div className="bg-[#111827] rounded-2xl border-2 border-[#374151] p-4 sm:p-6 shadow-sm w-full">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="support-subject" className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+              <label htmlFor="support-subject" className="block text-sm font-medium text-gray-200 mb-1">Subject</label>
               <input
                 id="support-subject"
                 type="text"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="e.g. Payment issue, Game error"
-                className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-800 placeholder-gray-500 focus:ring-2 focus:ring-[#1B3150] focus:border-[#1B3150] transition"
+                className="w-full px-4 py-2.5 bg-[#111827] border border-[#374151] rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-[#1B3150] focus:border-[#1a74e5] transition"
                 disabled={!userId}
               />
             </div>
             <div>
-              <label htmlFor="support-description" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="support-description" className="block text-sm font-medium text-gray-200 mb-1">
                 Describe your problem <span className="text-red-500">*</span>
               </label>
               <textarea
@@ -170,12 +170,12 @@ const SupportNew = () => {
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Explain your issue in detail..."
                 rows={5}
-                className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-800 placeholder-gray-500 focus:ring-2 focus:ring-[#1B3150] focus:border-[#1B3150] resize-y transition"
+                className="w-full px-4 py-2.5 bg-[#111827] border border-[#374151] rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-[#1B3150] focus:border-[#1a74e5] resize-y transition"
                 disabled={!userId}
               />
             </div>
             <div>
-              <label htmlFor="support-screenshots" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="support-screenshots" className="block text-sm font-medium text-gray-200 mb-1">
                 Screenshots (optional, max 5 images)
               </label>
               <input
@@ -184,11 +184,11 @@ const SupportNew = () => {
                 accept="image/jpeg,image/jpg,image/png,image/gif"
                 multiple
                 onChange={handleFileChange}
-                className="w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#1B3150] file:text-white file:font-semibold file:cursor-pointer hover:file:bg-[#1B3150]"
+                className="w-full text-sm text-gray-300 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#1a74e5] file:text-white file:font-semibold file:cursor-pointer hover:file:bg-[#1a74e5]"
                 disabled={!userId}
               />
               {screenshots.length > 0 && (
-                <p className="mt-1 text-sm text-gray-600">{screenshots.length} file(s) selected</p>
+                <p className="mt-1 text-sm text-gray-300">{screenshots.length} file(s) selected</p>
               )}
             </div>
             {message.text && (
@@ -205,7 +205,7 @@ const SupportNew = () => {
             <button
               type="submit"
               disabled={!userId || loading}
-              className="w-full px-6 py-2.5 bg-[#1B3150] hover:bg-[#152842] disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition shadow-md hover:shadow-lg"
+              className="w-full px-6 py-2.5 bg-[#1a74e5] hover:bg-[#152842] disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition shadow-md hover:shadow-lg"
             >
               {loading ? 'Submitting...' : 'Submit'}
             </button>

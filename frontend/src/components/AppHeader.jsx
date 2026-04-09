@@ -163,7 +163,7 @@ const AppHeader = () => {
             </Link>
 
             {/* Logo - aligned next to hamburger */}
-            
+
           </div>
 
         <div className="flex items-center gap-2 sm:gap-2.5 md:gap-3">
@@ -188,7 +188,7 @@ const AppHeader = () => {
             <img
               src="https://res.cloudinary.com/dnyp5jknp/image/upload/v1771394532/wallet_n1oyef.png"
               alt="Wallet"
-              className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 object-contain brightness-0 invert"
+              className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 object-contain"
             />
             <span className="text-xs md:text-sm lg:text-base font-bold text-white">₹{formattedBalance}</span>
           </button>
@@ -228,9 +228,9 @@ const AppHeader = () => {
             onClick={() => setIsMenuOpen(false)}
             aria-label="Close menu overlay"
           />
-          <aside className="relative h-full w-[86%] max-w-[360px] sm:w-[70%] sm:max-w-[380px] md:w-[420px] md:max-w-none bg-white shadow-[6px_0_24px_rgba(0,0,0,0.2)] border-r-2 border-gray-300">
+          <aside className="relative h-full w-[86%] max-w-[360px] sm:w-[70%] sm:max-w-[380px] md:w-[420px] md:max-w-none bg-[#111827] shadow-[6px_0_24px_rgba(0,0,0,0.2)] border-r-2 border-[#374151]">
             {/* User Profile Section */}
-            <div className="px-5 sm:px-6 pt-6 pb-5 border-b-2 border-gray-300 bg-gradient-to-b from-gray-50 to-white">
+            <div className="px-5 sm:px-6 pt-6 pb-5 border-b-2 border-[#374151] bg-gradient-to-b from-[#1f2937] to-[#111827]">
               <div className="flex items-start justify-between gap-3">
                 <button
                   type="button"
@@ -243,7 +243,7 @@ const AppHeader = () => {
                 >
                   {/* Avatar */}
                   <div className="relative shrink-0">
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-gray-500 to-[#1B3150] border-2 border-gray-400 flex items-center justify-center text-white text-xl sm:text-2xl font-bold shadow-lg">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-[#374151] to-[#1a74e5] border-2 border-[#4b5563] flex items-center justify-center text-white text-xl sm:text-2xl font-bold shadow-lg">
                       {avatarInitial}
                     </div>
                     {user && (
@@ -253,9 +253,9 @@ const AppHeader = () => {
                   
                   {/* User Info */}
                   <div className="flex-1 min-w-0">
-                    <div className="text-base sm:text-lg font-bold text-gray-800 truncate">{displayName}</div>
-                    <div className="text-xs sm:text-sm text-gray-600 mt-0.5 truncate">{displayPhone}</div>
-                    <div className="text-xs sm:text-sm text-gray-500 mt-0.5">{sinceText}</div>
+                    <div className="text-base sm:text-lg font-bold text-white truncate">{displayName}</div>
+                    <div className="text-xs sm:text-sm text-gray-300 mt-0.5 truncate">{displayPhone}</div>
+                    <div className="text-xs sm:text-sm text-gray-400 mt-0.5">{sinceText}</div>
                   </div>
                 </button>
                 
@@ -263,7 +263,7 @@ const AppHeader = () => {
                 <button
                   type="button"
                   onClick={() => setIsMenuOpen(false)}
-                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-50 border-2 border-gray-300 flex items-center justify-center text-gray-500 hover:text-[#1B3150] hover:bg-gray-100 hover:border-gray-400 active:scale-95 transition-all duration-200 shrink-0"
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#1f2937] border-2 border-[#374151] flex items-center justify-center text-gray-400 hover:text-[#1a74e5] hover:bg-[#374151] hover:border-[#4b5563] active:scale-95 transition-all duration-200 shrink-0"
                   aria-label="Close menu"
                 >
                   <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
@@ -289,105 +289,105 @@ const AppHeader = () => {
                       navigate(item.path);
                     }
                   }}
-                  className="group w-full bg-white rounded-xl sm:rounded-2xl px-4 py-3.5 sm:py-4 flex items-center gap-4 border-2 border-gray-300 hover:border-[#1B3150] hover:bg-gray-50 hover:shadow-lg active:scale-[0.98] transition-all duration-200"
+                  className="group w-full bg-[#111827] rounded-xl sm:rounded-2xl px-4 py-3.5 sm:py-4 flex items-center gap-4 border-2 border-[#374151] hover:border-[#1a74e5] hover:bg-[#1f2937] hover:shadow-lg active:scale-[0.98] transition-all duration-200"
                 >
                   {/* Icon Container */}
-                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gray-50 border-2 border-gray-300 flex items-center justify-center shrink-0 group-hover:border-[#1B3150] group-hover:bg-gray-100 group-hover:shadow-md transition-all duration-200">
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#1f2937] border-2 border-[#374151] flex items-center justify-center shrink-0 group-hover:border-[#1a74e5] group-hover:bg-[#374151] group-hover:shadow-md transition-all duration-200">
                     {item.label === 'Top Winners' ? (
                       <img
                         src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769797561/podium_swqjij.png"
                         alt={item.label}
-                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0"
+                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
                       />
                     ) : item.label === 'Telegram Channel' ? (
                       <img
                         src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769797952/telegram_yw9hf1.png"
                         alt="Telegram"
-                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0"
+                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
                       />
                     ) : item.label === 'My Bets' ? (
                       <img
                         src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769777192/auction_ofhpps.png"
                         alt="My Bets"
-                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0"
+                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
                       />
                     ) : item.label === 'Bank' ? (
                       <img
                         src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769777283/bank_il6uwi.png"
                         alt="Bank"
-                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0"
+                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
                       />
                     ) : item.label === 'Funds' ? (
                       <img
                         src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769777500/funding_zjmbzp.png"
                         alt="Funds"
-                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0"
+                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
                       />
                     ) : item.label === 'Notification' ? (
                       <img
                         src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769798359/notification_1_pflwit.png"
                         alt="Notification"
-                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0"
+                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
                       />
                     ) : item.label === 'Game Chart' ? (
                       <img
                         src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769798462/start_eotpxc.png"
                         alt="Game Chart"
-                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0"
+                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
                       />
                     ) : item.label === 'Game Rate' ? (
                       <img
                         src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769798548/stars_v1jfzk.png"
                         alt="Game Rate"
-                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0"
+                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
                       />
                     ) : item.label === 'Time Table' ? (
                       <img
                         src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769798627/schedule_frf8zc.png"
                         alt="Time Table"
-                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0"
+                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
                       />
                     ) : item.label === 'Help Desk' ? (
                       <img
                         src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769777618/customer-support_du0zcj.png"
                         alt="Help Desk"
-                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0"
+                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
                       />
                     ) : item.label === 'Share App' ? (
                       <img
                         src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769798998/share_a6shgt.png"
                         alt="Share App"
-                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0"
+                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
                       />
                     ) : item.label === 'Logout' ? (
                       <img
                         src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769798997/logout_mttqvy.png"
                         alt="Logout"
-                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0"
+                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
                       />
                     ) : item.label === 'Download App' ? (
                       <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                       </svg>
                     ) : (
-                      <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-gray-400"></div>
+                      <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-[#4b5563]"></div>
                     )}
                   </div>
                   
                   {/* Menu Text */}
-                  <span className="text-sm sm:text-base font-semibold text-gray-800 group-hover:text-[#1B3150] transition-colors duration-200 flex-1 text-left">
+                  <span className="text-sm sm:text-base font-semibold text-white group-hover:text-[#1a74e5] transition-colors duration-200 flex-1 text-left">
                     {item.label}
                   </span>
                   
                   {/* Arrow Indicator */}
-                  <svg className="w-5 h-5 text-gray-400 group-hover:text-gray-500 group-hover:translate-x-1 transition-all duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                  <svg className="w-5 h-5 text-gray-400 group-hover:text-gray-300 group-hover:translate-x-1 transition-all duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
               ))}
               
               {/* Version Footer */}
-              <div className="text-center text-xs text-gray-500 pt-4 pb-2">Version: 1.0.0</div>
+              <div className="text-center text-xs text-gray-400 pt-4 pb-2">Version: 1.0.0</div>
             </div>
           </aside>
         </div>

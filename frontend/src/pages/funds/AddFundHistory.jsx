@@ -31,12 +31,12 @@ const AddFundHistory = () => {
 
     const getStatusBadge = (status) => {
         const styles = {
-            pending: 'bg-gray-100 text-gray-700 border border-gray-300',
+            pending: 'bg-[#374151] text-gray-200 border border-[#374151]',
             approved: 'bg-green-100 text-green-700 border border-green-300',
             rejected: 'bg-red-100 text-red-700 border border-red-300',
             completed: 'bg-blue-100 text-blue-700 border border-blue-300',
         };
-        return styles[status] || 'bg-gray-100 text-gray-600 border border-gray-300';
+        return styles[status] || 'bg-[#374151] text-gray-300 border border-[#374151]';
     };
 
     const formatDate = (dateString) => {
@@ -68,7 +68,7 @@ const AddFundHistory = () => {
                 <div 
                     onClick={() => setFilter('all')}
                     className={`p-3 rounded-xl text-center cursor-pointer transition-colors ${
-                        filter === 'all' ? 'bg-[#1B3150] text-white border border-[#1B3150]' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+                        filter === 'all' ? 'bg-[#1a74e5] text-white border border-[#1a74e5]' : 'bg-[#111827] text-gray-200 border border-[#374151] hover:bg-[#1f2937]'
                     }`}
                 >
                     <p className="text-lg font-bold">{stats.total}</p>
@@ -77,29 +77,29 @@ const AddFundHistory = () => {
                 <div 
                     onClick={() => setFilter('pending')}
                     className={`p-3 rounded-xl text-center cursor-pointer transition-colors ${
-                        filter === 'pending' ? 'bg-gray-100 text-gray-700 border border-gray-300' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+                        filter === 'pending' ? 'bg-[#374151] text-gray-200 border border-[#374151]' : 'bg-[#111827] text-gray-200 border border-[#374151] hover:bg-[#1f2937]'
                     }`}
                 >
-                    <p className="text-lg font-bold text-gray-600">{stats.pending}</p>
-                    <p className="text-xs text-gray-600">Pending</p>
+                    <p className="text-lg font-bold text-gray-300">{stats.pending}</p>
+                    <p className="text-xs text-gray-300">Pending</p>
                 </div>
                 <div 
                     onClick={() => setFilter('approved')}
                     className={`p-3 rounded-xl text-center cursor-pointer transition-colors ${
-                        filter === 'approved' ? 'bg-green-100 text-green-700 border border-green-300' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+                        filter === 'approved' ? 'bg-green-100 text-green-700 border border-green-300' : 'bg-[#111827] text-gray-200 border border-[#374151] hover:bg-[#1f2937]'
                     }`}
                 >
                     <p className="text-lg font-bold text-green-600">{stats.approved}</p>
-                    <p className="text-xs text-gray-600">Approved</p>
+                    <p className="text-xs text-gray-300">Approved</p>
                 </div>
                 <div 
                     onClick={() => setFilter('rejected')}
                     className={`p-3 rounded-xl text-center cursor-pointer transition-colors ${
-                        filter === 'rejected' ? 'bg-red-100 text-red-700 border border-red-300' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+                        filter === 'rejected' ? 'bg-red-100 text-red-700 border border-red-300' : 'bg-[#111827] text-gray-200 border border-[#374151] hover:bg-[#1f2937]'
                     }`}
                 >
                     <p className="text-lg font-bold text-red-600">{stats.rejected}</p>
-                    <p className="text-xs text-gray-600">Rejected</p>
+                    <p className="text-xs text-gray-300">Rejected</p>
                 </div>
             </div>
 
@@ -110,15 +110,15 @@ const AddFundHistory = () => {
                     <p className="text-gray-400 mt-3">Loading history...</p>
                 </div>
             ) : filteredDeposits.length === 0 ? (
-                <div className="text-center py-8 bg-white rounded-xl border border-gray-200">
+                <div className="text-center py-8 bg-[#111827] rounded-xl border border-[#374151]">
                     <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <p className="text-gray-600">No deposit history found</p>
+                    <p className="text-gray-300">No deposit history found</p>
                     {filter !== 'all' && (
                         <button
                             onClick={() => setFilter('all')}
-                            className="mt-2 text-gray-600 text-sm hover:text-gray-700"
+                            className="mt-2 text-gray-300 text-sm hover:text-gray-200"
                         >
                             View all deposits
                         </button>
@@ -129,7 +129,7 @@ const AddFundHistory = () => {
                     {filteredDeposits.map((deposit) => (
                         <div
                             key={deposit._id}
-                            className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
+                            className="bg-[#111827] rounded-xl p-4 border border-[#374151] shadow-sm hover:shadow-md transition-shadow"
                         >
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
@@ -152,7 +152,7 @@ const AddFundHistory = () => {
                                         )}
                                     </div>
                                     <div>
-                                        <p className="text-gray-800 font-semibold">₹{deposit.amount.toLocaleString()}</p>
+                                        <p className="text-white font-semibold">₹{deposit.amount.toLocaleString()}</p>
                                         <p className="text-gray-500 text-xs">{formatDate(deposit.createdAt)}</p>
                                     </div>
                                 </div>
@@ -164,12 +164,12 @@ const AddFundHistory = () => {
                             {/* Details */}
                             <div className="mt-3 pt-3 border-t border-gray-100 space-y-1">
                                 {deposit.upiTransactionId && (
-                                    <p className="text-gray-600 text-sm">
+                                    <p className="text-gray-300 text-sm">
                                         <span className="text-gray-500">UTR:</span> {deposit.upiTransactionId}
                                     </p>
                                 )}
                                 {deposit.adminRemarks && (
-                                    <p className="text-gray-600 text-sm">
+                                    <p className="text-gray-300 text-sm">
                                         <span className="text-gray-500">Admin:</span> {deposit.adminRemarks}
                                     </p>
                                 )}
@@ -189,7 +189,7 @@ const AddFundHistory = () => {
                                             : `${API_BASE_URL}${deposit.screenshotUrl}?userId=${user?.id || ''}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-2 text-gray-600 text-sm hover:text-gray-700"
+                                        className="inline-flex items-center gap-2 text-gray-300 text-sm hover:text-gray-200"
                                     >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />

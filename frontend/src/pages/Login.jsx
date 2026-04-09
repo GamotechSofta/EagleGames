@@ -191,26 +191,26 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-8 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#1f2937] px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-md items-center">
-        <div className="w-full rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
+        <div className="w-full rounded-2xl border border-[#374151] bg-[#111827] p-6 shadow-sm sm:p-8">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-[#1B3150] sm:text-3xl">{mode === 'signin' ? 'Sign In' : 'Sign Up'}</h1>
-            <p className="mt-1 text-sm text-gray-600">
+            <h1 className="text-2xl font-bold text-[#1a74e5] sm:text-3xl">{mode === 'signin' ? 'Sign In' : 'Sign Up'}</h1>
+            <p className="mt-1 text-sm text-gray-300">
               {mode === 'signin' ? 'Access your account to continue.' : 'Create your own player account.'}
             </p>
-            <div className="mt-4 grid grid-cols-2 rounded-lg border border-gray-300 p-1">
+            <div className="mt-4 grid grid-cols-2 rounded-lg border border-[#374151] p-1">
               <button
                 type="button"
                 onClick={() => { setMode('signin'); setError(''); setSuccess(''); }}
-                className={`rounded-md py-2 text-sm font-semibold transition ${mode === 'signin' ? 'bg-[#1B3150] text-white' : 'text-gray-700 hover:bg-gray-100'}`}
+                className={`rounded-md py-2 text-sm font-semibold transition ${mode === 'signin' ? 'bg-[#1a74e5] text-white' : 'text-gray-200 hover:bg-[#374151]'}`}
               >
                 Sign In
               </button>
               <button
                 type="button"
                 onClick={() => { setMode('signup'); setError(''); setSuccess(''); }}
-                className={`rounded-md py-2 text-sm font-semibold transition ${mode === 'signup' ? 'bg-[#1B3150] text-white' : 'text-gray-700 hover:bg-gray-100'}`}
+                className={`rounded-md py-2 text-sm font-semibold transition ${mode === 'signup' ? 'bg-[#1a74e5] text-white' : 'text-gray-200 hover:bg-[#374151]'}`}
               >
                 Sign Up
               </button>
@@ -236,15 +236,15 @@ const Login = () => {
             {mode === 'signup' && (
               <>
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                    Full Name <span className="text-[#1B3150]">*</span>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-200">
+                    Full Name <span className="text-[#1a74e5]">*</span>
                   </label>
                   <input
                     type="text"
                     name="username"
                     value={formData.username}
                     onChange={handleChange}
-                    className="w-full rounded-lg border border-gray-300 bg-white py-2.5 px-3 text-sm text-gray-900 placeholder-gray-400 focus:border-[#1B3150] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
+                    className="w-full rounded-lg border border-[#374151] bg-[#111827] py-2.5 px-3 text-sm text-gray-900 placeholder-gray-400 focus:border-[#1a74e5] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
                     placeholder="Enter your full name"
                     required
                   />
@@ -253,8 +253,8 @@ const Login = () => {
             )}
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                Phone Number <span className="text-[#1B3150]">*</span>
+              <label className="mb-1.5 block text-sm font-medium text-gray-200">
+                Phone Number <span className="text-[#1a74e5]">*</span>
               </label>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -268,7 +268,7 @@ const Login = () => {
                   value={formData.phone}
                   onChange={handleChange}
                   maxLength="10"
-                  className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-[#1B3150] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
+                  className="w-full rounded-lg border border-[#374151] bg-[#111827] py-2.5 pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-[#1a74e5] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
                   placeholder="10-digit phone number"
                   required
                 />
@@ -276,8 +276,8 @@ const Login = () => {
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                Password <span className="text-[#1B3150]">*</span>
+              <label className="mb-1.5 block text-sm font-medium text-gray-200">
+                Password <span className="text-[#1a74e5]">*</span>
               </label>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -290,14 +290,14 @@ const Login = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-10 text-sm text-gray-900 placeholder-gray-400 focus:border-[#1B3150] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
+                  className="w-full rounded-lg border border-[#374151] bg-[#111827] py-2.5 pl-10 pr-10 text-sm text-gray-900 placeholder-gray-400 focus:border-[#1a74e5] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
                   placeholder="Enter your password"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-[#1B3150]"
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-[#1a74e5]"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <FaEyeSlash className="h-5 w-5" /> : <FaEye className="h-5 w-5" />}
@@ -307,8 +307,8 @@ const Login = () => {
 
             {mode === 'signup' && (
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                  Confirm Password <span className="text-[#1B3150]">*</span>
+                <label className="mb-1.5 block text-sm font-medium text-gray-200">
+                  Confirm Password <span className="text-[#1a74e5]">*</span>
                 </label>
                 <div className="relative">
                   <input
@@ -316,14 +316,14 @@ const Login = () => {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className="w-full rounded-lg border border-gray-300 bg-white py-2.5 px-3 pr-10 text-sm text-gray-900 placeholder-gray-400 focus:border-[#1B3150] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
+                    className="w-full rounded-lg border border-[#374151] bg-[#111827] py-2.5 px-3 pr-10 text-sm text-gray-900 placeholder-gray-400 focus:border-[#1a74e5] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
                     placeholder="Re-enter your password"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-[#1B3150]"
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-[#1a74e5]"
                     aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
                   >
                     {showConfirmPassword ? <FaEyeSlash className="h-5 w-5" /> : <FaEye className="h-5 w-5" />}
@@ -338,12 +338,12 @@ const Login = () => {
                   type="checkbox"
                   checked={isAbove18}
                   onChange={(e) => setIsAbove18(e.target.checked)}
-                  className="mt-1 h-4 w-4 rounded border-gray-300 text-[#1B3150] focus:ring-[#1B3150]"
+                  className="mt-1 h-4 w-4 rounded border-[#374151] text-[#1a74e5] focus:ring-[#1B3150]"
                 />
-                <span className="text-xs leading-5 text-gray-600">
+                <span className="text-xs leading-5 text-gray-300">
                   I confirm that I am above 18 years of age and agree to the{' '}
-                  <span className="text-[#1B3150] underline">Terms of Use</span> and{' '}
-                  <span className="text-[#1B3150] underline">Privacy Policy</span>.
+                  <span className="text-[#1a74e5] underline">Terms of Use</span> and{' '}
+                  <span className="text-[#1a74e5] underline">Privacy Policy</span>.
                 </span>
               </label>
             </div>
@@ -351,7 +351,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading || !isAbove18}
-              className="w-full rounded-lg bg-[#1B3150] py-2.5 text-sm font-semibold text-white transition hover:bg-[#152842] disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-lg bg-[#1a74e5] py-2.5 text-sm font-semibold text-white transition hover:bg-[#155fc2] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">

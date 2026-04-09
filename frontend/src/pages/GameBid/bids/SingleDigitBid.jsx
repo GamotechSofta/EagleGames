@@ -162,13 +162,13 @@ const SingleDigitBid = ({ market, title }) => {
         <div className="grid grid-cols-2 gap-3">
             <button
                 onClick={() => setActiveTab('special')}
-                className={`min-h-[44px] py-3 rounded-lg font-bold text-sm shadow-sm border-2 active:scale-[0.98] transition-colors ${activeTab === 'special' ? 'bg-[#1B3150] text-white border-[#1B3150]' : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'}`}
+                className={`min-h-[44px] py-3 rounded-lg font-bold text-sm shadow-sm border-2 active:scale-[0.98] transition-colors ${activeTab === 'special' ? 'bg-[#1a74e5] text-white border-[#1a74e5]' : 'bg-[#111827] text-gray-300 border-[#374151] hover:border-[#4b5563]'}`}
             >
                 SPECIAL MODE
             </button>
             <button
                 onClick={() => setActiveTab('easy')}
-                className={`min-h-[44px] py-3 rounded-lg font-bold text-sm shadow-sm border-2 active:scale-[0.98] transition-colors ${activeTab === 'easy' ? 'bg-[#1B3150] text-white border-[#1B3150]' : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'}`}
+                className={`min-h-[44px] py-3 rounded-lg font-bold text-sm shadow-sm border-2 active:scale-[0.98] transition-colors ${activeTab === 'easy' ? 'bg-[#1a74e5] text-white border-[#1a74e5]' : 'bg-[#111827] text-gray-300 border-[#374151] hover:border-[#4b5563]'}`}
             >
                 EASY MODE
             </button>
@@ -184,28 +184,28 @@ const SingleDigitBid = ({ market, title }) => {
             )}
             {modeTabs}
             <div className="grid grid-cols-2 gap-1.5 md:gap-2 px-1">
-                <div className="rounded-xl border border-gray-300 bg-white px-2 py-1.5 md:px-3 md:py-2 text-center">
-                    <div className="text-[11px] text-gray-600 font-medium">Count</div>
-                    <div className="text-base font-bold text-[#1B3150] leading-tight">{displayCount}</div>
+                <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
+                    <div className="text-[11px] text-gray-300 font-medium">Count</div>
+                    <div className="text-base font-bold text-white leading-tight">{displayCount}</div>
                 </div>
-                <div className="rounded-xl border border-gray-300 bg-white px-2 py-1.5 md:px-3 md:py-2 text-center">
-                    <div className="text-[11px] text-gray-600 font-medium">Bet Amount</div>
-                    <div className="text-base font-bold text-[#1B3150] leading-tight">{displayBetAmount}</div>
+                <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
+                    <div className="text-[11px] text-gray-300 font-medium">Bet Amount</div>
+                    <div className="text-base font-bold text-white leading-tight">{displayBetAmount}</div>
                 </div>
             </div>
             {activeTab === 'easy' ? (
                 <>
                     <div className="flex flex-col gap-3">
                         <div className="flex flex-row items-center gap-2">
-                            <label className="text-gray-700 text-sm font-medium shrink-0 w-32">Select Game Type:</label>
-                            <div className="flex-1 min-w-0 bg-white border-2 border-gray-300 rounded-full py-2.5 min-h-[40px] px-4 flex items-center justify-center text-sm font-bold text-gray-800">{session}</div>
+                            <label className="text-gray-200 text-sm font-medium shrink-0 w-32">Select Game Type:</label>
+                            <div className="flex-1 min-w-0 bg-[#111827] border-2 border-[#374151] rounded-full py-2.5 min-h-[40px] px-4 flex items-center justify-center text-sm font-bold text-white">{session}</div>
                         </div>
                         <div className="flex flex-row items-center gap-2">
-                            <label className="text-gray-700 text-sm font-medium shrink-0 w-32">Enter Single Digit:</label>
-                            <input type="text" inputMode="numeric" value={inputNumber} onChange={handleNumberInputChange} placeholder="Digit" maxLength={1} className="flex-1 min-w-0 bg-white border-2 border-gray-300 text-gray-800 placeholder-gray-400 rounded-full py-2.5 min-h-[40px] px-4 text-center text-sm focus:ring-2 focus:ring-[#1B3150] focus:border-[#1B3150] focus:outline-none" />
+                            <label className="text-gray-200 text-sm font-medium shrink-0 w-32">Enter Single Digit:</label>
+                            <input type="text" inputMode="numeric" value={inputNumber} onChange={handleNumberInputChange} placeholder="Digit" maxLength={1} className="flex-1 min-w-0 bg-[#111827] border-2 border-[#374151] text-white placeholder-gray-400 rounded-full py-2.5 min-h-[40px] px-4 text-center text-sm focus:ring-2 focus:ring-[#1B3150] focus:border-[#1a74e5] focus:outline-none" />
                         </div>
                         <div className="flex flex-row items-center gap-2">
-                            <label className="text-gray-700 text-sm font-medium shrink-0 w-32">Enter Points:</label>
+                            <label className="text-gray-200 text-sm font-medium shrink-0 w-32">Enter Points:</label>
                             <input
                                 ref={pointsInputRef}
                                 type="text"
@@ -213,23 +213,23 @@ const SingleDigitBid = ({ market, title }) => {
                                 value={inputPoints}
                                 onChange={(e) => setInputPoints(e.target.value.replace(/\D/g, '').slice(0, 6))}
                                 placeholder="Point"
-                                className="no-spinner flex-1 min-w-0 bg-white border-2 border-gray-300 text-gray-800 placeholder-gray-400 rounded-full py-2.5 min-h-[40px] px-4 text-center text-sm focus:ring-2 focus:ring-[#1B3150] focus:border-[#1B3150] focus:outline-none"
+                                className="no-spinner flex-1 min-w-0 bg-[#111827] border-2 border-[#374151] text-white placeholder-gray-400 rounded-full py-2.5 min-h-[40px] px-4 text-center text-sm focus:ring-2 focus:ring-[#1B3150] focus:border-[#1a74e5] focus:outline-none"
                             />
                         </div>
                     </div>
-                    <button onClick={handleAddBid} className="w-full bg-[#1B3150] text-white font-bold py-3.5 min-h-[48px] rounded-lg shadow-md hover:bg-[#152842] transition-all active:scale-[0.98]">Submit Bet</button>
+                    <button onClick={handleAddBid} className="w-full bg-[#1a74e5] text-white font-bold py-3.5 min-h-[48px] rounded-lg shadow-md hover:bg-[#152842] transition-all active:scale-[0.98]">Submit Bet</button>
                 </>
             ) : (
                 <>
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
                         {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
                             <div key={num} className="flex items-center gap-2">
-                                <div className="w-10 h-10 bg-[#1B3150] border-2 border-gray-300 text-white flex items-center justify-center rounded-l-md font-bold text-sm shrink-0">{num}</div>
-                                <input type="number" min="0" placeholder="Pts" value={specialModeInputs[num]} onChange={(e) => setSpecialModeInputs((p) => ({ ...p, [num]: e.target.value }))} className="w-full h-10 bg-white border-2 border-gray-300 text-gray-800 placeholder-gray-400 rounded-r-md focus:outline-none focus:border-[#1B3150] px-3 text-sm font-semibold" />
+                                <div className="w-10 h-10 bg-[#1a74e5] border-2 border-[#374151] text-white flex items-center justify-center rounded-l-md font-bold text-sm shrink-0">{num}</div>
+                                <input type="number" min="0" placeholder="Pts" value={specialModeInputs[num]} onChange={(e) => setSpecialModeInputs((p) => ({ ...p, [num]: e.target.value }))} className="w-full h-10 bg-[#111827] border-2 border-[#374151] text-white placeholder-gray-400 rounded-r-md focus:outline-none focus:border-[#1a74e5] px-3 text-sm font-semibold" />
                             </div>
                         ))}
                     </div>
-                    <button onClick={handleAddSpecialModeBids} className="w-full bg-[#1B3150] text-white font-bold py-3 rounded-md shadow-md hover:bg-[#152842] transition-all">Submit Bet</button>
+                    <button onClick={handleAddSpecialModeBids} className="w-full bg-[#1a74e5] text-white font-bold py-3 rounded-md shadow-md hover:bg-[#152842] transition-all">Submit Bet</button>
                 </>
             )}
 

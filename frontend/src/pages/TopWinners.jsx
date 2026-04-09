@@ -72,13 +72,13 @@ const TopWinners = () => {
   }, [rows]);
 
   return (
-    <div className="min-h-screen bg-white text-gray-800 px-3 sm:px-6 md:px-8 pb-[calc(6rem+env(safe-area-inset-bottom,0px))]">
+    <div className="min-h-screen bg-[#111827] text-white px-3 sm:px-6 md:px-8 pb-[calc(6rem+env(safe-area-inset-bottom,0px))]">
       <div className="w-full max-w-2xl mx-auto">
         <div className="flex items-center gap-3 pt-4 pb-3">
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="min-w-[44px] min-h-[44px] rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-800 hover:bg-gray-100 active:scale-95 transition touch-manipulation"
+            className="min-w-[44px] min-h-[44px] rounded-full bg-[#1f2937] border border-[#374151] flex items-center justify-center text-white hover:bg-[#374151] active:scale-95 transition touch-manipulation"
             aria-label="Back"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,8 +98,8 @@ const TopWinners = () => {
                 onClick={() => setTimeRange(t.key)}
                 className={`h-9 px-4 rounded-full border text-sm font-semibold transition-colors ${
                   active
-                    ? 'bg-[#1B3150] text-white border-[#1B3150]'
-                    : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                    ? 'bg-[#1a74e5] text-white border-[#1a74e5]'
+                    : 'bg-[#111827] text-gray-200 border-[#374151] hover:border-[#374151] hover:bg-[#1f2937]'
                 }`}
               >
                 {t.label}
@@ -117,11 +117,11 @@ const TopWinners = () => {
         {loading ? (
           <div className="space-y-3">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-[76px] rounded-2xl bg-gray-50 border border-gray-200 animate-pulse" />
+              <div key={i} className="h-[76px] rounded-2xl bg-[#1f2937] border border-[#374151] animate-pulse" />
             ))}
           </div>
         ) : normalized.length === 0 ? (
-          <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6 text-center text-gray-600 text-sm">
+          <div className="bg-[#1f2937] border border-[#374151] rounded-2xl p-6 text-center text-gray-300 text-sm">
             No winners found.
           </div>
         ) : (
@@ -129,7 +129,7 @@ const TopWinners = () => {
             {normalized.map((r) => (
               <div
                 key={`${r.rank}-${r.username}`}
-                className="bg-white border border-gray-200 rounded-2xl p-4 shadow-md hover:shadow-lg transition-shadow flex items-center gap-3"
+                className="bg-[#111827] border border-[#374151] rounded-2xl p-4 shadow-md hover:shadow-lg transition-shadow flex items-center gap-3"
               >
                 <div
                   className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${medalBg(r.rank)} text-black flex items-center justify-center font-extrabold shadow-[0_10px_20px_rgba(0,0,0,0.35)] shrink-0`}
@@ -140,10 +140,10 @@ const TopWinners = () => {
 
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-3">
-                    <div className="text-gray-800 font-bold truncate">{r.username}</div>
-                    <div className="text-[#1B3150] font-extrabold shrink-0">₹ {INR(r.totalWinnings)}</div>
+                    <div className="text-white font-bold truncate">{r.username}</div>
+                    <div className="text-[#1a74e5] font-extrabold shrink-0">₹ {INR(r.totalWinnings)}</div>
                   </div>
-                  <div className="mt-1 flex items-center gap-3 text-xs text-gray-600">
+                  <div className="mt-1 flex items-center gap-3 text-xs text-gray-300">
                     <span className="shrink-0">Wins: {INR(r.totalWins)}</span>
                     {r.winRate ? <span className="shrink-0">Win rate: {r.winRate}%</span> : null}
                   </div>

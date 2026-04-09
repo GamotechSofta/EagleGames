@@ -75,7 +75,7 @@ const HalfSangamABid = ({ market, title }) => {
     const totalPoints = useMemo(() => bids.reduce((sum, b) => sum + Number(b.points || 0), 0), [bids]);
     const submitBtnClass = (enabled) =>
         enabled
-            ? 'w-full bg-[#1B3150] text-white font-bold py-3.5 min-h-[48px] rounded-lg shadow-md hover:bg-[#152842] transition-all active:scale-[0.98]'
+            ? 'w-full bg-[#1a74e5] text-white font-bold py-3.5 min-h-[48px] rounded-lg shadow-md hover:bg-[#152842] transition-all active:scale-[0.98]'
             : 'w-full bg-gray-400 text-white font-bold py-3.5 min-h-[48px] rounded-lg shadow-md opacity-50 cursor-not-allowed';
 
     const clearAll = () => {
@@ -199,7 +199,7 @@ const HalfSangamABid = ({ market, title }) => {
 
                         <div className="flex flex-col gap-3">
                             <div className="flex flex-row items-center gap-2">
-                                <label className="text-gray-700 text-sm font-medium shrink-0 w-40">Enter Open Pana:</label>
+                                <label className="text-gray-200 text-sm font-medium shrink-0 w-40">Enter Open Pana:</label>
                                 <input
                                     type="text"
                                     inputMode="numeric"
@@ -220,26 +220,26 @@ const HalfSangamABid = ({ market, title }) => {
                                         }
                                     }}
                                     placeholder="Pana"
-                                    className={`flex-1 min-w-0 bg-white border-2 border-gray-300 text-gray-800 placeholder-gray-400 rounded-full py-2.5 min-h-[40px] px-4 text-center text-sm focus:ring-2 focus:outline-none ${
-                                        openPanaInvalid ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'focus:ring-[#1B3150] focus:border-gray-300'
+                                    className={`flex-1 min-w-0 bg-[#111827] border-2 border-[#374151] text-white placeholder-gray-400 rounded-full py-2.5 min-h-[40px] px-4 text-center text-sm focus:ring-2 focus:outline-none ${
+                                        openPanaInvalid ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'focus:ring-[#1B3150] focus:border-[#374151]'
                                     }`}
                                 />
                             </div>
 
                             <div className="flex flex-row items-center gap-2">
-                                <label className="text-gray-700 text-sm font-medium shrink-0 w-40">Enter Close Ank:</label>
+                                <label className="text-gray-200 text-sm font-medium shrink-0 w-40">Enter Close Ank:</label>
                                 <input
                                     type="text"
                                     inputMode="numeric"
                                     value={closeAnk}
                                     onChange={(e) => setCloseAnk(sanitizeDigits(e.target.value, 1))}
                                     placeholder="Ank"
-                                    className="flex-1 min-w-0 bg-white border-2 border-gray-300 text-gray-800 placeholder-gray-400 rounded-full py-2.5 min-h-[40px] px-4 text-center text-sm focus:ring-2 focus:ring-[#1B3150] focus:border-gray-300 focus:outline-none"
+                                    className="flex-1 min-w-0 bg-[#111827] border-2 border-[#374151] text-white placeholder-gray-400 rounded-full py-2.5 min-h-[40px] px-4 text-center text-sm focus:ring-2 focus:ring-[#1B3150] focus:border-[#374151] focus:outline-none"
                                 />
                             </div>
 
                             <div className="flex flex-row items-center gap-2">
-                                <label className="text-gray-700 text-sm font-medium shrink-0 w-40">Enter Points:</label>
+                                <label className="text-gray-200 text-sm font-medium shrink-0 w-40">Enter Points:</label>
                                 <input
                                     ref={pointsInputRef}
                                     type="text"
@@ -247,7 +247,7 @@ const HalfSangamABid = ({ market, title }) => {
                                     value={points}
                                     onChange={(e) => setPoints(sanitizePoints(e.target.value))}
                                     placeholder="Point"
-                                    className="no-spinner flex-1 min-w-0 bg-white border-2 border-gray-300 text-gray-800 placeholder-gray-400 rounded-full py-2.5 min-h-[40px] px-4 text-center text-sm focus:ring-2 focus:ring-[#1B3150] focus:border-gray-300 focus:outline-none"
+                                    className="no-spinner flex-1 min-w-0 bg-[#111827] border-2 border-[#374151] text-white placeholder-gray-400 rounded-full py-2.5 min-h-[40px] px-4 text-center text-sm focus:ring-2 focus:ring-[#1B3150] focus:border-[#374151] focus:outline-none"
                                 />
                             </div>
                         </div>
@@ -256,7 +256,7 @@ const HalfSangamABid = ({ market, title }) => {
                             <button
                                 type="button"
                                 onClick={handleAdd}
-                                className="w-full bg-[#1B3150] text-white font-bold py-3.5 min-h-[48px] rounded-lg shadow-md hover:bg-[#152842] transition-all active:scale-[0.98]"
+                                className="w-full bg-[#1a74e5] text-white font-bold py-3.5 min-h-[48px] rounded-lg shadow-md hover:bg-[#152842] transition-all active:scale-[0.98]"
                             >
                                 Add to List
                             </button>
@@ -274,22 +274,22 @@ const HalfSangamABid = ({ market, title }) => {
 
                     {/* Right: list */}
                     <div className="mt-10 md:mt-0">
-                        <div className="grid grid-cols-[1.4fr_0.7fr_0.6fr] gap-2 sm:gap-3 text-center text-[#1B3150] font-bold text-xs sm:text-sm mb-2 px-2">
+                        <div className="grid grid-cols-[1.4fr_0.7fr_0.6fr] gap-2 sm:gap-3 text-center text-white font-bold text-xs sm:text-sm mb-2 px-2">
                             <div className="truncate">Sangam</div>
                             <div className="truncate">Amount</div>
                             <div className="truncate">Delete</div>
                         </div>
-                        <div className="h-px bg-[#1B3150] w-full mb-2" />
+                        <div className="h-px bg-[#1a74e5] w-full mb-2" />
 
                         {bids.length === 0 ? null : (
                             <div className="space-y-2">
                                 {bids.map((b) => (
                                     <div
                                         key={b.id}
-                                        className="grid grid-cols-[1.4fr_0.7fr_0.6fr] gap-2 sm:gap-3 text-center items-center py-2.5 px-3 bg-gray-50 rounded-lg border-2 border-gray-300 text-sm"
+                                        className="grid grid-cols-[1.4fr_0.7fr_0.6fr] gap-2 sm:gap-3 text-center items-center py-2.5 px-3 bg-[#1f2937] rounded-lg border-2 border-[#374151] text-sm"
                                     >
-                                        <div className="font-bold text-gray-800 truncate">{b.number}</div>
-                                        <div className="font-bold text-[#1B3150] truncate">{b.points}</div>
+                                        <div className="font-bold text-white truncate">{b.number}</div>
+                                        <div className="font-bold text-white truncate">{b.points}</div>
                                         <div className="flex justify-center">
                                             <button
                                                 type="button"

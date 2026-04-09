@@ -407,7 +407,7 @@ const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
   };
 
   return (
-    <div className="min-h-screen bg-white text-gray-800 px-3 sm:px-4 pt-3 pb-[calc(7rem+env(safe-area-inset-bottom,0px))]">
+    <div className="min-h-screen bg-[#111827] text-white px-3 sm:px-4 pt-3 pb-[calc(7rem+env(safe-area-inset-bottom,0px))]">
       <div className="w-full max-w-7xl mx-auto">
         {/* Header row */}
         <div className="flex flex-col gap-3 mb-4">
@@ -416,20 +416,20 @@ const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="w-10 h-10 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center text-gray-700 hover:bg-gray-200 active:scale-95 transition"
+                className="w-10 h-10 rounded-full bg-[#374151] border border-[#374151] flex items-center justify-center text-gray-200 hover:bg-gray-200 active:scale-95 transition"
                 aria-label="Back"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
-              <h1 className="text-xl sm:text-2xl font-bold truncate text-[#1B3150]">{pageTitle}</h1>
+              <h1 className="text-xl sm:text-2xl font-bold truncate text-[#1a74e5]">{pageTitle}</h1>
             </div>
 
             <button
               type="button"
               onClick={() => setIsFilterOpen(true)}
-              className="shrink-0 flex items-center gap-2 rounded-lg border-2 border-[#1B3150] px-3 py-2 text-[#1B3150] hover:bg-[#1B3150]/5 transition-colors"
+              className="shrink-0 flex items-center gap-2 rounded-lg border-2 border-[#1a74e5] px-3 py-2 text-[#1a74e5] hover:bg-[#1a74e5]/5 transition-colors"
               aria-label="More filters"
               title="Open / Close, markets, Pending"
             >
@@ -458,8 +458,8 @@ const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
                   onClick={() => setSelectedStatuses(statuses)}
                   className={`min-h-[40px] px-4 rounded-xl text-sm font-bold border-2 transition-colors ${
                     active
-                      ? 'bg-[#1B3150] border-[#1B3150] text-white shadow-sm'
-                      : 'bg-white border-gray-300 text-[#1B3150] hover:border-[#1B3150]/40 hover:bg-gray-50'
+                      ? 'bg-[#1a74e5] border-[#1a74e5] text-white shadow-sm'
+                      : 'bg-[#111827] border-[#374151] text-[#1a74e5] hover:border-[#1a74e5]/40 hover:bg-[#1f2937]'
                   }`}
                 >
                   {label}
@@ -471,7 +471,7 @@ const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
 
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
           {sortedFiltered.length === 0 ? (
-            <div className="rounded-xl border-2 border-gray-200 bg-gray-50 p-6 text-center text-gray-600 col-span-2 lg:col-span-3 xl:col-span-4">
+            <div className="rounded-xl border-2 border-[#374151] bg-[#1f2937] p-6 text-center text-gray-300 col-span-2 lg:col-span-3 xl:col-span-4">
               {userId ? 'No bets found.' : 'Please login to see your bet history.'}
             </div>
           ) : (
@@ -511,16 +511,16 @@ const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
             onClick={() => setIsFilterOpen(false)}
           />
 
-          <div className="relative w-full max-w-md rounded-[28px] overflow-hidden shadow-xl border-2 border-gray-300 bg-white">
-            <div className="bg-[#1B3150] text-white text-center py-4 text-2xl font-extrabold border-b border-gray-300">
+          <div className="relative w-full max-w-md rounded-[28px] overflow-hidden shadow-xl border-2 border-[#374151] bg-[#111827]">
+            <div className="bg-[#1a74e5] text-white text-center py-4 text-2xl font-extrabold border-b border-[#374151]">
               Filter Type
             </div>
 
-            <div className="bg-white text-gray-800">
+            <div className="bg-[#111827] text-white">
               <div className="px-5 py-4 max-h-[70vh] overflow-y-auto">
-                <div className="text-lg font-bold text-[#1B3150] mb-3">By Game Type</div>
+                <div className="text-lg font-bold text-[#1a74e5] mb-3">By Game Type</div>
                 <div className="flex items-center justify-around gap-6 pb-4">
-                  <label className="flex items-center gap-3 text-base sm:text-lg text-gray-700">
+                  <label className="flex items-center gap-3 text-base sm:text-lg text-gray-200">
                     <input
                       type="checkbox"
                       className="w-6 h-6 accent-[#1B3150]"
@@ -529,7 +529,7 @@ const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
                     />
                     Open
                   </label>
-                  <label className="flex items-center gap-3 text-base sm:text-lg text-gray-700">
+                  <label className="flex items-center gap-3 text-base sm:text-lg text-gray-200">
                     <input
                       type="checkbox"
                       className="w-6 h-6 accent-[#1B3150]"
@@ -542,10 +542,10 @@ const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
 
                 <div className="h-px bg-gray-300 my-3" />
 
-                <div className="text-lg font-bold text-[#1B3150] mb-3">By Winning Status</div>
+                <div className="text-lg font-bold text-[#1a74e5] mb-3">By Winning Status</div>
                 <div className="flex items-center justify-around gap-3 pb-4">
                   {['Win', 'Lost', 'Pending'].map((s) => (
-                    <label key={s} className="flex items-center gap-3 text-base sm:text-lg text-gray-700">
+                    <label key={s} className="flex items-center gap-3 text-base sm:text-lg text-gray-200">
                       <input
                         type="checkbox"
                         className="w-6 h-6 accent-[#1B3150]"
@@ -559,12 +559,12 @@ const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
 
                 <div className="h-px bg-gray-300 my-3" />
 
-                <div className="text-lg font-bold text-[#1B3150] mb-3">By Games</div>
+                <div className="text-lg font-bold text-[#1a74e5] mb-3">By Games</div>
                 <div className="space-y-3 pb-2">
                   {marketOptions.map((name) => (
                     <label
                       key={name.key}
-                      className="flex items-center gap-4 bg-gray-50 rounded-xl border-2 border-gray-300 shadow-sm px-4 py-4 hover:border-gray-400 transition-colors"
+                      className="flex items-center gap-4 bg-[#1f2937] rounded-xl border-2 border-[#374151] shadow-sm px-4 py-4 hover:border-[#4b5563] transition-colors"
                     >
                       <input
                         type="checkbox"
@@ -572,7 +572,7 @@ const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
                         checked={draftMarkets.includes(name.key)}
                         onChange={() => toggleDraft(draftMarkets, name.key, setDraftMarkets)}
                       />
-                      <span className="text-sm sm:text-base font-semibold tracking-wide text-gray-800">
+                      <span className="text-sm sm:text-base font-semibold tracking-wide text-white">
                         {name.label.toUpperCase()}
                       </span>
                     </label>
@@ -585,7 +585,7 @@ const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
                   <button
                     type="button"
                     onClick={() => setIsFilterOpen(false)}
-                    className="rounded-full bg-gray-100 border-2 border-gray-300 text-gray-700 font-bold py-4 text-base sm:text-lg shadow-md active:scale-[0.99] hover:border-gray-400 hover:bg-gray-200 transition-colors"
+                    className="rounded-full bg-[#374151] border-2 border-[#374151] text-gray-200 font-bold py-4 text-base sm:text-lg shadow-md active:scale-[0.99] hover:border-[#4b5563] hover:bg-gray-200 transition-colors"
                   >
                     Cancel
                   </button>
@@ -597,7 +597,7 @@ const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
                       setSelectedMarkets(draftMarkets);
                       setIsFilterOpen(false);
                     }}
-                    className="rounded-full bg-gradient-to-r bg-[#1B3150] text-white font-extrabold py-4 text-base sm:text-lg shadow-md active:scale-[0.99] hover:bg-[#152842] transition-colors"
+                    className="rounded-full bg-gradient-to-r bg-[#1a74e5] text-white font-extrabold py-4 text-base sm:text-lg shadow-md active:scale-[0.99] hover:bg-[#155fc2] transition-colors"
                   >
                     Filter
                   </button>

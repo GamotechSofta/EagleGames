@@ -551,7 +551,7 @@ const Bids = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white text-gray-800 pl-3 pr-3 sm:pl-4 sm:pr-4 pt-0 pb-[calc(6rem+env(safe-area-inset-bottom,0px))]">
+    <div className="min-h-screen bg-[#111827] text-white pl-3 pr-3 sm:pl-4 sm:pr-4 pt-0 pb-[calc(6rem+env(safe-area-inset-bottom,0px))]">
       <style>{`
         .hide-scrollbar {
           scrollbar-width: none; /* Firefox */
@@ -568,7 +568,7 @@ const Bids = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={handleBack}
-              className="w-10 h-10 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center text-gray-700 hover:bg-gray-200 active:scale-95 transition"
+              className="w-10 h-10 rounded-full bg-[#374151] border border-[#374151] flex items-center justify-center text-gray-200 hover:bg-gray-200 active:scale-95 transition"
               aria-label="Back"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -580,7 +580,7 @@ const Bids = () => {
 
           <div className="hidden md:flex flex-col items-stretch gap-3 px-1 min-w-0">
             <div className="flex items-center justify-between gap-4 min-w-0">
-              <div className="text-2xl font-extrabold text-gray-900 truncate min-w-0">{rightPanelTitle}</div>
+              <div className="text-2xl font-extrabold text-white truncate min-w-0">{rightPanelTitle}</div>
               {isGameResultsPanel ? (
                 <div className="w-[320px] shrink-0">
                   <ResultDatePicker
@@ -588,14 +588,14 @@ const Bids = () => {
                     onChange={setResultsDate}
                     maxDate={new Date()}
                     label="Select Date"
-                    buttonClassName="px-4 py-2 rounded-full bg-white border border-gray-200 text-gray-800 font-bold text-sm shadow-sm hover:border-gray-400 transition-colors"
+                    buttonClassName="px-4 py-2 rounded-full bg-[#111827] border border-[#374151] text-white font-bold text-sm shadow-sm hover:border-[#4b5563] transition-colors"
                   />
                 </div>
               ) : isAnyHistoryPanel ? (
                 <button
                   type="button"
                   onClick={() => setIsDesktopFilterOpen(true)}
-                  className="shrink-0 px-4 py-2 rounded-lg border-2 border-[#1B3150] text-[#1B3150] font-bold text-sm shadow-sm hover:bg-[#1B3150]/5 transition-colors"
+                  className="shrink-0 px-4 py-2 rounded-lg border-2 border-[#1a74e5] text-[#1a74e5] font-bold text-sm shadow-sm hover:bg-[#1a74e5]/5 transition-colors"
                   aria-label="More filters"
                   title="Open / Close, markets, Pending"
                 >
@@ -622,8 +622,8 @@ const Bids = () => {
                       onClick={() => setSelectedStatuses(statuses)}
                       className={`min-h-[40px] px-4 rounded-xl text-sm font-bold border-2 transition-colors ${
                         active
-                          ? 'bg-[#1B3150] border-[#1B3150] text-white shadow-sm'
-                          : 'bg-white border-gray-300 text-[#1B3150] hover:border-[#1B3150]/40 hover:bg-gray-50'
+                          ? 'bg-[#1a74e5] border-[#1a74e5] text-white shadow-sm'
+                          : 'bg-[#111827] border-[#374151] text-[#1a74e5] hover:border-[#1a74e5]/40 hover:bg-[#1f2937]'
                       }`}
                     >
                       {label}
@@ -641,11 +641,11 @@ const Bids = () => {
             <div
               key={item.title}
               onClick={() => handleMobileItemClick(item)}
-              className="bg-white border border-gray-200 rounded-2xl p-4 flex items-center justify-between shadow-md"
+              className="bg-[#111827] border border-[#374151] rounded-2xl p-4 flex items-center justify-between shadow-md"
             >
               <div className="flex items-center gap-4">
                 <div
-                  className="w-14 h-14 rounded-full flex items-center justify-center text-black shadow-[0_10px_20px_rgba(0,0,0,0.35)]"
+                  className="w-14 h-14 rounded-full flex items-center justify-center text-[#111827] shadow-[0_10px_20px_rgba(0,0,0,0.35)]"
                   style={{ backgroundColor: item.color }}
                 >
                   {item.iconUrl ? (
@@ -658,11 +658,11 @@ const Bids = () => {
                   )}
                 </div>
                 <div>
-                  <p className="text-base sm:text-lg font-semibold text-gray-900">{item.title}</p>
-                  <p className="text-xs sm:text-sm text-gray-600">{item.subtitle}</p>
+                  <p className="text-base sm:text-lg font-semibold text-white">{item.title}</p>
+                  <p className="text-xs sm:text-sm text-gray-300">{item.subtitle}</p>
                 </div>
               </div>
-              <div className="w-9 h-9 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-600">
+              <div className="w-9 h-9 rounded-full bg-[#1f2937] border border-[#374151] flex items-center justify-center text-gray-300">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                 </svg>
@@ -681,13 +681,13 @@ const Bids = () => {
                   key={item.title}
                   type="button"
                   onClick={() => handleDesktopItemClick(item)}
-                  className={`w-full text-left bg-white border rounded-2xl p-4 md:p-5 flex items-center justify-between shadow-md transition-colors ${
-                    active ? 'border-[#1B3150] bg-gray-50' : 'border-gray-200 hover:border-gray-300'
+                  className={`w-full text-left bg-[#111827] border rounded-2xl p-4 md:p-5 flex items-center justify-between shadow-md transition-colors ${
+                    active ? 'border-[#1a74e5] bg-[#1f2937]' : 'border-[#374151] hover:border-[#374151]'
                   }`}
                 >
                   <div className="flex items-center gap-4">
                     <div
-                      className="w-12 h-12 rounded-full flex items-center justify-center text-black shadow-[0_10px_20px_rgba(0,0,0,0.35)]"
+                      className="w-12 h-12 rounded-full flex items-center justify-center text-[#111827] shadow-[0_10px_20px_rgba(0,0,0,0.35)]"
                       style={{ backgroundColor: item.color }}
                     >
                       {item.iconUrl ? (
@@ -700,12 +700,12 @@ const Bids = () => {
                       )}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-base font-semibold text-gray-900 truncate">{item.title}</p>
-                      <p className="text-xs text-gray-600 truncate">{item.subtitle}</p>
+                      <p className="text-base font-semibold text-white truncate">{item.title}</p>
+                      <p className="text-xs text-gray-300 truncate">{item.subtitle}</p>
                     </div>
                   </div>
                   <div className={`w-9 h-9 rounded-full border flex items-center justify-center ${
-                    active ? 'bg-gray-100 border-gray-400 text-[#1B3150]' : 'bg-gray-50 border-gray-200 text-gray-600'
+                    active ? 'bg-[#374151] border-[#4b5563] text-[#1a74e5]' : 'bg-[#1f2937] border-[#374151] text-gray-300'
                   }`}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
@@ -720,13 +720,13 @@ const Bids = () => {
             className={
               (isAnyHistoryPanel || isGameResultsPanel)
                 ? 'bg-transparent border-0 shadow-none p-0'
-                : 'rounded-2xl bg-white border border-gray-200 shadow-md p-6'
+                : 'rounded-2xl bg-[#111827] border border-[#374151] shadow-md p-6'
             }
           >
             {(isAnyHistoryPanel || isGameResultsPanel) ? null : (
               <div className="flex items-center justify-center gap-4">
                 <div
-                  className="w-14 h-14 rounded-full flex items-center justify-center text-black shadow-[0_10px_20px_rgba(0,0,0,0.35)]"
+                  className="w-14 h-14 rounded-full flex items-center justify-center text-[#111827] shadow-[0_10px_20px_rgba(0,0,0,0.35)]"
                   style={{ backgroundColor: activeItem?.color || '#f3b61b' }}
                 >
                   {activeItem?.iconUrl ? (
@@ -739,8 +739,8 @@ const Bids = () => {
                   )}
                 </div>
                 <div className="min-w-0 text-center">
-                  <div className="text-xl font-bold text-gray-900 truncate">{activeItem?.title}</div>
-                  <div className="text-sm text-gray-600">{activeItem?.subtitle}</div>
+                  <div className="text-xl font-bold text-white truncate">{activeItem?.title}</div>
+                  <div className="text-sm text-gray-300">{activeItem?.subtitle}</div>
                 </div>
               </div>
             )}
@@ -749,19 +749,19 @@ const Bids = () => {
               <div className={isAnyHistoryPanel ? 'mt-0' : 'mt-6'}>
                 <div className="max-h-[calc(100vh-220px)] overflow-y-auto hide-scrollbar">
                   {betsLoading ? (
-                    <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-gray-600 text-sm">
+                    <div className="rounded-xl border border-[#374151] bg-[#1f2937] p-4 text-gray-300 text-sm">
                       Loading bets...
                     </div>
                   ) : desktopUserId && filteredDesktopRows.length === 0 ? (
-                    <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-gray-600 text-sm">
+                    <div className="rounded-xl border border-[#374151] bg-[#1f2937] p-4 text-gray-300 text-sm">
                       No bets found.
                     </div>
                   ) : !desktopUserId ? (
-                    <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-gray-600 text-sm">
+                    <div className="rounded-xl border border-[#374151] bg-[#1f2937] p-4 text-gray-300 text-sm">
                       Please login to see your bet history.
                     </div>
                   ) : (
-                    <div className="rounded-2xl bg-gray-50 border-2 border-gray-200 p-3 sm:p-4">
+                    <div className="rounded-2xl bg-[#1f2937] border-2 border-[#374151] p-3 sm:p-4">
                       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3">
                         {filteredDesktopRows.map(({ x, r, idx, betValue, gameType, points, session, market, verdict, statusLabel }, i) => (
                           <BetHistoryCard
@@ -787,7 +787,7 @@ const Bids = () => {
               <div className="mt-3">
                 <div className="max-h-[calc(100vh-260px)] overflow-y-auto hide-scrollbar">
                   {resultsRows.length === 0 ? (
-                    <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center text-gray-600">
+                    <div className="rounded-2xl border border-[#374151] bg-[#111827] p-6 text-center text-gray-300">
                       No markets found.
                     </div>
                   ) : (
@@ -795,10 +795,10 @@ const Bids = () => {
                       {resultsRows.map((r) => (
                         <div
                           key={r.id}
-                          className="rounded-2xl bg-white border border-gray-200 px-5 py-4 shadow-md flex items-center justify-between gap-4"
+                          className="rounded-2xl bg-[#111827] border border-[#374151] px-5 py-4 shadow-md flex items-center justify-between gap-4"
                         >
-                          <div className="font-extrabold tracking-wide text-gray-900 truncate">{r.name.toUpperCase()}</div>
-                          <div className="font-extrabold tracking-wide text-gray-600 shrink-0">{r.result}</div>
+                          <div className="font-extrabold tracking-wide text-white truncate">{r.name.toUpperCase()}</div>
+                          <div className="font-extrabold tracking-wide text-gray-300 shrink-0">{r.result}</div>
                         </div>
                       ))}
                     </div>
@@ -806,7 +806,7 @@ const Bids = () => {
                 </div>
               </div>
             ) : (
-              <div className="mt-6 text-gray-600 text-sm">
+              <div className="mt-6 text-gray-300 text-sm">
                 Select an item from the left menu. We will add the actual pages/content here next.
               </div>
             )}
@@ -824,14 +824,14 @@ const Bids = () => {
             onClick={() => setIsDesktopFilterOpen(false)}
           />
 
-          <div className="relative w-full max-w-md rounded-[28px] overflow-hidden shadow-xl border border-gray-200 bg-white">
-            <div className="bg-[#1B3150] text-white text-center py-4 text-2xl font-extrabold border-b border-gray-300">
+          <div className="relative w-full max-w-md rounded-[28px] overflow-hidden shadow-xl border border-[#374151] bg-[#111827]">
+            <div className="bg-[#1a74e5] text-white text-center py-4 text-2xl font-extrabold border-b border-[#374151]">
               Filter Type
             </div>
 
-            <div className="bg-white text-gray-800">
+            <div className="bg-[#111827] text-white">
               <div className="px-5 py-4 max-h-[70vh] overflow-y-auto">
-                <div className="text-lg font-bold text-gray-600 mb-3">By Game Type</div>
+                <div className="text-lg font-bold text-gray-300 mb-3">By Game Type</div>
                 <div className="flex items-center justify-around gap-6 pb-4">
                   <label className="flex items-center gap-3 text-base sm:text-lg">
                     <input
@@ -855,7 +855,7 @@ const Bids = () => {
 
                 <div className="h-px bg-gray-200 my-3" />
 
-                <div className="text-lg font-bold text-gray-600 mb-3">By Winning Status</div>
+                <div className="text-lg font-bold text-gray-300 mb-3">By Winning Status</div>
                 <div className="flex items-center justify-around gap-3 pb-4">
                   {['Win', 'Lost', 'Pending'].map((s) => (
                     <label key={s} className="flex items-center gap-3 text-base sm:text-lg">
@@ -872,12 +872,12 @@ const Bids = () => {
 
                 <div className="h-px bg-gray-200 my-3" />
 
-                <div className="text-lg font-bold text-gray-600 mb-3">By Games</div>
+                <div className="text-lg font-bold text-gray-300 mb-3">By Games</div>
                 <div className="space-y-3 pb-2">
                   {marketOptions.map((name) => (
                     <label
                       key={name.key}
-                      className="flex items-center gap-4 bg-gray-50 rounded-xl border border-gray-200 shadow-sm px-4 py-4 hover:border-gray-400 transition-colors"
+                      className="flex items-center gap-4 bg-[#1f2937] rounded-xl border border-[#374151] shadow-sm px-4 py-4 hover:border-[#4b5563] transition-colors"
                     >
                       <input
                         type="checkbox"
@@ -885,7 +885,7 @@ const Bids = () => {
                         checked={draftMarkets.includes(name.key)}
                         onChange={() => toggleDraft(draftMarkets, name.key, setDraftMarkets)}
                       />
-                      <span className="text-sm sm:text-base font-semibold tracking-wide text-gray-800">
+                      <span className="text-sm sm:text-base font-semibold tracking-wide text-white">
                         {name.label.toUpperCase()}
                       </span>
                     </label>
@@ -898,7 +898,7 @@ const Bids = () => {
                   <button
                     type="button"
                     onClick={() => setIsDesktopFilterOpen(false)}
-                    className="rounded-full bg-gray-100 border border-gray-300 text-gray-800 font-bold py-4 text-base sm:text-lg shadow-md active:scale-[0.99] hover:border-gray-400 transition-colors"
+                    className="rounded-full bg-[#374151] border border-[#374151] text-white font-bold py-4 text-base sm:text-lg shadow-md active:scale-[0.99] hover:border-[#4b5563] transition-colors"
                   >
                     Cancel
                   </button>
@@ -910,7 +910,7 @@ const Bids = () => {
                       setSelectedMarkets(draftMarkets);
                       setIsDesktopFilterOpen(false);
                     }}
-                    className="rounded-full bg-[#1B3150] text-white font-extrabold py-4 text-base sm:text-lg shadow-md active:scale-[0.99] hover:bg-[#152842] transition-colors"
+                    className="rounded-full bg-[#1a74e5] text-white font-extrabold py-4 text-base sm:text-lg shadow-md active:scale-[0.99] hover:bg-[#155fc2] transition-colors"
                   >
                     Filter
                   </button>

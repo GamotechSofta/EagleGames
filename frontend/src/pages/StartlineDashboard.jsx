@@ -114,7 +114,7 @@ const StartlineDashboard = () => {
             <button
               type="button"
               onClick={() => navigate('/')}
-              className="w-11 h-11 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-white active:scale-95 transition shrink-0"
+              className="w-11 h-11 rounded-full bg-[#111827]/10 border border-white/10 flex items-center justify-center text-white active:scale-95 transition shrink-0"
               aria-label="Back"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -145,7 +145,7 @@ const StartlineDashboard = () => {
           Choose a market to view hourly slots and play.
         </div>
 
-        <div className="mt-4 md:mt-6 h-px bg-white/10 md:bg-white/5" />
+        <div className="mt-4 md:mt-6 h-px bg-[#111827]/10 md:bg-[#111827]/5" />
 
         {/* Dynamic Starline markets from API (same as admin tabs) */}
         <div className="mt-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-6">

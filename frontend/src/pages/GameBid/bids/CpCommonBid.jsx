@@ -199,26 +199,26 @@ const CpCommonBid = ({ market, title }) => {
                 <>
                     <div className="md:hidden w-full px-3 py-1">
                         <div className="grid grid-cols-2 gap-1.5 md:gap-2">
-                            <div className="rounded-xl border border-gray-300 bg-white px-2 py-1.5 md:px-3 md:py-2 text-center">
-                                <div className="text-[11px] text-gray-600 font-medium">Count</div>
-                                <div className="text-base font-bold text-[#1B3150] leading-tight">{bidsCount}</div>
+                            <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
+                                <div className="text-[11px] text-gray-300 font-medium">Count</div>
+                                <div className="text-base font-bold text-white leading-tight">{bidsCount}</div>
                             </div>
-                            <div className="rounded-xl border border-gray-300 bg-white px-2 py-1.5 md:px-3 md:py-2 text-center">
-                                <div className="text-[11px] text-gray-600 font-medium">Bet Amount</div>
-                                <div className="text-base font-bold text-[#1B3150] leading-tight">{totalPoints}</div>
+                            <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
+                                <div className="text-[11px] text-gray-300 font-medium">Bet Amount</div>
+                                <div className="text-base font-bold text-white leading-tight">{totalPoints}</div>
                             </div>
                         </div>
                     </div>
                     <div className="hidden md:flex pr-12 pl-1 pb-0 justify-end w-full">
                         <div className="inline-flex items-center gap-2 md:gap-4">
                             <div className="text-center">
-                                <div className="text-[10px] md:text-xs text-gray-500">Count</div>
-                                <div className="text-xs md:text-base font-bold text-[#1B3150]">{bidsCount}</div>
+                                <div className="text-[10px] md:text-xs text-gray-400">Count</div>
+                                <div className="text-xs md:text-base font-bold text-white">{bidsCount}</div>
                             </div>
-                            <div className="w-px h-6 md:h-8 bg-gray-200" />
+                            <div className="w-px h-6 md:h-8 bg-[#4b5563]" />
                             <div className="text-center">
-                                <div className="text-[10px] md:text-xs text-gray-500">Bet Amount</div>
-                                <div className="text-xs md:text-base font-bold text-[#1B3150]">{totalPoints}</div>
+                                <div className="text-[10px] md:text-xs text-gray-400">Bet Amount</div>
+                                <div className="text-xs md:text-base font-bold text-white">{totalPoints}</div>
                             </div>
                         </div>
                     </div>
@@ -227,7 +227,7 @@ const CpCommonBid = ({ market, title }) => {
         >
             <div className="px-3 sm:px-4 pt-0 pb-2 min-h-0">
                 {warning && (
-                    <div className="fixed top-16 sm:top-20 left-1/2 transform -translate-x-1/2 z-50 bg-white border border-green-200 text-green-600 rounded-lg px-3 py-2.5 text-xs sm:text-sm font-medium shadow-xl max-w-[calc(100%-2rem)] sm:max-w-md backdrop-blur-sm">
+                    <div className="fixed top-16 sm:top-20 left-1/2 transform -translate-x-1/2 z-50 bg-[#111827] border border-green-200 text-green-600 rounded-lg px-3 py-2.5 text-xs sm:text-sm font-medium shadow-xl max-w-[calc(100%-2rem)] sm:max-w-md backdrop-blur-sm">
                         {warning}
                     </div>
                 )}
@@ -235,7 +235,7 @@ const CpCommonBid = ({ market, title }) => {
                 <div className="flex flex-col md:flex-row gap-4 sm:gap-5 items-stretch md:items-start">
                     <div className="flex flex-col gap-3 w-full md:w-1/2 shrink-0 min-w-0">
                         <div>
-                            <div className="block text-[11px] sm:text-xs font-semibold text-gray-500 mb-2">Select Digits</div>
+                            <div className="block text-[11px] sm:text-xs font-semibold text-gray-400 mb-2">Select Digits</div>
                             <div className="grid grid-cols-5 gap-2">
                                 {Array.from({ length: 10 }, (_, i) => i).map((d) => {
                                     const selected = selectedDigits.includes(String(d));
@@ -247,8 +247,8 @@ const CpCommonBid = ({ market, title }) => {
                                             aria-pressed={selected}
                                             className={`min-h-[40px] h-10 rounded-md font-bold text-sm sm:text-base transition-all active:scale-[0.98] border ${
                                                 selected
-                                                    ? 'bg-[#1B3150] text-white border-[#1B3150]'
-                                                    : 'bg-white text-[#1B3150] border-gray-300 hover:bg-[#1B3150]/5'
+                                                    ? 'bg-[#1a74e5] text-white border-[#1a74e5]'
+                                                    : 'bg-[#111827] text-white border-[#374151] hover:bg-[#1a74e5]/5'
                                             }`}
                                         >
                                             {d}
@@ -257,36 +257,36 @@ const CpCommonBid = ({ market, title }) => {
                                 })}
                             </div>
                             <div className="flex items-center gap-2 mt-3">
-                                <label className="shrink-0 w-24 text-xs sm:text-sm font-semibold text-gray-600">Enter Digit</label>
+                                <label className="shrink-0 w-24 text-xs sm:text-sm font-semibold text-gray-300">Enter Digit</label>
                                 <input
                                     type="text"
                                     value={selectedDigits.join(',')}
                                     readOnly
                                     placeholder="e.g. 1,2"
-                                    className="flex-1 min-w-0 min-h-[40px] h-10 sm:h-11 bg-white border border-gray-300 rounded-lg px-3 text-sm sm:text-base font-semibold text-gray-800"
+                                    className="flex-1 min-w-0 min-h-[40px] h-10 sm:h-11 bg-[#111827] border border-[#374151] rounded-lg px-3 text-sm sm:text-base font-semibold text-white"
                                 />
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
-                            <label className="shrink-0 w-24 text-xs sm:text-sm font-semibold text-gray-600">Enter Points</label>
+                            <label className="shrink-0 w-24 text-xs sm:text-sm font-semibold text-gray-300">Enter Points</label>
                             <input
                                 type="text"
                                 inputMode="numeric"
                                 value={pointsInput}
                                 onChange={(e) => setPointsInput((e.target.value ?? '').replace(/\D/g, '').slice(0, 6))}
                                 placeholder="Points"
-                                className="flex-1 min-w-0 min-h-[40px] h-10 sm:h-11 bg-white border border-gray-300 rounded-lg px-3 text-sm sm:text-base font-semibold text-gray-800"
+                                className="flex-1 min-w-0 min-h-[40px] h-10 sm:h-11 bg-[#111827] border border-[#374151] rounded-lg px-3 text-sm sm:text-base font-semibold text-white"
                             />
                             <button
                                 type="button"
                                 onClick={clearLocal}
-                                className="min-h-[40px] h-10 px-4 rounded-md text-[11px] sm:text-xs font-semibold border-2 border-[#1B3150]/30 text-[#1B3150] bg-white hover:bg-[#1B3150]/5 active:scale-[0.98] transition-all shrink-0"
+                                className="min-h-[40px] h-10 px-4 rounded-md text-[11px] sm:text-xs font-semibold border-2 border-[#1a74e5]/30 text-white bg-[#111827] hover:bg-[#1a74e5]/5 active:scale-[0.98] transition-all shrink-0"
                             >
                                 Clear
                             </button>
                         </div>
                         <div className="flex items-center gap-2">
-                            <label className="shrink-0 w-24 text-xs sm:text-sm font-semibold text-gray-600">Quick Points</label>
+                            <label className="shrink-0 w-24 text-xs sm:text-sm font-semibold text-gray-300">Quick Points</label>
                             <div className="flex-1 min-w-0 grid grid-cols-5 gap-2">
                                 {[10, 20, 30, 40, 50].map((pts) => {
                                     const selected = String(pointsInput || '') === String(pts);
@@ -297,8 +297,8 @@ const CpCommonBid = ({ market, title }) => {
                                             onClick={() => setPointsInput(String(pts))}
                                             className={`min-h-[34px] h-9 rounded-md text-xs sm:text-sm font-semibold border transition-all active:scale-[0.98] ${
                                                 selected
-                                                    ? 'bg-[#1B3150] text-white border-[#1B3150]'
-                                                    : 'bg-white text-[#1B3150] border-gray-300 hover:bg-[#1B3150]/5'
+                                                    ? 'bg-[#1a74e5] text-white border-[#1a74e5]'
+                                                    : 'bg-[#111827] text-white border-[#374151] hover:bg-[#1a74e5]/5'
                                             }`}
                                         >
                                             {pts}
@@ -311,7 +311,7 @@ const CpCommonBid = ({ market, title }) => {
                             <button
                                 type="button"
                                 onClick={handleGenerate}
-                                className="flex-1 min-h-[40px] h-10 py-2.5 rounded-lg bg-[#1B3150] text-white font-semibold text-sm sm:text-base"
+                                className="flex-1 min-h-[40px] h-10 py-2.5 rounded-lg bg-[#1a74e5] text-white font-semibold text-sm sm:text-base"
                             >
                                 GENERATE
                             </button>
@@ -319,7 +319,7 @@ const CpCommonBid = ({ market, title }) => {
                                 type="button"
                                 onClick={openReview}
                                 disabled={!bidsCount || !bettingAllowed}
-                                className={`flex-1 bg-[#1B3150] text-white font-semibold text-sm sm:text-base py-2.5 min-h-[40px] h-10 rounded-lg shadow-lg hover:bg-[#152842] transition-all active:scale-[0.98] ${
+                                className={`flex-1 bg-[#1a74e5] text-white font-semibold text-sm sm:text-base py-2.5 min-h-[40px] h-10 rounded-lg shadow-lg hover:bg-[#152842] transition-all active:scale-[0.98] ${
                                     !bidsCount || !bettingAllowed ? 'opacity-50 cursor-not-allowed' : ''
                                 }`}
                             >
@@ -329,30 +329,30 @@ const CpCommonBid = ({ market, title }) => {
                     </div>
 
                     <div className="w-full md:w-1/2 flex-1 min-w-0">
-                        <div className="grid grid-cols-4 gap-1 sm:gap-2 text-center text-[#1B3150] font-bold text-xs sm:text-sm mb-2 px-1">
+                        <div className="grid grid-cols-4 gap-1 sm:gap-2 text-center text-white font-bold text-xs sm:text-sm mb-2 px-1">
                             <div>Pana</div>
                             <div>Point</div>
                             <div>Type</div>
                             <div>Delete</div>
                         </div>
-                        <div className="h-px bg-[#1B3150] w-full mb-2" />
+                        <div className="h-px bg-[#1a74e5] w-full mb-2" />
                         <div className="max-h-[520px] sm:max-h-[560px] overflow-y-auto space-y-2 pr-0.5">
                             {generatedRows.length === 0 ? (
                                 <div className="py-6 text-center text-gray-400 text-sm">Generate to add</div>
                             ) : (
                                 generatedRows.map((row) => (
-                                    <div key={row.id} className="grid grid-cols-4 gap-1 sm:gap-2 text-center items-center py-2.5 px-2 bg-gray-50 rounded-lg border-2 border-gray-300 text-sm">
-                                        <div className="font-bold text-gray-800">{row.pana}</div>
+                                    <div key={row.id} className="grid grid-cols-4 gap-1 sm:gap-2 text-center items-center py-2.5 px-2 bg-[#1f2937] rounded-lg border-2 border-[#374151] text-sm">
+                                        <div className="font-bold text-white">{row.pana}</div>
                                         <div className="px-0.5 min-w-0">
                                             <input
                                                 type="text"
                                                 inputMode="numeric"
                                                 value={row.points}
                                                 onChange={(e) => updatePoint(row.id, e.target.value)}
-                                                className="w-full h-8 rounded-lg border border-gray-300 text-center font-bold text-[#1B3150] text-sm focus:outline-none focus:border-[#1B3150]"
+                                                className="w-full h-8 rounded-lg border border-[#374151] text-center font-bold text-white text-sm focus:outline-none focus:border-[#1a74e5]"
                                             />
                                         </div>
-                                        <div className="text-sm font-semibold text-[#1B3150]">{session}</div>
+                                        <div className="text-sm font-semibold text-white">{session}</div>
                                         <div className="flex justify-center">
                                             <button
                                                 type="button"

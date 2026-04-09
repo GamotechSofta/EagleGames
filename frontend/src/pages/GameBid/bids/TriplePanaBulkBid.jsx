@@ -187,24 +187,24 @@ const TriplePanaBulkBid = ({ market, title }) => {
 
     const submitBtnClass = (enabled) =>
         enabled
-            ? 'w-full bg-[#1B3150] text-white font-bold py-3.5 min-h-[48px] rounded-lg shadow-md hover:bg-[#152842] transition-all active:scale-[0.98]'
+            ? 'w-full bg-[#1a74e5] text-white font-bold py-3.5 min-h-[48px] rounded-lg shadow-md hover:bg-[#152842] transition-all active:scale-[0.98]'
             : 'w-full bg-gray-400 text-white font-bold py-3.5 min-h-[48px] rounded-lg shadow-md opacity-50 cursor-not-allowed';
 
     const bidsList = (
         <>
-            <div className="grid grid-cols-4 gap-1 sm:gap-2 text-center text-[#1B3150] font-bold text-xs sm:text-sm mb-2 px-1">
+            <div className="grid grid-cols-4 gap-1 sm:gap-2 text-center text-white font-bold text-xs sm:text-sm mb-2 px-1">
                 <div>Pana</div>
                 <div>Point</div>
                 <div>Type</div>
                 <div>Delete</div>
             </div>
-            <div className="h-px bg-[#1B3150] w-full mb-2" />
+            <div className="h-px bg-[#1a74e5] w-full mb-2" />
             <div className="space-y-2">
                 {bids.map((bid) => (
-                    <div key={bid.id} className="grid grid-cols-4 gap-1 sm:gap-2 text-center items-center py-2.5 px-2 bg-gray-50 rounded-lg border-2 border-gray-300 text-sm">
-                        <div className="font-bold text-gray-800">{bid.number}</div>
-                        <div className="font-bold text-[#1B3150]">{bid.points}</div>
-                        <div className="text-sm text-gray-600">{bid.type}</div>
+                    <div key={bid.id} className="grid grid-cols-4 gap-1 sm:gap-2 text-center items-center py-2.5 px-2 bg-[#1f2937] rounded-lg border-2 border-[#374151] text-sm">
+                        <div className="font-bold text-white">{bid.number}</div>
+                        <div className="font-bold text-white">{bid.points}</div>
+                        <div className="text-sm text-gray-300">{bid.type}</div>
                         <div className="flex justify-center">
                             <button type="button" onClick={() => handleDeleteBid(bid.id)} className="p-2 text-red-500 hover:text-red-600 active:scale-95" aria-label="Delete">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -242,13 +242,13 @@ const TriplePanaBulkBid = ({ market, title }) => {
                     )}
 
                     <div className="grid grid-cols-2 gap-1.5 md:gap-2 px-1">
-                        <div className="rounded-xl border border-gray-300 bg-white px-2 py-1.5 md:px-3 md:py-2 text-center">
-                            <div className="text-[11px] text-gray-600 font-medium">Count</div>
-                            <div className="text-base font-bold text-[#1B3150] leading-tight">{displayCount}</div>
+                        <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
+                            <div className="text-[11px] text-gray-300 font-medium">Count</div>
+                            <div className="text-base font-bold text-white leading-tight">{displayCount}</div>
                         </div>
-                        <div className="rounded-xl border border-gray-300 bg-white px-2 py-1.5 md:px-3 md:py-2 text-center">
-                            <div className="text-[11px] text-gray-600 font-medium">Bet Amount</div>
-                            <div className="text-base font-bold text-[#1B3150] leading-tight">{displayBetAmount}</div>
+                        <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
+                            <div className="text-[11px] text-gray-300 font-medium">Bet Amount</div>
+                            <div className="text-base font-bold text-white leading-tight">{displayBetAmount}</div>
                         </div>
                     </div>
 
@@ -256,7 +256,7 @@ const TriplePanaBulkBid = ({ market, title }) => {
                         <div>
                             <div className="flex flex-col gap-3 mt-2 mb-4 px-1">
                                 <div className="flex flex-row items-center gap-2">
-                                    <label className="text-gray-700 text-sm font-medium shrink-0 w-28">Enter Pana:</label>
+                                    <label className="text-gray-200 text-sm font-medium shrink-0 w-28">Enter Pana:</label>
                                     <input
                                         type="text"
                                         inputMode="numeric"
@@ -264,11 +264,11 @@ const TriplePanaBulkBid = ({ market, title }) => {
                                         onChange={handleNumberInputChange}
                                         placeholder="Pana"
                                         maxLength={3}
-                                        className={`flex-1 min-w-0 bg-white border-2 border-gray-300 text-gray-800 placeholder-gray-400 rounded-xl py-2.5 min-h-[40px] px-4 text-left text-sm focus:ring-2 focus:outline-none ${isPanaInvalid ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'focus:ring-[#1B3150] focus:border-[#1B3150]'}`}
+                                        className={`flex-1 min-w-0 bg-[#111827] border-2 border-[#374151] text-white placeholder-gray-400 rounded-xl py-2.5 min-h-[40px] px-4 text-left text-sm focus:ring-2 focus:outline-none ${isPanaInvalid ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'focus:ring-[#1B3150] focus:border-[#1a74e5]'}`}
                                     />
                                 </div>
                                 <div className="flex flex-row items-center gap-2">
-                                    <label className="text-gray-700 text-sm font-medium shrink-0 w-28">Enter Points</label>
+                                    <label className="text-gray-200 text-sm font-medium shrink-0 w-28">Enter Points</label>
                                     <div className="flex-1 min-w-0 grid grid-cols-[1fr_auto] gap-2">
                                         <input
                                             ref={pointsInputRef}
@@ -277,22 +277,22 @@ const TriplePanaBulkBid = ({ market, title }) => {
                                             value={inputPoints}
                                             onChange={(e) => setInputPoints(e.target.value.replace(/\D/g, '').slice(0, 6))}
                                             placeholder="Points"
-                                            className="no-spinner w-full bg-white border-2 border-gray-300 text-gray-800 placeholder-gray-400 rounded-xl py-2.5 min-h-[40px] px-4 text-left text-sm focus:ring-2 focus:ring-[#1B3150] focus:border-[#1B3150] focus:outline-none"
+                                            className="no-spinner w-full bg-[#111827] border-2 border-[#374151] text-white placeholder-gray-400 rounded-xl py-2.5 min-h-[40px] px-4 text-left text-sm focus:ring-2 focus:ring-[#1B3150] focus:border-[#1a74e5] focus:outline-none"
                                         />
                                         <button
                                             type="button"
                                             onClick={clearAll}
-                                            className="px-4 min-h-[40px] rounded-xl border-2 border-gray-300 bg-white text-[#1B3150] text-sm font-medium hover:border-[#1B3150] active:scale-95"
+                                            className="px-4 min-h-[40px] rounded-xl border-2 border-[#374151] bg-[#111827] text-white text-sm font-medium hover:border-[#1a74e5] active:scale-95"
                                         >
                                             Clear
                                         </button>
                                     </div>
                                 </div>
                                 <div className="flex flex-row items-center gap-2">
-                                    <label className="text-gray-700 text-sm font-medium shrink-0 w-28">Quick Points</label>
+                                    <label className="text-gray-200 text-sm font-medium shrink-0 w-28">Quick Points</label>
                                     <div className="flex-1 min-w-0 grid grid-cols-5 gap-2">
                                         {quickPointValues.map((pts) => (
-                                            <button key={pts} type="button" onClick={() => handleQuickPointClick(pts)} className="py-2 min-h-[36px] rounded-lg border-2 border-gray-300 bg-white text-sm font-medium text-[#1B3150] hover:border-[#1B3150] active:scale-95">
+                                            <button key={pts} type="button" onClick={() => handleQuickPointClick(pts)} className="py-2 min-h-[36px] rounded-lg border-2 border-[#374151] bg-[#111827] text-sm font-medium text-white hover:border-[#1a74e5] active:scale-95">
                                                 {pts}
                                             </button>
                                         ))}
@@ -300,7 +300,7 @@ const TriplePanaBulkBid = ({ market, title }) => {
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-3 mb-5 sm:mb-6 md:grid-cols-2">
-                                <button type="button" onClick={handleAddBid} className="w-full bg-[#1B3150] text-white font-bold py-3.5 min-h-[48px] rounded-lg shadow-md hover:bg-[#152842] transition-all active:scale-[0.98]">
+                                <button type="button" onClick={handleAddBid} className="w-full bg-[#1a74e5] text-white font-bold py-3.5 min-h-[48px] rounded-lg shadow-md hover:bg-[#152842] transition-all active:scale-[0.98]">
                                     Add to List
                                 </button>
                                 <button type="button" disabled={!bids.length} onClick={() => bids.length && setIsReviewOpen(true)} className={submitBtnClass(!!bids.length)}>

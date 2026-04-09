@@ -197,7 +197,7 @@ const StarlineMarket = () => {
           <button
             type="button"
             onClick={() => navigate('/startline-dashboard')}
-            className="w-11 h-11 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-white active:scale-95 transition shrink-0"
+            className="w-11 h-11 rounded-full bg-[#111827]/10 border border-white/10 flex items-center justify-center text-white active:scale-95 transition shrink-0"
             aria-label="Back"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

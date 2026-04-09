@@ -44,11 +44,11 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white w-full px-2 sm:px-4 py-1.5 sm:py-2 flex items-center justify-between border-b border-gray-200">
+    <nav className="bg-[#111827] w-full px-2 sm:px-4 py-1.5 sm:py-2 flex items-center justify-between border-b border-[#374151]">
       {/* Left side - Hamburger menu, Home icon and Logo */}
       <div className="flex items-center gap-2 sm:gap-3">
         {/* Hamburger Menu Icon */}
-        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-gray-300 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors">
+        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-[#374151] flex items-center justify-center cursor-pointer hover:bg-[#1f2937] transition-colors">
           <div className="flex flex-col gap-1 sm:gap-1.5">
             <div className="w-2.5 sm:w-3 h-0.5 bg-black"></div>
             <div className="w-3 sm:w-4 h-0.5 bg-black"></div>
@@ -59,7 +59,7 @@ const Navbar = () => {
         {/* Home Icon */}
         <Link 
           to="/" 
-          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-gray-300 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors"
+          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-[#374151] flex items-center justify-center cursor-pointer hover:bg-[#1f2937] transition-colors"
           title="Home"
         >
           <svg 
@@ -79,10 +79,10 @@ const Navbar = () => {
         
         {/* Logo Text - Clickable to home */}
         <Link to="/" className="flex items-center cursor-pointer">
-          <span className="text-base sm:text-xl md:text-2xl font-bold text-[#1B3150] underline decoration-[#1B3150] decoration-2 underline-offset-2">
+          <span className="text-base sm:text-xl md:text-2xl font-bold text-[#1a74e5] underline decoration-[#1B3150] decoration-2 underline-offset-2">
             RATAN
           </span>
-          <span className="text-base sm:text-xl md:text-2xl font-bold text-[#1B3150] underline decoration-[#1B3150] decoration-2 underline-offset-2 ml-0.5 sm:ml-1">
+          <span className="text-base sm:text-xl md:text-2xl font-bold text-[#1a74e5] underline decoration-[#1B3150] decoration-2 underline-offset-2 ml-0.5 sm:ml-1">
             365
           </span>
         </Link>
@@ -93,7 +93,7 @@ const Navbar = () => {
         {/* Bank Button */}
         <button 
           onClick={() => navigate('/bank')}
-          className="bg-[#1B3150] text-white px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg shadow-md hover:bg-[#152842] transition-colors font-medium text-xs sm:text-sm md:text-base"
+          className="bg-[#1a74e5] text-white px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg shadow-md hover:bg-[#152842] transition-colors font-medium text-xs sm:text-sm md:text-base"
         >
           Bank
         </button>
@@ -104,11 +104,11 @@ const Navbar = () => {
             {/* Profile Icon - Clickable to profile or logout */}
             <div 
               onClick={handleLogout}
-              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-[#1B3150] bg-gray-50 flex items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors"
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-[#1a74e5] bg-[#1f2937] flex items-center justify-center cursor-pointer hover:bg-[#374151] transition-colors"
               title="Logout"
             >
               <svg 
-                className="w-5 h-5 sm:w-6 sm:h-6 text-[#1B3150]" 
+                className="w-5 h-5 sm:w-6 sm:h-6 text-[#1a74e5]" 
                 fill="currentColor" 
                 viewBox="0 0 20 20"
               >
@@ -121,7 +121,7 @@ const Navbar = () => {
             </div>
             
             {/* Username - Hidden on very small screens */}
-            <span className="text-gray-800 font-medium text-sm sm:text-base md:text-lg hidden sm:inline">
+            <span className="text-white font-medium text-sm sm:text-base md:text-lg hidden sm:inline">
               {user.username}
             </span>
           </>
@@ -129,11 +129,11 @@ const Navbar = () => {
           /* Sign In/Sign Up Icon */
           <div 
             onClick={() => navigate('/login')}
-            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-[#1B3150] bg-gray-50 flex items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors"
+            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-[#1a74e5] bg-[#1f2937] flex items-center justify-center cursor-pointer hover:bg-[#374151] transition-colors"
             title="Sign In / Sign Up"
           >
             <svg 
-              className="w-5 h-5 sm:w-6 sm:h-6 text-[#1B3150]" 
+              className="w-5 h-5 sm:w-6 sm:h-6 text-[#1a74e5]" 
               fill="none" 
               stroke="currentColor" 
               viewBox="0 0 24 24"

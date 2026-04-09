@@ -136,24 +136,24 @@ const OddEvenBid = ({ market, title }) => {
         <>
             <div className="w-full basis-full min-w-0 shrink-0 md:hidden px-3 py-1">
                 <div className="grid grid-cols-2 gap-1.5">
-                    <div className="rounded-xl border border-gray-300 bg-white px-2 py-1.5 text-center">
-                        <div className="text-[11px] text-gray-600 font-medium">Count</div>
-                        <div className="text-base font-bold text-[#1B3150] leading-tight">{bids.length}</div>
+                    <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 text-center">
+                        <div className="text-[11px] text-gray-300 font-medium">Count</div>
+                        <div className="text-base font-bold text-white leading-tight">{bids.length}</div>
                     </div>
-                    <div className="rounded-xl border border-gray-300 bg-white px-2 py-1.5 text-center">
-                        <div className="text-[11px] text-gray-600 font-medium">Bet Amount</div>
-                        <div className="text-base font-bold text-[#1B3150] leading-tight">{totalPoints}</div>
+                    <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 text-center">
+                        <div className="text-[11px] text-gray-300 font-medium">Bet Amount</div>
+                        <div className="text-base font-bold text-white leading-tight">{totalPoints}</div>
                     </div>
                 </div>
             </div>
             <div className="hidden md:flex items-center gap-2 shrink-0">
-                <div className="rounded-full border-2 border-gray-300 bg-white h-[44px] px-3 flex items-center gap-1.5">
-                    <span className="text-[10px] text-gray-500 uppercase leading-none">Bets</span>
-                    <span className="text-sm font-bold text-[#1B3150]">{bids.length}</span>
+                <div className="rounded-full border-2 border-[#374151] bg-[#111827] h-[44px] px-3 flex items-center gap-1.5">
+                    <span className="text-[10px] text-gray-400 uppercase leading-none">Bets</span>
+                    <span className="text-sm font-bold text-white">{bids.length}</span>
                 </div>
-                <div className="rounded-full border-2 border-gray-300 bg-white h-[44px] px-3 flex items-center gap-1.5">
-                    <span className="text-[10px] text-gray-500 uppercase leading-none">Points</span>
-                    <span className="text-sm font-bold text-[#1B3150]">{totalPoints}</span>
+                <div className="rounded-full border-2 border-[#374151] bg-[#111827] h-[44px] px-3 flex items-center gap-1.5">
+                    <span className="text-[10px] text-gray-400 uppercase leading-none">Points</span>
+                    <span className="text-sm font-bold text-white">{totalPoints}</span>
                 </div>
             </div>
         </>
@@ -170,20 +170,20 @@ const OddEvenBid = ({ market, title }) => {
                 <button
                     type="button"
                     onClick={() => setChoice('odd')}
-                    className={`h-10 rounded-lg font-bold text-xs border-2 transition-colors ${choice === 'odd' ? 'bg-[#1B3150] text-white border-[#1B3150]' : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'}`}
+                    className={`h-10 rounded-lg font-bold text-xs border-2 transition-colors ${choice === 'odd' ? 'bg-[#1a74e5] text-white border-[#1a74e5]' : 'bg-[#111827] text-gray-300 border-[#374151] hover:border-[#4b5563]'}`}
                 >
                     Odd
                 </button>
                 <button
                     type="button"
                     onClick={() => setChoice('even')}
-                    className={`h-10 rounded-lg font-bold text-xs border-2 transition-colors ${choice === 'even' ? 'bg-[#1B3150] text-white border-[#1B3150]' : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'}`}
+                    className={`h-10 rounded-lg font-bold text-xs border-2 transition-colors ${choice === 'even' ? 'bg-[#1a74e5] text-white border-[#1a74e5]' : 'bg-[#111827] text-gray-300 border-[#374151] hover:border-[#4b5563]'}`}
                 >
                     Even
                 </button>
             </div>
             <div className="flex items-center gap-3">
-                <label className="text-gray-700 text-sm font-medium shrink-0">Enter Points:</label>
+                <label className="text-gray-200 text-sm font-medium shrink-0">Enter Points:</label>
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                     <input
                         type="text"
@@ -191,26 +191,26 @@ const OddEvenBid = ({ market, title }) => {
                         placeholder="Point"
                         value={inputPoints}
                         onChange={(e) => setInputPoints(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                        className="w-full h-10 bg-white border-2 border-gray-300 text-gray-800 placeholder-gray-400 rounded-full focus:outline-none focus:border-[#1B3150] px-4 text-sm font-semibold text-center min-w-0"
+                        className="w-full h-10 bg-[#111827] border-2 border-[#374151] text-white placeholder-gray-400 rounded-full focus:outline-none focus:border-[#1a74e5] px-4 text-sm font-semibold text-center min-w-0"
                     />
                     <button
                         type="button"
                         onClick={clearAll}
-                        className="h-10 px-4 rounded-lg border-2 border-gray-300 bg-white text-[#1B3150] text-sm font-semibold hover:border-[#1B3150] active:scale-95 shrink-0"
+                        className="h-10 px-4 rounded-lg border-2 border-[#374151] bg-[#111827] text-white text-sm font-semibold hover:border-[#1a74e5] active:scale-95 shrink-0"
                     >
                         Clear
                     </button>
                 </div>
             </div>
             <div className="flex items-center gap-3">
-                <label className="text-gray-700 text-sm font-medium shrink-0">Quick Points</label>
+                <label className="text-gray-200 text-sm font-medium shrink-0">Quick Points</label>
                 <div className="grid grid-cols-5 gap-2 flex-1 min-w-0">
                     {quickPointValues.map((pts) => (
                         <button
                             key={pts}
                             type="button"
                             onClick={() => setInputPoints(String(pts))}
-                            className="h-10 rounded-lg border-2 border-gray-300 bg-white text-[#1B3150] text-sm font-semibold hover:border-[#1B3150] active:scale-95"
+                            className="h-10 rounded-lg border-2 border-[#374151] bg-[#111827] text-white text-sm font-semibold hover:border-[#1a74e5] active:scale-95"
                         >
                             {pts}
                         </button>
@@ -220,7 +220,7 @@ const OddEvenBid = ({ market, title }) => {
             <div className="flex gap-3">
                 <button
                     onClick={handleAddBid}
-                    className="flex-1 bg-[#1B3150] text-white font-bold h-10 rounded-lg shadow-md hover:bg-[#152842] transition-all active:scale-[0.98] text-xs"
+                    className="flex-1 bg-[#1a74e5] text-white font-bold h-10 rounded-lg shadow-md hover:bg-[#152842] transition-all active:scale-[0.98] text-xs"
                 >
                     Add
                 </button>
@@ -230,29 +230,29 @@ const OddEvenBid = ({ market, title }) => {
                     disabled={!bids.length}
                     className={`flex-1 font-bold h-10 rounded-lg shadow-md transition-all text-xs ${
                         bids.length
-                            ? 'bg-[#1B3150] text-white hover:bg-[#152842] active:scale-[0.98]'
-                            : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                            ? 'bg-[#1a74e5] text-white hover:bg-[#152842] active:scale-[0.98]'
+                            : 'bg-[#4b5563] text-gray-300 cursor-not-allowed'
                     }`}
                 >
                     Submit
                 </button>
             </div>
             <div>
-                <div className="grid grid-cols-4 gap-1 sm:gap-2 text-center text-[#1B3150] font-bold text-xs sm:text-sm mb-2 px-1">
+                <div className="grid grid-cols-4 gap-1 sm:gap-2 text-center text-white font-bold text-xs sm:text-sm mb-2 px-1">
                     <div>Ank</div>
                     <div>Point</div>
                     <div>Type</div>
                     <div>Delete</div>
                 </div>
-                <div className="h-px bg-[#1B3150] w-full mb-2" />
+                <div className="h-px bg-[#1a74e5] w-full mb-2" />
                 <div className="space-y-2">
                     {bids.length ? (
                         bids.map((b) => (
                             <div
                                 key={b.id}
-                                className="grid grid-cols-4 gap-1 sm:gap-2 text-center items-center py-2.5 px-2 bg-gray-50 rounded-lg border-2 border-gray-300 text-sm"
+                                className="grid grid-cols-4 gap-1 sm:gap-2 text-center items-center py-2.5 px-2 bg-[#1f2937] rounded-lg border-2 border-[#374151] text-sm"
                             >
-                                <div className="font-bold text-gray-800">{b.number}</div>
+                                <div className="font-bold text-white">{b.number}</div>
                                 <div className="px-0.5 min-w-0">
                                     <input
                                         type="text"
@@ -265,10 +265,10 @@ const OddEvenBid = ({ market, title }) => {
                                                 )
                                             )
                                         }
-                                        className="w-full h-8 rounded-lg border border-gray-300 text-center font-bold text-[#1B3150] text-sm focus:outline-none focus:border-[#1B3150]"
+                                        className="w-full h-8 rounded-lg border border-[#374151] text-center font-bold text-white text-sm focus:outline-none focus:border-[#1a74e5]"
                                     />
                                 </div>
-                                <div className="text-sm text-gray-600">{b.type}</div>
+                                <div className="text-sm text-gray-300">{b.type}</div>
                                 <div className="flex justify-center">
                                     <button
                                         type="button"

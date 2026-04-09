@@ -118,11 +118,11 @@ const Section1 = () => {
       {/* Market Cards Grid */}
       {loading ? (
         <div className="text-center py-12">
-          <p className="text-gray-600">Loading markets...</p>
+          <p className="text-gray-300">Loading markets...</p>
         </div>
       ) : markets.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-600">No markets available</p>
+          <p className="text-gray-300">No markets available</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-2 min-[375px]:gap-3 sm:gap-4">

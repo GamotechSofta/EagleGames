@@ -209,30 +209,30 @@ const Bank = () => {
   const hasPagination = computed.length > PAGE_SIZE;
 
   return (
-    <div className={`min-h-screen bg-gray-100 text-gray-800 ${hasPagination ? 'pb-[calc(100px+env(safe-area-inset-bottom,0px))] md:pb-10' : 'pb-[calc(6rem+env(safe-area-inset-bottom,0px))] md:pb-24'}`}>
-      <div className="bg-gray-100 px-4 pt-4 pb-3">
+    <div className={`min-h-screen bg-[#374151] text-white ${hasPagination ? 'pb-[calc(100px+env(safe-area-inset-bottom,0px))] md:pb-10' : 'pb-[calc(6rem+env(safe-area-inset-bottom,0px))] md:pb-24'}`}>
+      <div className="bg-[#374151] px-4 pt-4 pb-3">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center text-gray-800 hover:opacity-80 active:scale-95 transition touch-manipulation"
+            className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center text-white hover:opacity-80 active:scale-95 transition touch-manipulation"
             aria-label="Go back"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h1 className="text-xl font-semibold text-[#1B3150]">Transaction History</h1>
+          <h1 className="text-xl font-semibold text-[#1a74e5]">Transaction History</h1>
         </div>
       </div>
 
       <div className="px-4 pt-4">
         {!isLoggedIn ? (
-          <div className="rounded-2xl border-2 border-gray-200 bg-white p-6 text-center text-gray-500 shadow-sm">
+          <div className="rounded-2xl border-2 border-[#374151] bg-[#111827] p-6 text-center text-gray-500 shadow-sm">
             Please login to see your transaction history.
           </div>
         ) : loading ? (
-          <div className="rounded-2xl border-2 border-gray-200 bg-white p-6 text-center text-gray-500 shadow-sm">
+          <div className="rounded-2xl border-2 border-[#374151] bg-[#111827] p-6 text-center text-gray-500 shadow-sm">
             Loading...
           </div>
         ) : error ? (
@@ -240,7 +240,7 @@ const Bank = () => {
             {error}
           </div>
         ) : visible.length === 0 ? (
-          <div className="rounded-2xl border-2 border-gray-200 bg-white p-6 text-center text-gray-500 shadow-sm">
+          <div className="rounded-2xl border-2 border-[#374151] bg-[#111827] p-6 text-center text-gray-500 shadow-sm">
             No transactions found.
           </div>
         ) : (
@@ -262,7 +262,7 @@ const Bank = () => {
                 return (
                   <div
                     key={tx.id}
-                    className="bg-white text-gray-800 rounded-2xl border-2 border-gray-200 p-4 shadow-sm"
+                    className="bg-[#111827] text-white rounded-2xl border-2 border-[#374151] p-4 shadow-sm"
                   >
                     <div className="flex items-center justify-between text-sm">
                       <div className={`font-semibold ${topColor}`}>
@@ -273,29 +273,29 @@ const Bank = () => {
 
                     <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-6 text-center">
                       <div>
-                        <div className="text-[15px] font-extrabold text-[#1B3150]">Bid Play</div>
-                        <div className="mt-1 text-[16px] font-semibold text-gray-800">{bidPlay || '-'}</div>
+                        <div className="text-[15px] font-extrabold text-[#1a74e5]">Bid Play</div>
+                        <div className="mt-1 text-[16px] font-semibold text-white">{bidPlay || '-'}</div>
                       </div>
                       <div>
-                        <div className="text-[15px] font-extrabold text-[#1B3150]">Game</div>
-                        <div className="mt-1 text-[16px] font-semibold break-words text-gray-800">
+                        <div className="text-[15px] font-extrabold text-[#1a74e5]">Game</div>
+                        <div className="mt-1 text-[16px] font-semibold break-words text-white">
                           {(game || '-').toUpperCase()}
                         </div>
                       </div>
                       <div>
-                        <div className="text-[15px] font-extrabold text-[#1B3150]">Type</div>
-                        <div className="mt-1 text-[16px] font-semibold text-gray-800">{typeLabel || '-'}</div>
+                        <div className="text-[15px] font-extrabold text-[#1a74e5]">Type</div>
+                        <div className="mt-1 text-[16px] font-semibold text-white">{typeLabel || '-'}</div>
                       </div>
                       <div>
-                        <div className="text-[15px] font-extrabold text-[#1B3150]">Market</div>
-                        <div className="mt-1 text-[16px] font-semibold text-gray-800">{marketLabel || '-'}</div>
+                        <div className="text-[15px] font-extrabold text-[#1a74e5]">Market</div>
+                        <div className="mt-1 text-[16px] font-semibold text-white">{marketLabel || '-'}</div>
                       </div>
                     </div>
 
                     <div className="border-t-2 border-gray-100 mt-5 pt-4 text-sm grid grid-cols-2 gap-4 text-center">
                       <div>
                         <div className="font-semibold text-gray-500">Previous Balance</div>
-                        <div className="mt-1 text-[16px] font-semibold text-gray-800">
+                        <div className="mt-1 text-[16px] font-semibold text-white">
                           {tx.previousBalance == null ? '—' : `₹${formatMoney(tx.previousBalance)}`}
                         </div>
                       </div>
@@ -310,7 +310,7 @@ const Bank = () => {
                     </div>
 
                     {tx.currentBalance != null ? (
-                      <div className="border-t-2 border-gray-100 mt-4 pt-3 text-center font-extrabold text-[18px] text-[#1B3150]">
+                      <div className="border-t-2 border-gray-100 mt-4 pt-3 text-center font-extrabold text-[18px] text-[#1a74e5]">
                         Current Balance : {formatMoney(tx.currentBalance)} ₹
                       </div>
                     ) : null}
@@ -333,7 +333,7 @@ const Bank = () => {
         >
           <div>
             <div className="mx-auto w-full max-w-[520px] pointer-events-auto">
-              <div className="bg-white rounded-full border-2 border-gray-200 px-4 py-2 flex items-center justify-between shadow-md">
+              <div className="bg-[#111827] rounded-full border-2 border-[#374151] px-4 py-2 flex items-center justify-between shadow-md">
                 <button
                   type="button"
                   onClick={() => {
@@ -341,7 +341,7 @@ const Bank = () => {
                     scrollToTop();
                   }}
                   disabled={currentPage <= 1}
-                  className="flex items-center gap-1 text-[#1B3150] font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-80"
+                  className="flex items-center gap-1 text-[#1a74e5] font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-80"
                 >
                   <span className="text-lg leading-none">‹</span>
                   <span>PREV</span>
@@ -349,7 +349,7 @@ const Bank = () => {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    className="w-8 h-8 rounded-full bg-[#1B3150] text-white flex items-center justify-center font-bold text-sm border-2 border-[#1B3150]"
+                    className="w-8 h-8 rounded-full bg-[#1a74e5] text-white flex items-center justify-center font-bold text-sm border-2 border-[#1a74e5]"
                   >
                     {currentPage}
                   </button>
@@ -361,7 +361,7 @@ const Bank = () => {
                     scrollToTop();
                   }}
                   disabled={currentPage >= totalPages}
-                  className="flex items-center gap-1 text-[#1B3150] font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-80"
+                  className="flex items-center gap-1 text-[#1a74e5] font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-80"
                 >
                   <span>NEXT</span>
                   <span className="text-lg leading-none">›</span>

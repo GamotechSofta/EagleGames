@@ -181,25 +181,25 @@ const BidLayout = ({
     }, [walletBalance]);
 
     return (
-        <div className="min-h-screen min-h-ios-screen bg-[#E8ECEF] font-sans w-full max-w-full overflow-x-hidden">
+        <div className="min-h-screen min-h-ios-screen bg-[#111827] font-sans w-full max-w-full overflow-x-hidden">
             {/* Header - Gray theme - iOS safe area padding */}
             <div
-                className="bg-gray-100 border-b-2 border-gray-200 py-1.5 flex items-center justify-between gap-2 sticky top-0 z-10 shadow-sm"
+                className="bg-[#374151] border-b-2 border-[#374151] py-1.5 flex items-center justify-between gap-2 sticky top-0 z-10 shadow-sm"
                 style={{ paddingLeft: 'max(0.75rem, env(safe-area-inset-left))', paddingRight: 'max(0.75rem, env(safe-area-inset-right))' }}
             >
                 <button
                     onClick={() => market ? navigate('/bidoptions', { state: { market } }) : navigate(-1)}
-                    className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center text-gray-800 hover:opacity-80 active:scale-95 transition touch-manipulation"
+                    className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center text-white hover:opacity-80 active:scale-95 transition touch-manipulation"
                     aria-label="Back"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                 </button>
-                <h1 className="text-xs sm:text-sm md:text-base font-bold uppercase tracking-wide truncate flex-1 text-center mx-1 text-gray-800 min-w-0">
+                <h1 className="text-xs sm:text-sm md:text-base font-bold uppercase tracking-wide truncate flex-1 text-center mx-1 text-white min-w-0">
                     {market?.gameName ? `${market.gameName} - ${title}` : title}
                 </h1>
-                <div className="bg-gray-200 text-gray-800 px-2 sm:px-2.5 py-0.5 rounded-full flex items-center gap-1.5 text-[11px] sm:text-sm font-bold shadow-md shrink-0 border-2 border-gray-300">
+                <div className="bg-[#4b5563] text-white px-2 sm:px-2.5 py-0.5 rounded-full flex items-center gap-1.5 text-[11px] sm:text-sm font-bold shadow-md shrink-0 border-2 border-[#374151]">
                     <img
                         src="https://res.cloudinary.com/dnyp5jknp/image/upload/v1771394532/wallet_n1oyef.png"
                         alt="Wallet"
@@ -224,7 +224,7 @@ const BidLayout = ({
                     {/* Date Input Button */}
                     <div className="relative flex-1 min-w-0 shrink overflow-hidden">
                         <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none z-10">
-                            <svg className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                         </div>
@@ -233,7 +233,7 @@ const BidLayout = ({
                             type="text"
                             value={todayDate}
                             readOnly
-                            className={`w-full pl-8 pr-2.5 py-1.5 min-h-[40px] h-[40px] sm:pl-10 sm:pr-3 sm:py-2.5 sm:min-h-[44px] sm:h-[44px] bg-white border-2 border-gray-300 text-gray-800 rounded-full text-xs sm:text-sm font-bold text-center focus:outline-none focus:border-[#1B3150] cursor-pointer truncate ${dateSessionControlClassName}`}
+                            className={`w-full pl-8 pr-2.5 py-1.5 min-h-[40px] h-[40px] sm:pl-10 sm:pr-3 sm:py-2.5 sm:min-h-[44px] sm:h-[44px] bg-[#111827] border-2 border-[#374151] text-white rounded-full text-xs sm:text-sm font-bold text-center focus:outline-none focus:border-[#1a74e5] cursor-pointer truncate ${dateSessionControlClassName}`}
                             style={{
                                 colorScheme: 'light',
                             }}
@@ -247,7 +247,7 @@ const BidLayout = ({
                             value={session}
                             onChange={(e) => setSession(e.target.value)}
                             disabled={lockSessionSelect || (isToday && isRunning)}
-                            className={`w-full appearance-none bg-white border-2 border-gray-300 text-gray-800 font-bold text-xs sm:text-sm py-1.5 min-h-[40px] h-[40px] px-3 pr-7 sm:py-2.5 sm:min-h-[44px] sm:h-[44px] sm:px-4 sm:pr-8 rounded-full text-center focus:outline-none focus:border-[#1B3150] ${(lockSessionSelect || (isToday && isRunning)) ? 'opacity-60 cursor-not-allowed bg-gray-100' : ''} ${dateSessionControlClassName}`}
+                            className={`w-full appearance-none bg-[#111827] border-2 border-[#374151] text-white font-bold text-xs sm:text-sm py-1.5 min-h-[40px] h-[40px] px-3 pr-7 sm:py-2.5 sm:min-h-[44px] sm:h-[44px] sm:px-4 sm:pr-8 rounded-full text-center focus:outline-none focus:border-[#1a74e5] ${(lockSessionSelect || (isToday && isRunning)) ? 'opacity-60 cursor-not-allowed bg-[#374151]' : ''} ${dateSessionControlClassName}`}
                         >
                             {sessionOptions.map((opt) => (
                                 <option key={opt} value={opt}>
@@ -256,7 +256,7 @@ const BidLayout = ({
                             ))}
                         </select>
                         {!hideSessionSelectCaret && (
-                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 sm:px-4 text-gray-500">
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 sm:px-4 text-gray-400">
                                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
@@ -293,19 +293,19 @@ const BidLayout = ({
                     <div
                         className={`w-full max-w-sm md:max-w-md rounded-2xl flex flex-col sm:flex-row items-center gap-4 sm:gap-6 ${
                             showFooterStats
-                                ? 'bg-[#E8ECEF] backdrop-blur-sm border-2 border-gray-300 shadow-xl px-4 py-4'
+                                ? 'bg-[#111827] backdrop-blur-sm border-2 border-[#374151] shadow-xl px-4 py-4'
                                 : 'bg-transparent border-0 shadow-none p-0'
                         }`}
                     >
                         {showFooterStats && (
                             <div className="flex items-center gap-6 sm:gap-8 shrink-0">
                                 <div className="text-center">
-                                    <div className="text-[10px] sm:text-xs text-gray-600 uppercase tracking-wider">Bets</div>
-                                    <div className="text-base sm:text-lg font-bold text-[#1B3150]">{bidsCount}</div>
+                                    <div className="text-[10px] sm:text-xs text-gray-300 uppercase tracking-wider">Bets</div>
+                                    <div className="text-base sm:text-lg font-bold text-[#1a74e5]">{bidsCount}</div>
                                 </div>
                                 <div className="text-center">
-                                    <div className="text-[10px] sm:text-xs text-gray-600 uppercase tracking-wider">Points</div>
-                                    <div className="text-base sm:text-lg font-bold text-[#1B3150]">{totalPoints}</div>
+                                    <div className="text-[10px] sm:text-xs text-gray-300 uppercase tracking-wider">Points</div>
+                                    <div className="text-base sm:text-lg font-bold text-[#1a74e5]">{totalPoints}</div>
                                 </div>
                             </div>
                         )}
@@ -315,7 +315,7 @@ const BidLayout = ({
                             disabled={!bidsCount || !bettingAllowed}
                             className={`flex-1 w-full sm:w-auto sm:min-w-[140px] font-bold py-3 px-6 rounded-xl shadow-lg transition-all text-sm sm:text-base ${
                                 bidsCount && bettingAllowed
-                                    ? 'bg-[#1B3150] text-white hover:bg-[#152842] active:scale-[0.98]'
+                                    ? 'bg-[#1a74e5] text-white hover:bg-[#152842] active:scale-[0.98]'
                                     : 'bg-gray-400 text-white opacity-50 cursor-not-allowed'
                             }`}
                         >
