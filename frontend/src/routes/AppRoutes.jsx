@@ -19,7 +19,6 @@ import Profile from '../pages/Profile';
 import BetHistory from '../pages/BetHistory';
 import MarketResultHistory from '../pages/MarketResultHistory';
 import TopWinners from '../pages/TopWinners';
-import RouletteGame from '../pages/RouletteGame';
 import GameRate from '../pages/GameRate';
 
 // Scroll to top on route change
@@ -108,11 +107,6 @@ const Layout = ({ children }) => {
     return <>{children}</>;
   }
 
-  // Roulette game: full-screen, no header or navbar
-  if (location.pathname === '/roulette' || location.pathname === '/games/roulette') {
-    return <>{children}</>;
-  }
-
   // Same header (logoipsum, Download App, bell) for all pages - mobile-style
   if (isHomePage) {
     return (
@@ -127,6 +121,7 @@ const Layout = ({ children }) => {
   }
 
   const isBidPage = location.pathname.includes('game-bid') || location.pathname === '/bidoptions';
+  const isGameBidPage = location.pathname.includes('game-bid');
   const isSupportPage =
     location.pathname === '/support' ||
     location.pathname === '/support/new' ||
@@ -137,20 +132,22 @@ const Layout = ({ children }) => {
     location.pathname === '/bet-history' || location.pathname === '/market-result-history';
 
   return (
-    <div className="min-h-screen min-h-ios-screen pb-[calc(4rem+env(safe-area-inset-bottom,0px))] md:pb-0 w-full max-w-full overflow-x-hidden bg-[#1f2937] text-white">
-      <AppHeader />
+    <div className={`min-h-screen min-h-ios-screen ${isGameBidPage ? 'pb-0' : 'pb-[calc(4rem+env(safe-area-inset-bottom,0px))]'} md:pb-0 w-full max-w-full overflow-x-hidden text-white ${isBidPage ? 'bg-[#111827]' : 'bg-[#1f2937]'}`}>
+      {!isGameBidPage && <AppHeader />}
       {/* Reduce mobile top-gap under fixed header */}
       {/* Desktop: ensure no overlap under fixed header */}
       <div
         className={
-          isBidPage
-            ? 'pt-[calc(52px+env(safe-area-inset-top,0px))] sm:pt-[calc(54px+env(safe-area-inset-top,0px))] md:pt-[calc(56px+env(safe-area-inset-top,0px))]'
+          isGameBidPage
+            ? 'pt-0'
+            : isBidPage
+            ? 'pt-[calc(44px+env(safe-area-inset-top,0px))] sm:pt-[calc(50px+env(safe-area-inset-top,0px))] md:pt-[calc(56px+env(safe-area-inset-top,0px))]'
             : ((isBetsPage || isHistoryPage) ? 'pt-[calc(72px+env(safe-area-inset-top,0px))] sm:pt-[calc(76px+env(safe-area-inset-top,0px))] md:pt-[calc(88px+env(safe-area-inset-top,0px))]' : 'pt-[calc(56px+env(safe-area-inset-top,0px))] sm:pt-[calc(68px+env(safe-area-inset-top,0px))] md:pt-[calc(72px+env(safe-area-inset-top,0px))]')
         }
       >
         {children}
       </div>
-      <BottomNavbar />
+      {!isGameBidPage && <BottomNavbar />}
     </div>
   );
 };
@@ -179,8 +176,6 @@ const AppRoutes = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/top-winners" element={<TopWinners />} />
           <Route path="/game-rate" element={<GameRate />} />
-          <Route path="/roulette" element={<RouletteGame />} />
-          <Route path="/games/roulette" element={<RouletteGame />} />
         </Routes>
       </Layout>
     </Router>

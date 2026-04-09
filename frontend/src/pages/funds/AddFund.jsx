@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL, getAuthHeaders, fetchWithAuth } from '../../config/api';
 
+const FIXED_UPI_ID = '9380158730-2@axl';
+const FIXED_QR_IMAGE_URL = 'https://res.cloudinary.com/dwwt5xdsz/image/upload/v1775733532/a2070441-4b78-4567-bf0b-a7c25888dbae.png';
+
 const AddFund = () => {
     const navigate = useNavigate();
     const [config, setConfig] = useState(null);
@@ -306,11 +309,9 @@ const AddFund = () => {
                         {/* QR Code Section */}
                         <div className="flex flex-col items-center mb-5">
                             <div className="bg-[#111827] p-3 rounded-xl mb-3">
-                                {config?.upiId ? (
+                                {FIXED_QR_IMAGE_URL ? (
                                     <img
-                                        src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
-                                            `upi://pay?pa=${config.upiId}&pn=${encodeURIComponent(config.upiName || 'Golden Games')}${qrAmount != null ? `&am=${qrAmount}` : ''}&cu=INR`
-                                        )}`}
+                                        src={FIXED_QR_IMAGE_URL}
                                         alt="UPI QR Code"
                                         className="w-[180px] h-[180px]"
                                     />
@@ -336,12 +337,12 @@ const AddFund = () => {
                             <div className="flex items-center justify-between bg-[#1f2937] rounded-xl p-4 border-2 border-[#374151]">
                                 <div>
                                     <p className="text-gray-300 text-sm">UPI ID</p>
-                                    <p className="text-white font-mono text-lg">{config?.upiId || 'Loading...'}</p>
+                                    <p className="text-white font-mono text-lg">{FIXED_UPI_ID}</p>
                                 </div>
                                 <button
                                     type="button"
                                     onClick={() => {
-                                        navigator.clipboard.writeText(config?.upiId || '');
+                                        navigator.clipboard.writeText(FIXED_UPI_ID);
                                         setSuccess('UPI ID copied!');
                                         setTimeout(() => setSuccess(''), 2000);
                                     }}
@@ -352,7 +353,7 @@ const AddFund = () => {
                             </div>
                             <div className="bg-[#1f2937] rounded-xl p-4 border-2 border-[#374151]">
                                 <p className="text-gray-300 text-sm">Pay to</p>
-                                <p className="text-white font-semibold">{config?.upiName || 'Golden Games'}</p>
+                                <p className="text-white font-semibold">{FIXED_UPI_ID}</p>
                             </div>
                         </div>
                     </div>

@@ -20,12 +20,14 @@ import {
     FaDice,
 } from 'react-icons/fa';
 import { useLanguage } from '../context/LanguageContext';
+import { LANGUAGE_OPTIONS, applyLanguage, getCurrentLanguage } from './GoogleTranslateWidget';
 
 const Sidebar = ({ user, onLogout, isOpen = true, onClose }) => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { t, language, changeLanguage } = useLanguage();
+    const { t } = useLanguage();
     const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
+    const [selectedLang, setSelectedLang] = useState(getCurrentLanguage());
 
     const menuItems = [
         { path: '/dashboard', label: t('dashboard'), icon: FaTachometerAlt, key: 'dashboard' },
@@ -126,45 +128,23 @@ const Sidebar = ({ user, onLogout, isOpen = true, onClose }) => {
                                     onClick={() => setLanguageMenuOpen(false)}
                                 />
                                 <div className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden z-50">
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            changeLanguage('en');
-                                            setLanguageMenuOpen(false);
-                                        }}
-                                        className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
-                                            language === 'en' ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'
-                                        }`}
-                                    >
-                                        <span className="text-sm">English</span>
-                                        {language === 'en' && <span className="ml-auto text-blue-600">✓</span>}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            changeLanguage('hi');
-                                            setLanguageMenuOpen(false);
-                                        }}
-                                        className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors border-t border-gray-200 ${
-                                            language === 'hi' ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'
-                                        }`}
-                                    >
-                                        <span className="text-sm">हिंदी</span>
-                                        {language === 'hi' && <span className="ml-auto text-blue-600">✓</span>}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            changeLanguage('mr');
-                                            setLanguageMenuOpen(false);
-                                        }}
-                                        className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors border-t border-gray-200 ${
-                                            language === 'mr' ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'
-                                        }`}
-                                    >
-                                        <span className="text-sm">मराठी</span>
-                                        {language === 'mr' && <span className="ml-auto text-blue-600">✓</span>}
-                                    </button>
+                                    {LANGUAGE_OPTIONS.map((lang, idx) => (
+                                        <button
+                                            key={lang.code}
+                                            type="button"
+                                            onClick={() => {
+                                                setSelectedLang(lang.code);
+                                                setLanguageMenuOpen(false);
+                                                applyLanguage(lang.code);
+                                            }}
+                                            className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
+                                                idx > 0 ? 'border-t border-gray-200' : ''
+                                            } ${selectedLang === lang.code ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'}`}
+                                        >
+                                            <span className="text-sm">{lang.label}</span>
+                                            {selectedLang === lang.code && <span className="ml-auto text-blue-600">✓</span>}
+                                        </button>
+                                    ))}
                                 </div>
                             </>
                         )}

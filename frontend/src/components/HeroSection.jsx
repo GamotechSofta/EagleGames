@@ -1,7 +1,7 @@
 import React from 'react';
 
 const heroImageDesktop =
-  'https://res.cloudinary.com/dzd47mpdo/image/upload/v1770635561/Black_Gold_Modern_Casino_Night_Party_Facebook_Cover_1545_x_900_px_1920_x_500_px_1_l8iyri.png';
+  'https://res.cloudinary.com/dzd47mpdo/image/upload/v1771396549/payments/bdijpmueip15gbkwe3ej.png';
 const heroImageMobile =
   'https://res.cloudinary.com/dzd47mpdo/image/upload/v1770623700/Black_Gold_Modern_Casino_Night_Party_Facebook_Cover_1545_x_900_px_ufrc1r.png';
 
@@ -21,7 +21,7 @@ const HeroSection = () => {
         style={{ aspectRatio: '1920/500' }}
       >
         <div
-          className="absolute inset-0 w-full h-full"
+          className="absolute inset-0 w-full h-full mt-3"
           style={heroStyle(heroImageDesktop)}
         />
       </section>

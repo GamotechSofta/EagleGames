@@ -106,7 +106,7 @@ input[type="date"]::-webkit-clear-button {
 html {
   -webkit-text-size-adjust: 100%;
   overflow-x: hidden;
-  background: #ffffff;
+  background: #1f2937;
   height: 100%;
 }
 
@@ -115,13 +115,13 @@ body {
   min-height: 100dvh;
   min-height: -webkit-fill-available;
   padding-bottom: env(safe-area-inset-bottom, 0);
-  background: #ffffff;
+  background: #1f2937;
   position: relative;
-  color: #1f2937;
+  color: #f9fafb;
 }
 
 #root {
-  background: #ffffff;
+  background: #1f2937;
   min-height: 100%;
   min-height: -webkit-fill-available;
 }

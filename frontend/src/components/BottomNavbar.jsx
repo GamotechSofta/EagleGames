@@ -103,7 +103,7 @@ const BottomNavbar = () => {
       }}
     >
       {/* Backplate to prevent white background showing behind navbar */}
-      <div className="absolute inset-0 bg-[#1f2937] pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#66000000] to-[#111827] pointer-events-none -mb-20" />
       <div className="relative bg-[#111827] rounded-3xl border border-[#374151] shadow-lg flex items-end justify-around px-1 py-1.5 min-h-[56px]">
         {navItems.map((item) => {
           const active = isActive(item.path);
@@ -132,7 +132,7 @@ const BottomNavbar = () => {
                   {/* Icon: gray when inactive, white when active (on navy bg) */}
                   <div
                     className={`transition-all duration-200 ${
-                      active ? 'brightness-0 invert' : 'brightness-0 opacity-40'
+                      active ? 'brightness-0 invert opacity-100' : 'brightness-0 invert opacity-75'
                     }`}
                   >
                     {item.icon}
@@ -159,12 +159,12 @@ const BottomNavbar = () => {
                 }
                 navigate(item.path);
               }}
-              className="relative flex flex-col items-center justify-center gap-0.5 px-2 py-2 rounded-xl min-w-[56px] active:scale-95 transition-all duration-150 touch-manipulation"
+              className="relative flex flex-col items-center justify-center gap-0.5 px-2 py-1 rounded-xl min-w-[56px] active:scale-95 transition-all duration-150 touch-manipulation"
             >
               {/* Icon: gray when inactive, navy when active */}
               <div
                 className={`transition-all duration-200 ${
-                  active ? 'scale-110 brightness-0 opacity-60' : 'scale-100 brightness-0 opacity-40'
+                  active ? 'scale-110 brightness-0 invert opacity-100' : 'scale-100 brightness-0 invert opacity-75'
                 }`}
               >
                 {item.icon}

@@ -249,17 +249,6 @@ const BidOptions = () => {
         />
       ),
     },
-    {
-      id: 6.65,
-      title: 'Chart Game',
-      icon: (
-        <img
-          src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769714254/Untitled_1080_x_1080_px_1080_x_1080_px_8_jdbxyd.svg"
-          alt="Chart Game"
-          className="w-full h-full object-contain"
-        />
-      ),
-    },
   ];
 
   if (!market) {
@@ -280,7 +269,6 @@ const BidOptions = () => {
           'SP Common',
           'CP (Common Pana)',
           'DP Common',
-          'Chart Game',
           'Single Pana',
           'Single Pana Bulk',
           'Double Pana',
@@ -332,7 +320,6 @@ const BidOptions = () => {
     'SP DP Motor',
     'SP DP T Motor',
     'Odd Even',
-    'Chart Game',
   ];
   const orderedVisibleOptions = [...visibleOptions].sort((a, b) => {
     const ia = optionDisplayOrder.indexOf(a.title);
@@ -369,7 +356,7 @@ const BidOptions = () => {
       </div>
 
       {/* Grid Content */}
-      <div className="w-full max-w-md lg:max-w-none px-3 sm:px-4 pt-3 sm:pt-4 pb-[calc(5rem+env(safe-area-inset-bottom,0px))] md:pb-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+      <div className="w-full max-w-md md:max-w-5xl lg:max-w-7xl mx-auto px-2.5 sm:px-4 pt-4 sm:pt-5 pb-[calc(5rem+env(safe-area-inset-bottom,0px))] md:pb-8 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 sm:gap-3.5">
         {orderedVisibleOptions.map((option) => (
           <div
             key={option.id}
@@ -380,15 +367,15 @@ const BidOptions = () => {
                 gameMode: option.title.toLowerCase().includes('bulk') ? 'bulk' : 'easy'
               }
             })}
-            className="relative rounded-2xl bg-gradient-to-b from-[#2B3547] to-[#232C3B] border-2 border-[#374151] p-3.5 sm:p-4 flex flex-col items-center justify-center gap-2 sm:gap-2.5 hover:border-[#1a74e5] active:scale-[0.98] transition-all cursor-pointer shadow-md hover:shadow-lg group touch-manipulation min-h-[104px] sm:min-h-[120px] md:min-h-[132px]"
+            className="relative aspect-square rounded-2xl bg-gradient-to-b from-[#2B3547] to-[#232C3B] border border-[#374151] p-2.5 sm:p-3 flex flex-col items-center justify-center gap-2 hover:border-[#4a5f87] active:scale-[0.98] transition-all cursor-pointer shadow-md hover:shadow-lg group touch-manipulation"
           >
             {/* Icon Container with subtle glow effect */}
-            <div className="flex items-center justify-center w-[72px] h-[72px] sm:w-[84px] sm:h-[84px] md:w-[96px] md:h-[96px] group-hover:scale-[1.03] transition-transform duration-300">
+            <div className="flex items-center justify-center w-[50px] h-[50px] sm:w-[62px] sm:h-[62px] md:w-[72px] md:h-[72px] group-hover:scale-[1.03] transition-transform duration-300">
               {option.icon}
             </div>
 
             {/* Title */}
-            <span className="text-white text-[10px] sm:text-[11px] md:text-sm font-semibold tracking-[0.14em] sm:tracking-[0.18em] uppercase text-center line-clamp-2 leading-tight">
+            <span className="text-white text-[8.5px] sm:text-[10px] md:text-[11px] font-semibold tracking-[0.11em] sm:tracking-[0.14em] uppercase text-center line-clamp-2 leading-tight">
               {option.title}
             </span>
           </div>

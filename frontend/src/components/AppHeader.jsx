@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { getBalance, updateUserBalance } from '../api/bets';
 import { BACKEND_BASE_URL } from '../config/api';
+import { LANGUAGE_OPTIONS, applyLanguage, getCurrentLanguage } from './GoogleTranslateWidget';
 
 const AppHeader = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [balance, setBalance] = useState(null);
+  const [selectedLang, setSelectedLang] = useState(getCurrentLanguage());
 
   const menuItems = [
     { label: 'My Bets', path: '/bids' },
@@ -167,18 +169,31 @@ const AppHeader = () => {
           </div>
 
         <div className="flex items-center gap-2 sm:gap-2.5 md:gap-3">
-          {/* Download App - direct in navbar */}
-          <button
-            type="button"
-            onClick={() => window.open(`${BACKEND_BASE_URL}/downloads/myapp.apk`, '_blank', 'noopener,noreferrer')}
-            className="flex shrink-0 items-center gap-1.5 rounded-lg bg-[#1f2937] border border-[#374151] px-2 md:px-2.5 py-1 md:py-1.5 hover:bg-[#2563eb] hover:border-[#1a74e5] transition-colors"
-            title="Download App"
-          >
-            <svg className="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          <div className="flex items-center rounded-lg bg-[#121d30] border border-[#2a3a55] px-2 py-1 shadow-sm max-w-[160px] sm:max-w-none">
+            <svg className="w-4 h-4 text-gray-300 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 5h12M9 3v2m1.5 13.5L7 10h2l3.5 8.5M12 21l4-9 4 9m-.9-2h-6.2" />
             </svg>
-            <span className="text-xs md:text-sm font-bold text-white hidden sm:inline">Download</span>
-          </button>
+            <select
+              value={selectedLang}
+              onChange={(e) => {
+                const nextLang = e.target.value;
+                setSelectedLang(nextLang);
+                applyLanguage(nextLang);
+              }}
+              className="bg-transparent text-xs md:text-sm font-semibold text-gray-100 outline-none w-full pr-1"
+              aria-label="Select language"
+            >
+              {LANGUAGE_OPTIONS.map((lang) => (
+                <option
+                  key={lang.code}
+                  value={lang.code}
+                  style={{ color: '#111827', backgroundColor: '#ffffff' }}
+                >
+                  {lang.label}
+                </option>
+              ))}
+            </select>
+          </div>
 
           {/* Wallet - desktop only, responsive size */}
           <button

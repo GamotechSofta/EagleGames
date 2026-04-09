@@ -25,6 +25,7 @@ import Shortcuts from './pages/Shortcuts';
 import Receipt from './pages/Receipt';
 import Settings from './pages/Settings';
 import { BetLayoutProvider } from './context/BetLayoutContext';
+import GoogleTranslateWidget from './components/GoogleTranslateWidget';
 
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -104,6 +105,7 @@ const App = () => {
                 <AuthProvider>
                     <BetLayoutProvider>
                         <AppRoutes />
+                        <GoogleTranslateWidget />
                     </BetLayoutProvider>
                 </AuthProvider>
             </LanguageProvider>

@@ -25,6 +25,7 @@ import MarketDetail from './pages/MarketDetail';
 import Settings from './pages/Settings';
 import TopWinners from './pages/TopWinners';
 import Roulette from './pages/Roulette';
+import GoogleTranslateWidget from './components/GoogleTranslateWidget';
 
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -255,6 +256,7 @@ const App = () => {
                     }
                 />
             </Routes>
+            <GoogleTranslateWidget />
         </Router>
     );
 };

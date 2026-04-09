@@ -68,8 +68,8 @@ const WithdrawFundHistory = () => {
     return (
         <div className="space-y-6">
             {/* Total Withdrawn */}
-            <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-5 border border-[#374151]">
-                <p className="text-gray-300 text-sm">Total Withdrawn</p>
+            <div className="bg-[#111827] rounded-2xl p-5 border border-[#374151]">
+                <p className="text-gray-400 text-sm">Total Withdrawn</p>
                 <p className="text-3xl font-bold text-[#1a74e5]">₹{totalWithdrawn.toLocaleString()}</p>
             </div>
 
