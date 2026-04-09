@@ -32,11 +32,8 @@ const BidLayout = ({
     setSession = () => {},
     sessionRightSlot = null,
     showSessionOnMobile = false,
-    // Optional: override allowed session options for this page (e.g. ['OPEN'])
     sessionOptionsOverride = null,
-    // Optional: lock session dropdown (prevents selecting OPEN/CLOSE)
     lockSessionSelect = false,
-    // Optional: hide the session dropdown caret icon
     hideSessionSelectCaret = false,
     dateSessionControlClassName = '',
     dateSessionGridClassName = '',
@@ -60,89 +57,62 @@ const BidLayout = ({
         Number.isFinite(Number(walletBalance)) ? Number(walletBalance) : getWalletFromStorage()
     );
     
-    // Get minimum date (today) for date picker - calculate once
     const minDate = React.useMemo(() => {
         return new Date().toISOString().split('T')[0];
-    }, []); // Only calculate once on mount
+    }, []); 
     
-    // Internal state for date if not provided via props
-    // Try to restore from localStorage, otherwise default to today
     const [internalDate, setInternalDate] = React.useState(() => {
         try {
             const savedDate = localStorage.getItem('betSelectedDate');
             if (savedDate) {
                 const today = new Date().toISOString().split('T')[0];
-                // Only restore if saved date is in the future (not today)
                 if (savedDate > today) {
                     return savedDate;
                 }
             }
-        } catch (e) {
-            // Ignore errors
-        }
+        } catch (e) {}
         const today = new Date();
-        return today.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+        return today.toISOString().split('T')[0];
     });
     
     const currentDate = selectedDate !== null ? selectedDate : internalDate;
     const setCurrentDate = setSelectedDate !== null ? setSelectedDate : (newDate) => {
-        // Save to localStorage when date changes
         try {
             localStorage.setItem('betSelectedDate', newDate);
-        } catch (e) {
-            // Ignore errors
-        }
+        } catch (e) {}
         setInternalDate(newDate);
     };
+
     useEffect(() => {
-        // Lock all bid screens to today's date only.
         if (currentDate !== minDate) setCurrentDate(minDate);
     }, [currentDate, minDate]);
 
     const marketStatus = market?.status;
-    const isRunning = marketStatus === 'running'; // "CLOSED IS RUNNING"
-    
-    // Check if selected date is today or in the future
-    // Compare dates as strings (YYYY-MM-DD format)
+    const isRunning = marketStatus === 'running';
     const isToday = currentDate === minDate;
-    // Schedule button should only show if date is in the future (not today)
     const isScheduled = currentDate > minDate;
     
-    // Determine session options based on date selection and betting window:
-    // - If today and (market is running OR opening time passed = closeOnly): only CLOSE
-    // - If today and market is open: both OPEN and CLOSE
-    // - If scheduled (future date): always both OPEN and CLOSE
     const sessionOptions =
         Array.isArray(sessionOptionsOverride) && sessionOptionsOverride.length
             ? sessionOptionsOverride
             : (isToday && (isRunning || bettingCloseOnly) ? ['CLOSE'] : ['OPEN', 'CLOSE']);
 
     useEffect(() => {
-        // If market is "CLOSED IS RUNNING" and it's today, force session to CLOSE and lock it.
         if (Array.isArray(sessionOptionsOverride) && sessionOptionsOverride.length) {
             const desired = sessionOptionsOverride[0];
             if (desired && session !== desired) setSession(desired);
             return;
         }
-        // Force CLOSE if it's today and (market is running OR opening time has passed = closeOnly)
         if (isToday && (isRunning || bettingCloseOnly) && session !== 'CLOSE') {
             setSession('CLOSE');
         }
-        // If scheduled (future date) and session was locked to CLOSE, allow OPEN option
-        if (isScheduled && sessionOptions.includes('OPEN') && session === 'CLOSE' && isRunning) {
-            // Don't force change, but allow user to choose OPEN for scheduled bets
-        }
     }, [isToday, isScheduled, isRunning, bettingCloseOnly, session, setSession, sessionOptionsOverride, sessionOptions, currentDate]);
 
-    // Scroll to top when route changes
     useEffect(() => {
         const timer = setTimeout(() => {
-            // Scroll window
             window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
             if (document.documentElement) document.documentElement.scrollTop = 0;
             if (document.body) document.body.scrollTop = 0;
-            
-            // Scroll content container
             if (contentRef.current) {
                 contentRef.current.scrollTop = 0;
             }
@@ -181,10 +151,10 @@ const BidLayout = ({
     }, [walletBalance]);
 
     return (
-        <div className="min-h-screen min-h-ios-screen bg-[#111827] font-sans w-full max-w-full overflow-x-hidden">
-            {/* Header - Gray theme - iOS safe area padding */}
+        <div className="min-h-screen min-h-ios-screen bg-[#111827] font-sans w-full max-w-full overflow-x-hidden flex flex-col">
+            {/* Header */}
             <div
-                className="bg-[#374151] border-b-2 border-[#374151] py-1.5 flex items-center justify-between gap-2 sticky top-0 z-10 shadow-sm"
+                className="bg-[#374151] border-b-2 border-[#374151] py-1.5 flex items-center justify-between gap-2 sticky top-0 z-20 shadow-sm"
                 style={{ paddingLeft: 'max(0.75rem, env(safe-area-inset-left))', paddingRight: 'max(0.75rem, env(safe-area-inset-right))' }}
             >
                 <button
@@ -221,7 +191,6 @@ const BidLayout = ({
                     className={`pt-1 pb-2 gap-1.5 md:pt-2 md:pb-4 md:gap-3 flex flex-row flex-wrap overflow-hidden ${dateSessionGridClassName}`}
                     style={{ paddingLeft: 'max(0.75rem, env(safe-area-inset-left))', paddingRight: 'max(0.75rem, env(safe-area-inset-right))' }}
                 >
-                    {/* Date Input Button */}
                     <div className="relative flex-1 min-w-0 shrink overflow-hidden">
                         <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none z-10">
                             <svg className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -234,14 +203,11 @@ const BidLayout = ({
                             value={todayDate}
                             readOnly
                             className={`w-full pl-8 pr-2.5 py-1.5 min-h-[40px] h-[40px] sm:pl-10 sm:pr-3 sm:py-2.5 sm:min-h-[44px] sm:h-[44px] bg-[#111827] border-2 border-[#374151] text-white rounded-full text-xs sm:text-sm font-bold text-center focus:outline-none focus:border-[#1a74e5] cursor-pointer truncate ${dateSessionControlClassName}`}
-                            style={{
-                                colorScheme: 'light',
-                            }}
+                            style={{ colorScheme: 'light' }}
                             title="Current date"
                         />
                     </div>
 
-                    {/* Session Select */}
                     <div className={`relative flex-1 min-w-0 ${showSessionOnMobile ? '' : 'hidden md:block'}`}>
                         <select
                             value={session}
@@ -250,9 +216,7 @@ const BidLayout = ({
                             className={`w-full appearance-none bg-[#111827] border-2 border-[#374151] text-white font-bold text-xs sm:text-sm py-1.5 min-h-[40px] h-[40px] px-3 pr-7 sm:py-2.5 sm:min-h-[44px] sm:h-[44px] sm:px-4 sm:pr-8 rounded-full text-center focus:outline-none focus:border-[#1a74e5] ${(lockSessionSelect || (isToday && isRunning)) ? 'opacity-60 cursor-not-allowed bg-[#374151]' : ''} ${dateSessionControlClassName}`}
                         >
                             {sessionOptions.map((opt) => (
-                                <option key={opt} value={opt}>
-                                    {opt}
-                                </option>
+                                <option key={opt} value={opt}>{opt}</option>
                             ))}
                         </select>
                         {!hideSessionSelectCaret && (
@@ -263,7 +227,6 @@ const BidLayout = ({
                             </div>
                         )}
                     </div>
-
                     {sessionRightSlot}
                 </div>
             )}
@@ -272,58 +235,58 @@ const BidLayout = ({
             <div
                 ref={contentRef}
                 className={`flex-1 overflow-y-auto overflow-x-hidden w-full max-w-full ios-scroll-touch ${
-                    contentPaddingClass ?? (hideFooter ? 'pb-6' : 'pb-[calc(7rem+env(safe-area-inset-bottom,0px))] md:pb-32')
+                    contentPaddingClass ?? (hideFooter ? 'pb-6' : 'pb-32')
                 }`}
                 style={{ paddingLeft: 'max(0.75rem, env(safe-area-inset-left))', paddingRight: 'max(0.75rem, env(safe-area-inset-right))' }}
             >
                 {children}
             </div>
 
-            {/* Footer - Card centered in right 50% on desktop (hidden when submit card is in content) - iOS safe area */}
+            {/* Footer - Positioned better for Reachability */}
             {!hideFooter && (
-            <div
-                className="fixed bottom-[calc(80px+env(safe-area-inset-bottom,0px))] left-0 right-0 md:bottom-0 z-10 py-3 md:grid md:grid-cols-2 md:gap-0"
-                style={{
-                    paddingLeft: 'max(0.75rem, env(safe-area-inset-left))',
-                    paddingRight: 'max(0.75rem, env(safe-area-inset-right))',
-                }}
-            >
-                <div className="hidden md:block" />
-                <div className="flex justify-center md:justify-center">
-                    <div
-                        className={`w-full max-w-sm md:max-w-md rounded-2xl flex flex-col sm:flex-row items-center gap-4 sm:gap-6 ${
-                            showFooterStats
-                                ? 'bg-[#111827] backdrop-blur-sm border-2 border-[#374151] shadow-xl px-4 py-4'
-                                : 'bg-transparent border-0 shadow-none p-0'
-                        }`}
-                    >
-                        {showFooterStats && (
-                            <div className="flex items-center gap-6 sm:gap-8 shrink-0">
-                                <div className="text-center">
-                                    <div className="text-[10px] sm:text-xs text-gray-300 uppercase tracking-wider">Bets</div>
-                                    <div className="text-base sm:text-lg font-bold text-[#1a74e5]">{bidsCount}</div>
-                                </div>
-                                <div className="text-center">
-                                    <div className="text-[10px] sm:text-xs text-gray-300 uppercase tracking-wider">Points</div>
-                                    <div className="text-base sm:text-lg font-bold text-[#1a74e5]">{totalPoints}</div>
-                                </div>
-                            </div>
-                        )}
-                        <button
-                            type="button"
-                            onClick={onSubmit}
-                            disabled={!bidsCount || !bettingAllowed}
-                            className={`flex-1 w-full sm:w-auto sm:min-w-[140px] font-bold py-3 px-6 rounded-xl shadow-lg transition-all text-sm sm:text-base ${
-                                bidsCount && bettingAllowed
-                                    ? 'bg-[#1a74e5] text-white hover:bg-[#152842] active:scale-[0.98]'
-                                    : 'bg-gray-400 text-white opacity-50 cursor-not-allowed'
+                <div
+                    className="fixed bottom-[calc(12px+env(safe-area-inset-bottom,0px))] left-0 right-0 md:bottom-0 z-30 py-2 md:grid md:grid-cols-2"
+                    style={{
+                        paddingLeft: 'max(0.75rem, env(safe-area-inset-left))',
+                        paddingRight: 'max(0.75rem, env(safe-area-inset-right))',
+                    }}
+                >
+                    <div className="hidden md:block" />
+                    <div className="flex justify-center">
+                        <div
+                            className={`w-full max-w-[350px] md:max-w-md rounded-2xl flex flex-row items-center gap-4 ${
+                                showFooterStats
+                                    ? 'bg-[#111827]/95 backdrop-blur-md border-2 border-[#374151] shadow-2xl px-4 py-2.5'
+                                    : 'bg-transparent border-0 shadow-none p-0'
                             }`}
                         >
-                            {submitLabel}
-                        </button>
+                            {showFooterStats && (
+                                <div className="flex items-center gap-4 shrink-0 border-r border-[#374151] pr-4">
+                                    <div className="text-center">
+                                        <div className="text-[9px] text-gray-400 uppercase tracking-wider">Bets</div>
+                                        <div className="text-sm font-bold text-[#1a74e5]">{bidsCount}</div>
+                                    </div>
+                                    <div className="text-center">
+                                        <div className="text-[9px] text-gray-400 uppercase tracking-wider">Points</div>
+                                        <div className="text-sm font-bold text-[#1a74e5]">{totalPoints}</div>
+                                    </div>
+                                </div>
+                            )}
+                            <button
+                                type="button"
+                                onClick={onSubmit}
+                                disabled={!bidsCount || !bettingAllowed}
+                                className={`flex-1 font-bold py-2.5 px-4 rounded-xl shadow-lg transition-all text-sm ${
+                                    bidsCount && bettingAllowed
+                                        ? 'bg-[#1a74e5] text-white active:scale-95'
+                                        : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                }`}
+                            >
+                                {submitLabel}
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
             )}
         </div>
     );

@@ -244,7 +244,7 @@ const Login = () => {
                     name="username"
                     value={formData.username}
                     onChange={handleChange}
-                    className="w-full rounded-lg border border-[#374151] bg-[#111827] py-2.5 px-3 text-sm text-gray-900 placeholder-gray-400 focus:border-[#1a74e5] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
+                    className="w-full rounded-lg border border-[#374151] bg-[#111827] py-2.5 px-3 text-sm text-white placeholder-gray-400 focus:border-[#1a74e5] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
                     placeholder="Enter your full name"
                     required
                   />
@@ -268,7 +268,7 @@ const Login = () => {
                   value={formData.phone}
                   onChange={handleChange}
                   maxLength="10"
-                  className="w-full rounded-lg border border-[#374151] bg-[#111827] py-2.5 pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-[#1a74e5] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
+                  className="w-full rounded-lg border border-[#374151] bg-[#111827] py-2.5 pl-10 pr-3 text-sm text-white placeholder-gray-400 focus:border-[#1a74e5] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
                   placeholder="10-digit phone number"
                   required
                 />
@@ -290,7 +290,7 @@ const Login = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-[#374151] bg-[#111827] py-2.5 pl-10 pr-10 text-sm text-gray-900 placeholder-gray-400 focus:border-[#1a74e5] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
+                  className="w-full rounded-lg border border-[#374151] bg-[#111827] py-2.5 pl-10 pr-10 text-sm text-white placeholder-gray-400 focus:border-[#1a74e5] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
                   placeholder="Enter your password"
                   required
                 />
@@ -316,7 +316,7 @@ const Login = () => {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className="w-full rounded-lg border border-[#374151] bg-[#111827] py-2.5 px-3 pr-10 text-sm text-gray-900 placeholder-gray-400 focus:border-[#1a74e5] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
+                    className="w-full rounded-lg border border-[#374151] bg-[#111827] py-2.5 px-3 pr-10 text-sm text-white placeholder-gray-400 focus:border-[#1a74e5] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
                     placeholder="Re-enter your password"
                     required
                   />
