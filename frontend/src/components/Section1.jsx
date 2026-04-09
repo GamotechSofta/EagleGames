@@ -87,21 +87,21 @@ const Section1 = () => {
 
 
   return (
-    <section className="w-full bg-gray-200 min-[375px]:pt-4 pb-[calc(5rem+env(safe-area-inset-bottom,0px))] sm:pt-6 sm:pb-10 min-[375px]:px-3 sm:px-4 md:pb-8 max-w-full overflow-x-hidden">
+    <section className="w-full bg-transparent min-[375px]:pt-4 pb-[calc(5rem+env(safe-area-inset-bottom,0px))] sm:pt-6 sm:pb-10 min-[375px]:px-3 sm:px-4 md:pb-8 max-w-full overflow-x-hidden">
       {/* ═══ Desktop: MARKETS header ── */}
       <div className="hidden md:flex items-center gap-4 mt-4 mb-5 w-full max-w-7xl mx-auto px-4">
         {/* ── Left navy line ── */}
-        <div className="flex-1 h-[1px] bg-gradient-to-r from-gray-300 via-[#1B3150] to-[#1B3150] min-w-[20px]" />
+        <div className="flex-1 h-[1px] bg-gradient-to-r from-[#374151] via-[#1a74e5] to-[#1a74e5] min-w-[20px]" />
 
         {/* ── MARKETS center ── */}
         <div className="flex items-center gap-2 shrink-0">
-          <svg className="w-2.5 h-2.5 text-[#1B3150]" viewBox="0 0 12 12" fill="currentColor"><path d="M6 0l1.8 4.2L12 6l-4.2 1.8L6 12l-1.8-4.2L0 6l4.2-1.8z"/></svg>
-          <h2 className="text-gray-800 text-lg font-bold tracking-[0.15em] uppercase">Markets</h2>
-          <svg className="w-2.5 h-2.5 text-[#1B3150]" viewBox="0 0 12 12" fill="currentColor"><path d="M6 0l1.8 4.2L12 6l-4.2 1.8L6 12l-1.8-4.2L0 6l4.2-1.8z"/></svg>
+          <svg className="w-2.5 h-2.5 text-[#1a74e5]" viewBox="0 0 12 12" fill="currentColor"><path d="M6 0l1.8 4.2L12 6l-4.2 1.8L6 12l-1.8-4.2L0 6l4.2-1.8z"/></svg>
+          <h2 className="text-white text-lg font-bold tracking-[0.15em] uppercase">Markets</h2>
+          <svg className="w-2.5 h-2.5 text-[#1a74e5]" viewBox="0 0 12 12" fill="currentColor"><path d="M6 0l1.8 4.2L12 6l-4.2 1.8L6 12l-1.8-4.2L0 6l4.2-1.8z"/></svg>
         </div>
 
         {/* ── Right navy line ── */}
-        <div className="flex-1 h-[1px] bg-gradient-to-l from-gray-300 via-[#1B3150] to-[#1B3150] min-w-[20px]" />
+        <div className="flex-1 h-[1px] bg-gradient-to-l from-[#374151] via-[#1a74e5] to-[#1a74e5] min-w-[20px]" />
 
       </div>
 
@@ -109,9 +109,9 @@ const Section1 = () => {
       <div className="flex md:hidden items-center justify-center gap-2 min-[375px]:gap-3 mb-4 min-[375px]:mb-6 sm:mb-8 w-full max-w-7xl mx-auto px-2">
         <div className="flex-1 h-[1px] bg-gray-400 min-w-[20px] shrink-0 shadow-sm" />
         <div className="flex items-center gap-1.5 shrink-0">
-          <span className="text-[#1B3150] font-bold text-sm min-[375px]:text-base sm:text-lg">+</span>
-          <h2 className="text-[#1B3150] font-bold text-sm min-[375px]:text-base sm:text-lg tracking-wider uppercase">MARKETS</h2>
-          <span className="text-[#1B3150] font-bold text-sm min-[375px]:text-base sm:text-lg">+</span>
+          <span className="text-[#1a74e5] font-bold text-sm min-[375px]:text-base sm:text-lg">+</span>
+          <h2 className="text-[#1a74e5] font-bold text-sm min-[375px]:text-base sm:text-lg tracking-wider uppercase">MARKETS</h2>
+          <span className="text-[#1a74e5] font-bold text-sm min-[375px]:text-base sm:text-lg">+</span>
         </div>
         <div className="flex-1 h-[1px] bg-gray-400 min-w-[20px] shrink-0 shadow-sm" />
       </div>
@@ -133,26 +133,26 @@ const Section1 = () => {
             <div
               key={market.id}
               onClick={() => isClickable && navigate('/bidoptions', { state: { market } })}
-              className={`bg-white rounded-lg overflow-hidden transform transition-transform duration-200 shadow hover:shadow-lg ${
+              className={`bg-[#111827] rounded-lg overflow-hidden transform transition-transform duration-200 shadow hover:shadow-lg ${
                 isClickable 
-                  ? 'cursor-pointer hover:scale-[1.01] border border-gray-200 hover:border-[#1B3150]/50' 
-                  : 'cursor-not-allowed border border-gray-200'
+                  ? 'cursor-pointer hover:scale-[1.01] border border-[#374151] hover:border-[#1a74e5]' 
+                  : 'cursor-not-allowed border border-[#374151]'
               }`}
             >
               <div className="p-1.5 sm:p-2 flex flex-col">
                 {/* Top: Market name (left) + Status (right) */}
                 <div className="flex items-start justify-between gap-2 mb-0.5">
-                  <h3 className="text-gray-900 text-sm sm:text-base font-bold truncate flex-1 min-w-0 leading-tight">
+                  <h3 className="text-white text-sm sm:text-base font-bold truncate flex-1 min-w-0 leading-tight">
                     {market.gameName}
                   </h3>
-                  <span className={`text-[10px] sm:text-xs font-medium shrink-0 leading-tight px-1.5 py-0.5 ${market.status === 'closed' ? 'text-red-500' : 'text-green-600'}`}>
+                  <span className={`text-[10px] sm:text-xs font-medium shrink-0 leading-tight px-1.5 py-0.5 ${market.status === 'closed' ? 'text-red-500' : 'text-green-500'}`}>
                     {statusText}
                   </span>
                 </div>
 
                 {/* Middle: Result numbers (green) + Icons (right) */}
                 <div className="flex items-center justify-between gap-2 mb-1">
-                  <p className="text-green-600 text-base sm:text-lg md:text-xl font-bold leading-tight flex-1 min-w-0">
+                  <p className="text-green-500 text-base sm:text-lg md:text-xl font-bold leading-tight flex-1 min-w-0">
                     {market.result}
                   </p>
                   <div className="flex items-center justify-center shrink-0 ml-auto self-center pt-2">
@@ -178,13 +178,13 @@ const Section1 = () => {
                 </div>
 
                 {/* Bottom: Open Bids / Close Bids times */}
-                <div className="flex gap-2 text-gray-600">
+                <div className="flex gap-2 text-gray-400">
                   <div className="space-y-0.5">
-                    <p className="text-[10px] sm:text-xs font-medium text-gray-500 leading-tight">Open Bids</p>
+                    <p className="text-[10px] sm:text-xs font-medium text-gray-400 leading-tight">Open Bids</p>
                     <p className="text-xs sm:text-sm font-semibold leading-tight">{formatTime(market.startingTime) || '-'}</p>
                   </div>
                   <div className="space-y-0.5">
-                    <p className="text-[10px] sm:text-xs font-medium text-gray-500 leading-tight">Close Bids</p>
+                    <p className="text-[10px] sm:text-xs font-medium text-gray-400 leading-tight">Close Bids</p>
                     <p className="text-xs sm:text-sm font-semibold leading-tight">{formatTime(market.closingTime) || '-'}</p>
                   </div>
                 </div>

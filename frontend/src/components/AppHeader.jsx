@@ -123,7 +123,7 @@ const AppHeader = () => {
   return (
     <>
       <div
-        className="fixed top-0 left-0 right-0 z-50 w-full bg-white border-b-2 border-gray-300 pl-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))] sm:pl-[max(1.25rem,env(safe-area-inset-left))] sm:pr-[max(1.25rem,env(safe-area-inset-right))] md:pl-[max(1.5rem,env(safe-area-inset-left))] md:pr-[max(1.5rem,env(safe-area-inset-right))] py-1 sm:py-1 md:py-1.5 pt-[calc(0.375rem+env(safe-area-inset-top,0px))] sm:pt-[calc(0.25rem+env(safe-area-inset-top,0px))] md:pt-[calc(0.375rem+env(safe-area-inset-top,0px))] pb-1 sm:pb-1 md:pb-1.5"
+        className="fixed top-0 left-0 right-0 z-50 w-full bg-[#111827] border-b border-[#374151] pl-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))] sm:pl-[max(1.25rem,env(safe-area-inset-left))] sm:pr-[max(1.25rem,env(safe-area-inset-right))] md:pl-[max(1.5rem,env(safe-area-inset-left))] md:pr-[max(1.5rem,env(safe-area-inset-right))] py-1 sm:py-1 md:py-1.5 pt-[calc(0.375rem+env(safe-area-inset-top,0px))] sm:pt-[calc(0.25rem+env(safe-area-inset-top,0px))] md:pt-[calc(0.375rem+env(safe-area-inset-top,0px))] pb-1 sm:pb-1 md:pb-1.5"
       >
         <div className="flex items-center justify-between gap-2 sm:gap-2 md:gap-3">
           {/* Hamburger Menu and Logo together on the left */}
@@ -131,24 +131,24 @@ const AppHeader = () => {
             <button
               type="button"
               onClick={() => setIsMenuOpen(true)}
-              className="w-8 h-8 sm:w-7 sm:h-7 md:w-8 md:h-8 shrink-0 rounded-lg bg-gray-50 border-2 border-gray-300 flex items-center justify-center cursor-pointer active:scale-95 hover:bg-gray-100 transition-all duration-200 shadow-sm"
+              className="w-8 h-8 sm:w-7 sm:h-7 md:w-8 md:h-8 shrink-0 rounded-lg bg-[#1f2937] border border-[#374151] flex items-center justify-center cursor-pointer active:scale-95 hover:bg-[#2563eb] hover:border-[#1a74e5] transition-all duration-200 shadow-sm"
               aria-label="Open menu"
             >
             <div className="flex flex-col gap-1 sm:gap-1">
-              <div className="w-4 sm:w-4 md:w-4 h-[2px] bg-black rounded-full"></div>
-              <div className="w-3.5 sm:w-3.5 md:w-3.5 h-[2px] bg-black rounded-full"></div>
-              <div className="w-3 sm:w-3 md:w-3 h-[2px] bg-black rounded-full"></div>
+              <div className="w-4 sm:w-4 md:w-4 h-[2px] bg-white rounded-full"></div>
+              <div className="w-3.5 sm:w-3.5 md:w-3.5 h-[2px] bg-white rounded-full"></div>
+              <div className="w-3 sm:w-3 md:w-3 h-[2px] bg-white rounded-full"></div>
             </div>
             </button>
 
             {/* Home Icon */}
             <Link 
               to="/" 
-              className="w-8 h-8 sm:w-7 sm:h-7 md:w-8 md:h-8 shrink-0 rounded-lg bg-gray-50 border-2 border-gray-300 flex items-center justify-center cursor-pointer active:scale-95 hover:bg-gray-100 transition-all duration-200 shadow-sm"
+              className="w-8 h-8 sm:w-7 sm:h-7 md:w-8 md:h-8 shrink-0 rounded-lg bg-[#1f2937] border border-[#374151] flex items-center justify-center cursor-pointer active:scale-95 hover:bg-[#2563eb] hover:border-[#1a74e5] transition-all duration-200 shadow-sm"
               title="Home"
             >
               <svg 
-                className="w-4 h-4 sm:w-4 sm:h-4 md:w-4 md:h-4 text-black" 
+                className="w-4 h-4 sm:w-4 sm:h-4 md:w-4 md:h-4 text-white" 
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
@@ -166,46 +166,45 @@ const AppHeader = () => {
             
           </div>
 
-        {/* Right side buttons - Download, Wallet, Profile */}
         <div className="flex items-center gap-2 sm:gap-2.5 md:gap-3">
           {/* Download App - direct in navbar */}
           <button
             type="button"
             onClick={() => window.open(`${BACKEND_BASE_URL}/downloads/myapp.apk`, '_blank', 'noopener,noreferrer')}
-            className="flex shrink-0 items-center gap-1.5 rounded-lg bg-gray-50 border-2 border-gray-300 px-2 md:px-2.5 py-1 md:py-1.5 hover:bg-gray-100 hover:border-gray-400 transition-colors"
+            className="flex shrink-0 items-center gap-1.5 rounded-lg bg-[#1f2937] border border-[#374151] px-2 md:px-2.5 py-1 md:py-1.5 hover:bg-[#2563eb] hover:border-[#1a74e5] transition-colors"
             title="Download App"
           >
-            <svg className="w-5 h-5 md:w-6 md:h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+            <svg className="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
-            <span className="text-xs md:text-sm font-bold text-gray-800 hidden sm:inline">Download</span>
+            <span className="text-xs md:text-sm font-bold text-white hidden sm:inline">Download</span>
           </button>
 
           {/* Wallet - desktop only, responsive size */}
           <button
             onClick={() => navigate('/funds?tab=add-fund')}
-            className="flex shrink-0 items-center gap-1.5 md:gap-2 lg:gap-2.5 rounded-lg bg-gray-50 border-2 border-gray-300 px-2 md:px-2.5 lg:px-3 py-1 md:py-1.5 hover:bg-gray-100 hover:border-gray-400 transition-colors"
+            className="flex shrink-0 items-center gap-1.5 md:gap-2 lg:gap-2.5 rounded-lg bg-[#1f2937] border border-[#374151] px-2 md:px-2.5 lg:px-3 py-1 md:py-1.5 hover:bg-[#2563eb] hover:border-[#1a74e5] transition-colors"
           >
             <img
               src="https://res.cloudinary.com/dnyp5jknp/image/upload/v1771394532/wallet_n1oyef.png"
               alt="Wallet"
-              className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 object-contain"
+              className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 object-contain brightness-0 invert"
             />
-            <span className="text-xs md:text-sm lg:text-base font-bold text-gray-800">₹{formattedBalance}</span>
+            <span className="text-xs md:text-sm lg:text-base font-bold text-white">₹{formattedBalance}</span>
           </button>
 
           {/* Profile Icon - improved mobile touch target */}
           <button
             type="button"
             onClick={handleProfileClick}
-            className={`w-8 h-8 sm:w-7 sm:h-7 md:w-8 md:h-8 shrink-0 rounded-lg border-2 flex items-center justify-center cursor-pointer active:scale-95 transition-all duration-200 shadow-sm ${
-              user ? 'bg-gray-50 border-gray-500 hover:bg-gray-100 hover:border-[#1B3150]' : 'bg-white border-gray-400 hover:bg-gray-50 hover:border-[#1B3150]'
+            className={`w-8 h-8 sm:w-7 sm:h-7 md:w-8 md:h-8 shrink-0 rounded-lg border flex items-center justify-center cursor-pointer active:scale-95 transition-all duration-200 shadow-sm ${
+              user ? 'bg-[#1f2937] border-[#374151] hover:bg-[#2563eb] hover:border-[#1a74e5]' : 'bg-[#1f2937] border-[#374151] hover:bg-[#2563eb] hover:border-[#1a74e5]'
             }`}
             title={user ? `${user.username} - View Profile` : 'Sign In / Sign Up'}
             aria-label="Profile"
           >
             <svg
-              className={`w-4 h-4 sm:w-4 sm:h-4 md:w-4 md:h-4 ${user ? 'text-gray-500' : 'text-[#1B3150]'}`}
+              className="w-4 h-4 sm:w-4 sm:h-4 md:w-4 md:h-4 text-white"
               fill={user ? 'currentColor' : 'none'}
               stroke={user ? 'none' : 'currentColor'}
               strokeWidth={user ? 0 : 1.5}

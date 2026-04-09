@@ -7,7 +7,7 @@ const Home = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen min-h-ios-screen bg-gray-200 w-full max-w-full overflow-x-hidden">
+    <div className="min-h-screen min-h-ios-screen bg-transparent w-full max-w-full overflow-x-hidden">
       <HeroSection />
       {/* Roulette game banner - under hero */}
       <section className="w-full max-w-full px-3 sm:px-4 mb-4">
