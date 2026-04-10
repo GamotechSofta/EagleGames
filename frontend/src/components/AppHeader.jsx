@@ -125,32 +125,32 @@ const AppHeader = () => {
   return (
     <>
       <div
-        className="fixed top-0 left-0 right-0 z-50 w-full bg-[#111827] border-b border-[#374151] pl-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))] sm:pl-[max(1.25rem,env(safe-area-inset-left))] sm:pr-[max(1.25rem,env(safe-area-inset-right))] md:pl-[max(1.5rem,env(safe-area-inset-left))] md:pr-[max(1.5rem,env(safe-area-inset-right))] py-1 sm:py-1 md:py-1.5 pt-[calc(0.375rem+env(safe-area-inset-top,0px))] sm:pt-[calc(0.25rem+env(safe-area-inset-top,0px))] md:pt-[calc(0.375rem+env(safe-area-inset-top,0px))] pb-1 sm:pb-1 md:pb-1.5"
+        className="fixed top-0 left-0 right-0 z-50 w-full bg-[#0f172a]/95 backdrop-blur-sm border-b border-[#233047] pl-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))] sm:pl-[max(1.25rem,env(safe-area-inset-left))] sm:pr-[max(1.25rem,env(safe-area-inset-right))] md:pl-[max(1.5rem,env(safe-area-inset-left))] md:pr-[max(1.5rem,env(safe-area-inset-right))] py-1.5 sm:py-1 md:py-1.5 pt-[calc(0.5rem+env(safe-area-inset-top,0px))] sm:pt-[calc(0.25rem+env(safe-area-inset-top,0px))] md:pt-[calc(0.375rem+env(safe-area-inset-top,0px))] pb-1.5 sm:pb-1 md:pb-1.5"
       >
-        <div className="flex items-center justify-between gap-2 sm:gap-2 md:gap-3">
+        <div className="flex items-center justify-between gap-1.5 sm:gap-2 md:gap-3 min-h-[40px] sm:min-h-[36px]">
           {/* Hamburger Menu and Logo together on the left */}
-          <div className="flex items-center gap-2.5 sm:gap-3 md:gap-4">
+          <div className="flex items-center gap-1.5 sm:gap-3 md:gap-4">
             <button
               type="button"
               onClick={() => setIsMenuOpen(true)}
-              className="w-8 h-8 sm:w-7 sm:h-7 md:w-8 md:h-8 shrink-0 rounded-lg bg-[#1f2937] border border-[#374151] flex items-center justify-center cursor-pointer active:scale-95 hover:bg-[#2563eb] hover:border-[#1a74e5] transition-all duration-200 shadow-sm"
+              className="w-8 h-8 sm:w-7 sm:h-7 md:w-8 md:h-8 shrink-0 rounded-full bg-[#1f2937] border border-[#334155] flex items-center justify-center cursor-pointer active:scale-95 hover:bg-[#2563eb] hover:border-[#1a74e5] transition-all duration-200"
               aria-label="Open menu"
             >
-            <div className="flex flex-col gap-1 sm:gap-1">
-              <div className="w-4 sm:w-4 md:w-4 h-[2px] bg-white rounded-full"></div>
-              <div className="w-3.5 sm:w-3.5 md:w-3.5 h-[2px] bg-white rounded-full"></div>
-              <div className="w-3 sm:w-3 md:w-3 h-[2px] bg-white rounded-full"></div>
+            <div className="flex flex-col gap-0.5 sm:gap-1">
+              <div className="w-3.5 sm:w-4 md:w-4 h-[2px] bg-white rounded-full"></div>
+              <div className="w-3 sm:w-3.5 md:w-3.5 h-[2px] bg-white rounded-full"></div>
+              <div className="w-2.5 sm:w-3 md:w-3 h-[2px] bg-white rounded-full"></div>
             </div>
             </button>
 
             {/* Home Icon */}
             <Link 
               to="/" 
-              className="w-8 h-8 sm:w-7 sm:h-7 md:w-8 md:h-8 shrink-0 rounded-lg bg-[#1f2937] border border-[#374151] flex items-center justify-center cursor-pointer active:scale-95 hover:bg-[#2563eb] hover:border-[#1a74e5] transition-all duration-200 shadow-sm"
+              className="w-8 h-8 sm:w-7 sm:h-7 md:w-8 md:h-8 shrink-0 rounded-full bg-[#1f2937] border border-[#334155] flex items-center justify-center cursor-pointer active:scale-95 hover:bg-[#2563eb] hover:border-[#1a74e5] transition-all duration-200"
               title="Home"
             >
               <svg 
-                className="w-4 h-4 sm:w-4 sm:h-4 md:w-4 md:h-4 text-white" 
+                className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-4 md:h-4 text-white" 
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
@@ -168,9 +168,9 @@ const AppHeader = () => {
 
           </div>
 
-        <div className="flex items-center gap-2 sm:gap-2.5 md:gap-3">
-          <div className="flex items-center rounded-lg bg-[#121d30] border border-[#2a3a55] px-2 py-1 shadow-sm max-w-[160px] sm:max-w-none">
-            <svg className="w-4 h-4 text-gray-300 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 md:gap-3">
+          <div className="flex items-center rounded-full bg-[#121d30] border border-[#2a3a55] px-1.5 sm:px-2 py-1 max-w-[120px] sm:max-w-none">
+            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-300 mr-1 sm:mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 5h12M9 3v2m1.5 13.5L7 10h2l3.5 8.5M12 21l4-9 4 9m-.9-2h-6.2" />
             </svg>
             <select
@@ -180,7 +180,7 @@ const AppHeader = () => {
                 setSelectedLang(nextLang);
                 applyLanguage(nextLang);
               }}
-              className="bg-transparent text-xs md:text-sm font-semibold text-gray-100 outline-none w-full pr-1"
+              className="bg-transparent text-[11px] sm:text-xs md:text-sm font-semibold text-gray-100 outline-none w-full pr-1"
               aria-label="Select language"
             >
               {LANGUAGE_OPTIONS.map((lang) => (
@@ -198,14 +198,14 @@ const AppHeader = () => {
           {/* Wallet - desktop only, responsive size */}
           <button
             onClick={() => navigate('/funds?tab=add-fund')}
-            className="flex shrink-0 items-center gap-1.5 md:gap-2 lg:gap-2.5 rounded-lg bg-[#1f2937] border border-[#374151] px-2 md:px-2.5 lg:px-3 py-1 md:py-1.5 hover:bg-[#2563eb] hover:border-[#1a74e5] transition-colors"
+            className="flex shrink-0 items-center gap-1 md:gap-2 lg:gap-2.5 rounded-full bg-[#1f2937] border border-[#334155] px-2 sm:px-2 md:px-2.5 lg:px-3 py-1 md:py-1.5 hover:bg-[#2563eb] hover:border-[#1a74e5] transition-colors"
           >
             <span
-              className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 rounded-full bg-[#0f172a] border border-[#4b5563] flex items-center justify-center"
+              className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 rounded-full bg-[#0f172a] border border-[#4b5563] flex items-center justify-center"
               aria-hidden="true"
             >
               <svg
-                className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#60a5fa]"
+                className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 text-[#60a5fa]"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -218,21 +218,21 @@ const AppHeader = () => {
                 />
               </svg>
             </span>
-            <span className="text-xs md:text-sm lg:text-base font-bold text-white">₹{formattedBalance}</span>
+            <span className="text-[11px] sm:text-xs md:text-sm lg:text-base font-bold text-white leading-none">₹{formattedBalance}</span>
           </button>
 
           {/* Profile Icon - improved mobile touch target */}
           <button
             type="button"
             onClick={handleProfileClick}
-            className={`w-8 h-8 sm:w-7 sm:h-7 md:w-8 md:h-8 shrink-0 rounded-lg border flex items-center justify-center cursor-pointer active:scale-95 transition-all duration-200 shadow-sm ${
+            className={`w-8 h-8 sm:w-7 sm:h-7 md:w-8 md:h-8 shrink-0 rounded-full border flex items-center justify-center cursor-pointer active:scale-95 transition-all duration-200 ${
               user ? 'bg-[#1f2937] border-[#374151] hover:bg-[#2563eb] hover:border-[#1a74e5]' : 'bg-[#1f2937] border-[#374151] hover:bg-[#2563eb] hover:border-[#1a74e5]'
             }`}
             title={user ? `${user.username} - View Profile` : 'Sign In / Sign Up'}
             aria-label="Profile"
           >
             <svg
-              className="w-4 h-4 sm:w-4 sm:h-4 md:w-4 md:h-4 text-white"
+              className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-4 md:h-4 text-white"
               fill={user ? 'currentColor' : 'none'}
               stroke={user ? 'none' : 'currentColor'}
               strokeWidth={user ? 0 : 1.5}
