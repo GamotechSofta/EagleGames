@@ -370,12 +370,12 @@ const BidOptions = () => {
             className="relative aspect-square rounded-2xl bg-gradient-to-b from-[#2B3547] to-[#232C3B] border border-[#374151] p-2.5 sm:p-3 flex flex-col items-center justify-center gap-2 hover:border-[#4a5f87] active:scale-[0.98] transition-all cursor-pointer shadow-md hover:shadow-lg group touch-manipulation"
           >
             {/* Icon Container with subtle glow effect */}
-            <div className="flex items-center justify-center w-[50px] h-[50px] sm:w-[62px] sm:h-[62px] md:w-[72px] md:h-[72px] group-hover:scale-[1.03] transition-transform duration-300">
+            <div className="flex items-center justify-center w-[68px] h-[68px] sm:w-[78px] sm:h-[78px] md:w-[88px] md:h-[88px] group-hover:scale-[1.03] transition-transform duration-300">
               {option.icon}
             </div>
 
             {/* Title */}
-            <span className="text-white text-[8.5px] sm:text-[10px] md:text-[11px] font-semibold tracking-[0.11em] sm:tracking-[0.14em] uppercase text-center line-clamp-2 leading-tight">
+            <span className="text-white text-[10px] sm:text-[11px] md:text-[12px] font-bold tracking-[0.06em] sm:tracking-[0.08em] uppercase text-center line-clamp-2 leading-tight">
               {option.title}
             </span>
           </div>
