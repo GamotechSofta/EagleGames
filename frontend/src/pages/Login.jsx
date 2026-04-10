@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../config/api';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
+const AUTH_SIDE_IMAGE =
+  'https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775826445/d40e37c1-bd75-4081-96ba-5bdf1a39a53c.png';
+
 const Login = () => {
   const navigate = useNavigate();
   const [mode, setMode] = useState('signin');
@@ -191,26 +194,35 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1f2937] px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-md items-center">
-        <div className="w-full rounded-2xl border border-[#374151] bg-[#111827] p-6 shadow-sm sm:p-8">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-[#1a74e5] sm:text-3xl">{mode === 'signin' ? 'Sign In' : 'Sign Up'}</h1>
+    <div className="min-h-screen bg-[#0b1220] px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-6xl items-center justify-center">
+        <div className="grid w-full overflow-hidden rounded-3xl border border-[#233047] bg-[#0f172a] shadow-[0_24px_70px_rgba(0,0,0,0.45)] md:grid-cols-2">
+          <div className="relative p-5 sm:p-7 lg:p-10">
+          <div className="absolute inset-0 md:hidden">
+            <img
+              src={AUTH_SIDE_IMAGE}
+              alt=""
+              className="h-full w-full object-cover opacity-35"
+            />
+            <div className="absolute inset-0 bg-[#0b1220]/75" />
+          </div>
+          <div className="relative z-10 mb-6">
+            <h1 className="text-2xl font-bold text-[#60a5fa] sm:text-3xl">{mode === 'signin' ? 'Sign In' : 'Sign Up'}</h1>
             <p className="mt-1 text-sm text-gray-300">
               {mode === 'signin' ? 'Access your account to continue.' : 'Create your own player account.'}
             </p>
-            <div className="mt-4 grid grid-cols-2 rounded-lg border border-[#374151] p-1">
+            <div className="mt-4 grid grid-cols-2 rounded-xl border border-[#334155] bg-[#0b1220] p-1">
               <button
                 type="button"
                 onClick={() => { setMode('signin'); setError(''); setSuccess(''); }}
-                className={`rounded-md py-2 text-sm font-semibold transition ${mode === 'signin' ? 'bg-[#1a74e5] text-white' : 'text-gray-200 hover:bg-[#374151]'}`}
+                className={`rounded-lg py-2 text-sm font-semibold transition ${mode === 'signin' ? 'bg-[#1a74e5] text-white' : 'text-gray-200 hover:bg-[#1f2937]'}`}
               >
                 Sign In
               </button>
               <button
                 type="button"
                 onClick={() => { setMode('signup'); setError(''); setSuccess(''); }}
-                className={`rounded-md py-2 text-sm font-semibold transition ${mode === 'signup' ? 'bg-[#1a74e5] text-white' : 'text-gray-200 hover:bg-[#374151]'}`}
+                className={`rounded-lg py-2 text-sm font-semibold transition ${mode === 'signup' ? 'bg-[#1a74e5] text-white' : 'text-gray-200 hover:bg-[#1f2937]'}`}
               >
                 Sign Up
               </button>
@@ -232,7 +244,7 @@ const Login = () => {
             </div>
           )}
 
-          <form onSubmit={mode === 'signin' ? handleSignInSubmit : handleSignUpSubmit} className="space-y-4">
+          <form onSubmit={mode === 'signin' ? handleSignInSubmit : handleSignUpSubmit} className="relative z-10 space-y-4">
             {mode === 'signup' && (
               <>
                 <div>
@@ -244,7 +256,7 @@ const Login = () => {
                     name="username"
                     value={formData.username}
                     onChange={handleChange}
-                    className="w-full rounded-lg border border-[#374151] bg-[#111827] py-2.5 px-3 text-sm text-white placeholder-gray-400 focus:border-[#1a74e5] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
+                    className="w-full rounded-xl border border-[#334155] bg-[#0b1220] py-2.5 px-3 text-sm text-white placeholder-gray-400 focus:border-[#1a74e5] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
                     placeholder="Enter your full name"
                     required
                   />
@@ -268,7 +280,7 @@ const Login = () => {
                   value={formData.phone}
                   onChange={handleChange}
                   maxLength="10"
-                  className="w-full rounded-lg border border-[#374151] bg-[#111827] py-2.5 pl-10 pr-3 text-sm text-white placeholder-gray-400 focus:border-[#1a74e5] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
+                  className="w-full rounded-xl border border-[#334155] bg-[#0b1220] py-2.5 pl-10 pr-3 text-sm text-white placeholder-gray-400 focus:border-[#1a74e5] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
                   placeholder="10-digit phone number"
                   required
                 />
@@ -290,7 +302,7 @@ const Login = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-[#374151] bg-[#111827] py-2.5 pl-10 pr-10 text-sm text-white placeholder-gray-400 focus:border-[#1a74e5] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
+                  className="w-full rounded-xl border border-[#334155] bg-[#0b1220] py-2.5 pl-10 pr-10 text-sm text-white placeholder-gray-400 focus:border-[#1a74e5] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
                   placeholder="Enter your password"
                   required
                 />
@@ -316,7 +328,7 @@ const Login = () => {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className="w-full rounded-lg border border-[#374151] bg-[#111827] py-2.5 px-3 pr-10 text-sm text-white placeholder-gray-400 focus:border-[#1a74e5] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
+                    className="w-full rounded-xl border border-[#334155] bg-[#0b1220] py-2.5 px-3 pr-10 text-sm text-white placeholder-gray-400 focus:border-[#1a74e5] focus:outline-none focus:ring-2 focus:ring-[#1B3150]/20"
                     placeholder="Re-enter your password"
                     required
                   />
@@ -351,7 +363,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading || !isAbove18}
-              className="w-full rounded-lg bg-[#1a74e5] py-2.5 text-sm font-semibold text-white transition hover:bg-[#155fc2] disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-xl bg-[#1a74e5] py-2.5 text-sm font-semibold text-white transition hover:bg-[#155fc2] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -366,6 +378,21 @@ const Login = () => {
               )}
             </button>
           </form>
+          </div>
+          <div className="relative hidden min-h-[620px] md:block">
+            <img
+              src={AUTH_SIDE_IMAGE}
+              alt="Casino cards background"
+              className="h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-l from-black/30 via-black/10 to-[#0f172a]/70" />
+            <div className="absolute bottom-8 left-8 right-8 rounded-2xl border border-white/10 bg-black/35 p-5 backdrop-blur-sm">
+              <h2 className="text-2xl font-bold text-white">Play Smart. Play Secure.</h2>
+              <p className="mt-2 text-sm text-gray-200">
+                Join EagleGames and enjoy fast sign in, secure wallet access, and a premium gaming experience.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
