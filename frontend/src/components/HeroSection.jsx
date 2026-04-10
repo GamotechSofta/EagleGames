@@ -58,7 +58,7 @@ const HeroSection = () => {
           className="w-full h-auto object-contain"
         />
       </section>
-      <section className="w-full max-w-full px-4 md:px-6 pb-3 md:pb-5">
+      <section className="w-full `max-w-full px-4 md:px-6 pb-3 md:pb-5">
         <div className="mb-3 flex items-start justify-between gap-3">
           <div>
             <h2 className="text-white text-lg md:text-xl font-semibold leading-tight">

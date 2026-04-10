@@ -15,11 +15,38 @@ export const LANGUAGE_OPTIONS = [
   { code: 'ml', label: 'മലയാളം (Malayalam)' },
 ];
 
-export const applyLanguage = (lang) => {
+const setLangCookies = (lang) => {
   document.cookie = `googtrans=/en/${lang};path=/`;
   document.cookie = `googtrans=/en/${lang};domain=${window.location.hostname};path=/`;
+};
+
+const triggerTranslateTo = (lang) => {
+  const combo = document.querySelector('.goog-te-combo');
+  if (!combo) return false;
+  combo.value = lang;
+  combo.dispatchEvent(new Event('change'));
+  return true;
+};
+
+export const applyLanguage = (lang) => {
+  setLangCookies(lang);
   localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
-  window.location.reload();
+
+  // Translate immediately when widget is ready.
+  if (triggerTranslateTo(lang)) return;
+
+  // Widget can appear late on mobile; retry briefly, then fallback to reload.
+  let attempts = 0;
+  const maxAttempts = 10;
+  const timer = window.setInterval(() => {
+    attempts += 1;
+    if (triggerTranslateTo(lang) || attempts >= maxAttempts) {
+      window.clearInterval(timer);
+      if (attempts >= maxAttempts) {
+        window.location.reload();
+      }
+    }
+  }, 200);
 };
 
 export const getCurrentLanguage = () => localStorage.getItem(LANGUAGE_STORAGE_KEY) || 'en';
@@ -106,9 +133,12 @@ const GoogleTranslateWidget = () => {
     }
 
     const storedLang = localStorage.getItem(LANGUAGE_STORAGE_KEY);
-    if (storedLang && storedLang !== 'en') {
-      document.cookie = `googtrans=/en/${storedLang};path=/`;
-      document.cookie = `googtrans=/en/${storedLang};domain=${window.location.hostname};path=/`;
+    if (storedLang) {
+      setLangCookies(storedLang);
+      // Apply selected language without forcing a hard reload.
+      window.setTimeout(() => {
+        triggerTranslateTo(storedLang);
+      }, 600);
     }
 
     const barCleanupInterval = window.setInterval(hideTranslateTopBar, 500);
