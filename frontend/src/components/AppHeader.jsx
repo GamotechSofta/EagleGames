@@ -200,11 +200,24 @@ const AppHeader = () => {
             onClick={() => navigate('/funds?tab=add-fund')}
             className="flex shrink-0 items-center gap-1.5 md:gap-2 lg:gap-2.5 rounded-lg bg-[#1f2937] border border-[#374151] px-2 md:px-2.5 lg:px-3 py-1 md:py-1.5 hover:bg-[#2563eb] hover:border-[#1a74e5] transition-colors"
           >
-            <img
-              src="https://res.cloudinary.com/dnyp5jknp/image/upload/v1771394532/wallet_n1oyef.png"
-              alt="Wallet"
-              className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 object-contain"
-            />
+            <span
+              className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 rounded-full bg-[#0f172a] border border-[#4b5563] flex items-center justify-center"
+              aria-hidden="true"
+            >
+              <svg
+                className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#60a5fa]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 7.5A2.5 2.5 0 015.5 5H18a2 2 0 012 2v1.5M3 7.5V17a2 2 0 002 2h14a2 2 0 002-2V9a1 1 0 00-1-1H5.5A2.5 2.5 0 013 5.5v2zm13 4.5h2"
+                />
+              </svg>
+            </span>
             <span className="text-xs md:text-sm lg:text-base font-bold text-white">₹{formattedBalance}</span>
           </button>
 
