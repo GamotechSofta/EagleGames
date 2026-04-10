@@ -34,7 +34,7 @@ const BidOptions = () => {
       title: 'Single Digit',
       icon: (
         <img
-          src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769756244/Untitled_90_x_160_px_1080_x_1080_px_1_yinraf.svg"
+          src="https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775804008/singledice_dizkld.png"
           alt="Single Digit"
           className="w-full h-full object-contain"
         />
@@ -45,7 +45,7 @@ const BidOptions = () => {
       title: 'Single Digit Bulk',
       icon: (
         <img
-          src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769756244/Untitled_90_x_160_px_1080_x_1080_px_1_yinraf.svg"
+          src="https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775804008/singledice_dizkld.png"
           alt="Single Digit"
           className="w-full h-full object-contain"
         />
@@ -56,7 +56,7 @@ const BidOptions = () => {
       title: 'Odd Even',
       icon: (
         <img
-          src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769756244/Untitled_90_x_160_px_1080_x_1080_px_1_yinraf.svg"
+          src="https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775804008/singledice_dizkld.png"
           alt="Odd Even"
           className="w-full h-full object-contain"
         />
@@ -67,7 +67,7 @@ const BidOptions = () => {
       title: 'Jodi',
       icon: (
         <img
-          src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769714108/Untitled_1080_x_1080_px_1080_x_1080_px_7_rpzykt.svg"
+          src="https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775804008/doubledice_ermh5e.png"
           alt="Jodi"
           className="w-full h-full object-contain"
         />
@@ -78,8 +78,7 @@ const BidOptions = () => {
       title: 'Jodi Bulk',
       icon: (
         <img
-          src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769714108/Untitled_1080_x_1080_px_1080_x_1080_px_7_rpzykt.svg"
-          alt="Jodi Bulk"
+          src="https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775804008/doubledice_ermh5e.png"
           className="w-full h-full object-contain"
         />
       ),
@@ -89,7 +88,7 @@ const BidOptions = () => {
       title: 'Single Pana',
       icon: (
         <img
-          src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769714254/Untitled_1080_x_1080_px_1080_x_1080_px_8_jdbxyd.svg"
+          src="https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775804008/singlepatti_yyjv8d.png"
           alt="Single Pana"
           className="w-full h-full object-contain"
         />
@@ -100,7 +99,7 @@ const BidOptions = () => {
       title: 'Single Pana Bulk',
       icon: (
         <img
-          src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769714254/Untitled_1080_x_1080_px_1080_x_1080_px_8_jdbxyd.svg"
+          src="https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775804008/singlepatti_yyjv8d.png"
           alt="Single Pana Bulk"
           className="w-full h-full object-contain"
         />
@@ -111,7 +110,7 @@ const BidOptions = () => {
       title: 'SP Common',
       icon: (
         <img
-          src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769714254/Untitled_1080_x_1080_px_1080_x_1080_px_8_jdbxyd.svg"
+          src="https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775804008/singlepatti_yyjv8d.png"
           alt="SP Common"
           className="w-full h-full object-contain"
         />
@@ -122,7 +121,7 @@ const BidOptions = () => {
       title: 'DP Common',
       icon: (
         <img
-          src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769713943/Untitled_1080_x_1080_px_1080_x_1080_px_6_uccv7o.svg"
+          src="https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775804008/doublepatti_ckgt10.png"
           alt="DP Common"
           className="w-full h-full object-contain"
         />
@@ -133,7 +132,7 @@ const BidOptions = () => {
       title: 'CP (Common Pana)',
       icon: (
         <img
-          src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769714254/Untitled_1080_x_1080_px_1080_x_1080_px_8_jdbxyd.svg"
+          src="https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775804008/singlepatti_yyjv8d.png"
           alt="CP (Common Pana)"
           className="w-full h-full object-contain"
         />
@@ -144,7 +143,7 @@ const BidOptions = () => {
       title: 'Double Pana',
       icon: (
         <img
-          src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769713943/Untitled_1080_x_1080_px_1080_x_1080_px_6_uccv7o.svg"
+          src="https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775804008/doublepatti_ckgt10.png"
           alt="Double Pana"
           className="w-full h-full object-contain"
         />
@@ -155,7 +154,7 @@ const BidOptions = () => {
       title: 'Double Pana Bulk',
       icon: (
         <img
-          src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769713943/Untitled_1080_x_1080_px_1080_x_1080_px_6_uccv7o.svg"
+          src="https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775804008/doublepatti_ckgt10.png"
           alt="Double Pana Bulk"
           className="w-full h-full object-contain"
         />
@@ -166,7 +165,7 @@ const BidOptions = () => {
       title: 'Triple Pana',
       icon: (
         <img
-          src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769714392/Untitled_1080_x_1080_px_1080_x_1080_px_9_ugcdef.svg"
+          src="https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775804007/triplePatti_pnq1xp.png"
           alt="Triple Pana"
           className="w-full h-full object-contain"
         />
@@ -177,7 +176,7 @@ const BidOptions = () => {
       title: 'Triple Pana Bulk',
       icon: (
         <img
-          src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769714392/Untitled_1080_x_1080_px_1080_x_1080_px_9_ugcdef.svg"
+          src="https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775804007/triplePatti_pnq1xp.png"
           alt="Triple Pana Bulk"
           className="w-full h-full object-contain"
         />
@@ -188,7 +187,7 @@ const BidOptions = () => {
       title: 'Full Sangam',
       icon: (
         <img
-          src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1770033671/Untitled_design_2_kr1imj.svg"
+          src="https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775804007/fullSangam_nb6jy6.png"
           alt="Triple Pana"
           className="w-full h-full object-contain"
         />
@@ -199,7 +198,8 @@ const BidOptions = () => {
       title: 'Half Sangam',
       icon: (
         <img
-          src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1770033165/Untitled_design_c5hag8.svg"
+          src="https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775804007/halfSangam_qvd3yr.png
+"
           alt="Half Sangam"
           className="w-full h-full object-contain"
         />
@@ -210,7 +210,7 @@ const BidOptions = () => {
       title: 'SP Motor',
       icon: (
         <img
-          src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769714254/Untitled_1080_x_1080_px_1080_x_1080_px_8_jdbxyd.svg"
+          src="https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775804008/singlepatti_yyjv8d.png"
           alt="SP Motor"
           className="w-full h-full object-contain"
         />
@@ -221,7 +221,7 @@ const BidOptions = () => {
       title: 'DP Motor',
       icon: (
         <img
-          src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769713943/Untitled_1080_x_1080_px_1080_x_1080_px_6_uccv7o.svg"
+          src="https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775804008/doublepatti_ckgt10.png"
           alt="DP Motor"
           className="w-full h-full object-contain"
         />
@@ -232,7 +232,7 @@ const BidOptions = () => {
       title: 'SP DP Motor',
       icon: (
         <img
-          src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769714254/Untitled_1080_x_1080_px_1080_x_1080_px_8_jdbxyd.svg"
+          src="https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775804008/doublepatti_ckgt10.png"
           alt="SP DP Motor"
           className="w-full h-full object-contain"
         />
@@ -243,7 +243,7 @@ const BidOptions = () => {
       title: 'SP DP T Motor',
       icon: (
         <img
-          src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769714254/Untitled_1080_x_1080_px_1080_x_1080_px_8_jdbxyd.svg"
+          src="https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775804007/triplePatti_pnq1xp.png"
           alt="SP DP T Motor"
           className="w-full h-full object-contain"
         />
