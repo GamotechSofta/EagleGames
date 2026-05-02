@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Layout from '../components/Layout';
-import { API_BASE_URL, getBookieAuthHeaders } from '../utils/api';
+import { API_BASE_URL, getBookieAuthHeaders, getBookieAuthHeadersMultipart } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
-import { FaEye, FaTimes, FaCheck, FaTimesCircle } from 'react-icons/fa';
+import { FaEye, FaTimes, FaCheck, FaTimesCircle, FaCloudUploadAlt } from 'react-icons/fa';
 
 const Payments = () => {
     const { t } = useLanguage();
@@ -13,6 +13,17 @@ const Payments = () => {
     const [filters, setFilters] = useState({ status: '', type: '' });
     const [selectedScreenshot, setSelectedScreenshot] = useState(null);
     const [canManagePayments, setCanManagePayments] = useState(false);
+    const [canManageOwnDepositQr, setCanManageOwnDepositQr] = useState(false);
+    const [pdUpi, setPdUpi] = useState('');
+    const [pdName, setPdName] = useState('');
+    const [pdExistingQr, setPdExistingQr] = useState('');
+    const [pdQrFile, setPdQrFile] = useState(null);
+    const [pdNewQrPreview, setPdNewQrPreview] = useState(null);
+    const [pdClearQr, setPdClearQr] = useState(false);
+    const pdQrInputRef = useRef(null);
+    const [pdSaving, setPdSaving] = useState(false);
+    const [pdMsg, setPdMsg] = useState('');
+    const [pdErr, setPdErr] = useState(false);
     const [actionModal, setActionModal] = useState({ show: false, payment: null, action: '' });
     const [adminRemarks, setAdminRemarks] = useState('');
     const [processing, setProcessing] = useState(false);
@@ -22,12 +33,31 @@ const Payments = () => {
         fetchPayments();
     }, [filters]);
 
+    useEffect(() => {
+        if (!pdQrFile) {
+            setPdNewQrPreview(null);
+            return;
+        }
+        const url = URL.createObjectURL(pdQrFile);
+        setPdNewQrPreview(url);
+        return () => URL.revokeObjectURL(url);
+    }, [pdQrFile]);
+
     const fetchProfile = async () => {
         try {
             const response = await fetch(`${API_BASE_URL}/bookie/profile`, { headers: getBookieAuthHeaders() });
             const data = await response.json();
             if (data.success) {
                 setCanManagePayments(data.data.canManagePayments || false);
+                setCanManageOwnDepositQr(data.data.canManageOwnDepositQr || false);
+                setPdUpi(data.data.playerDepositUpiId || '');
+                setPdName(data.data.playerDepositUpiName || '');
+                setPdExistingQr(data.data.playerDepositQrImageUrl || '');
+                setPdQrFile(null);
+                if (pdQrInputRef.current) pdQrInputRef.current.value = '';
+                setPdClearQr(false);
+                setPdMsg('');
+                setPdErr(false);
             }
         } catch (err) {
             console.error('Failed to fetch profile:', err);
@@ -78,6 +108,51 @@ const Payments = () => {
         }
     };
 
+    const handleSavePlayerDeposit = async (e) => {
+        e.preventDefault();
+        setPdMsg('');
+        setPdErr(false);
+        const upi = pdUpi.trim();
+        if (!upi) {
+            setPdMsg(t('playerDepositSaveFailed'));
+            setPdErr(true);
+            return;
+        }
+        setPdSaving(true);
+        try {
+            const fd = new FormData();
+            fd.append('playerDepositUpiId', upi);
+            fd.append('playerDepositUpiName', pdName.trim());
+            if (pdQrFile) {
+                fd.append('qrImage', pdQrFile);
+            } else if (pdClearQr) {
+                fd.append('playerDepositQrImageUrl', '');
+            }
+            const response = await fetch(`${API_BASE_URL}/bookie/player-deposit-details`, {
+                method: 'PATCH',
+                headers: getBookieAuthHeadersMultipart(),
+                body: fd,
+            });
+            const data = await response.json();
+            if (data.success) {
+                setPdMsg(t('playerDepositSaved'));
+                setPdErr(false);
+                setPdExistingQr(data.data?.playerDepositQrImageUrl || '');
+                setPdQrFile(null);
+                if (pdQrInputRef.current) pdQrInputRef.current.value = '';
+                setPdClearQr(false);
+            } else {
+                setPdMsg(data.message || t('playerDepositSaveFailed'));
+                setPdErr(true);
+            }
+        } catch {
+            setPdMsg(t('playerDepositSaveFailed'));
+            setPdErr(true);
+        } finally {
+            setPdSaving(false);
+        }
+    };
+
     const handleReject = async () => {
         if (!actionModal.payment) return;
         setProcessing(true);
@@ -107,6 +182,111 @@ const Payments = () => {
             <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">
                 {canManagePayments ? t('payments') : t('paymentsViewOnly')}
             </h1>
+            {canManageOwnDepositQr && (
+                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 sm:p-5 mb-4 sm:mb-6">
+                    <h2 className="text-lg font-bold text-emerald-900 mb-2">{t('playerDepositSettingsTitle')}</h2>
+                    <p className="text-sm text-emerald-800 mb-4">{t('playerDepositSettingsHelp')}</p>
+                    <form onSubmit={handleSavePlayerDeposit} className="space-y-3 max-w-lg">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t('playerDepositUpiLabel')}</label>
+                            <input
+                                type="text"
+                                value={pdUpi}
+                                onChange={(e) => setPdUpi(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900"
+                                placeholder="name@paytm"
+                                autoComplete="off"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t('playerDepositNameLabel')}</label>
+                            <input
+                                type="text"
+                                value={pdName}
+                                onChange={(e) => setPdName(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900"
+                                placeholder=""
+                                autoComplete="off"
+                            />
+                        </div>
+                        <div>
+                            <span className="block text-sm font-medium text-gray-700 mb-0.5">{t('playerDepositQrLabel')}</span>
+                            <p className="text-xs text-gray-600 mb-3">{t('playerDepositQrHint')}</p>
+                            <input
+                                ref={pdQrInputRef}
+                                id="pd-qr-upload"
+                                type="file"
+                                accept="image/jpeg,image/jpg,image/png,image/webp"
+                                className="hidden"
+                                onChange={(e) => {
+                                    const f = e.target.files?.[0];
+                                    if (f && f.size > 5 * 1024 * 1024) {
+                                        setPdMsg(t('playerDepositQrTooLarge'));
+                                        setPdErr(true);
+                                        e.target.value = '';
+                                        return;
+                                    }
+                                    setPdQrFile(f || null);
+                                    if (f) setPdClearQr(false);
+                                }}
+                            />
+                            <div className="flex flex-col sm:flex-row gap-4 items-start">
+                                <div className="shrink-0 w-[148px] h-[148px] rounded-xl border-2 border-dashed border-emerald-300 bg-white flex items-center justify-center overflow-hidden shadow-sm">
+                                    {pdNewQrPreview ? (
+                                        <img src={pdNewQrPreview} alt="" className="w-full h-full object-contain p-1" />
+                                    ) : pdExistingQr && !pdClearQr ? (
+                                        <img src={pdExistingQr} alt="" className="w-full h-full object-contain p-1" />
+                                    ) : (
+                                        <div className="text-center px-2 py-3 text-gray-500 text-xs leading-snug">
+                                            {t('playerDepositQrNoImageYet')}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="flex flex-col gap-2 min-w-0 flex-1">
+                                    <label
+                                        htmlFor="pd-qr-upload"
+                                        className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold cursor-pointer transition-colors shadow-sm"
+                                    >
+                                        <FaCloudUploadAlt className="w-4 h-4 shrink-0" />
+                                        {pdNewQrPreview || (pdExistingQr && !pdClearQr) ? t('playerDepositQrChange') : t('playerDepositQrUpload')}
+                                    </label>
+                                    {pdQrFile && (
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setPdQrFile(null);
+                                                if (pdQrInputRef.current) pdQrInputRef.current.value = '';
+                                            }}
+                                            className="text-left text-sm text-amber-800 hover:text-amber-950 font-medium underline-offset-2 hover:underline"
+                                        >
+                                            {t('playerDepositQrDiscardNew')}
+                                        </button>
+                                    )}
+                                    {pdExistingQr && !pdQrFile && (
+                                        <label className="flex items-start gap-2.5 cursor-pointer text-sm text-gray-700 mt-1">
+                                            <input
+                                                type="checkbox"
+                                                checked={pdClearQr}
+                                                onChange={(e) => setPdClearQr(e.target.checked)}
+                                                className="mt-1 w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                                            />
+                                            <span>{t('playerDepositClearQr')}</span>
+                                        </label>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                        {pdMsg && <p className={`text-sm ${pdErr ? 'text-red-600' : 'text-green-700'}`}>{pdMsg}</p>}
+                        <button
+                            type="submit"
+                            disabled={pdSaving}
+                            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium disabled:opacity-50"
+                        >
+                            {pdSaving ? '…' : t('playerDepositSave')}
+                        </button>
+                    </form>
+                </div>
+            )}
             <div className="bg-white rounded-lg p-4 mb-4 sm:mb-6 flex flex-wrap gap-3 items-center border border-gray-200">
                 <select value={filters.status} onChange={(e) => setFilters({ ...filters, status: e.target.value })} className="px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-800">
                     <option value="">{t('allStatus')}</option>

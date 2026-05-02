@@ -9,6 +9,15 @@ export const getBookieAuthHeaders = () => {
     return headers;
 };
 
+/** Bearer only — use with FormData (do not set Content-Type). */
+export const getBookieAuthHeadersMultipart = () => {
+    const bookie = JSON.parse(localStorage.getItem('bookie') || '{}');
+    const token = bookie?.token || '';
+    const headers = {};
+    if (token) headers.Authorization = `Bearer ${token}`;
+    return headers;
+};
+
 /** Clear bookie session and redirect to login. Use on 401 or suspend. */
 export const clearBookieSession = () => {
     localStorage.removeItem('bookie');

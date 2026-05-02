@@ -204,6 +204,22 @@ export default {
     method: 'Method',
     noPaymentsFound: 'No payments found',
     type: 'Type',
+    playerDepositSettingsTitle: 'Player add money — your UPI & QR',
+    playerDepositSettingsHelp:
+        'Super admin must enable “own deposit UPI/QR” for your account (separate from payment approval). Then set your UPI here. Your referred players will see this on Add Fund instead of the company default.',
+    playerDepositUpiLabel: 'Your UPI ID (for player deposits)',
+    playerDepositNameLabel: 'Payee name (optional)',
+    playerDepositQrLabel: 'QR code image (optional)',
+    playerDepositQrHint: 'JPEG, PNG or WebP · max 5 MB. Shown to your players on Add Fund.',
+    playerDepositQrUpload: 'Upload QR image',
+    playerDepositQrChange: 'Replace image',
+    playerDepositQrDiscardNew: 'Discard new image',
+    playerDepositQrNoImageYet: 'No QR yet — upload one or save with UPI only',
+    playerDepositQrTooLarge: 'Image must be 5 MB or smaller.',
+    playerDepositClearQr: 'Remove saved QR',
+    playerDepositSave: 'Save payment details',
+    playerDepositSaved: 'Saved.',
+    playerDepositSaveFailed: 'Could not save. Check UPI and try again.',
     
     // Markets
     marketsTitle: 'Markets',

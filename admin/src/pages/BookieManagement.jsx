@@ -31,6 +31,7 @@ const BookieManagement = () => {
         confirmPassword: '',
         commissionPercentage: '',
         canManagePayments: false,
+        canManageOwnDepositQr: false,
         balance: '',
     });
 
@@ -134,6 +135,7 @@ const BookieManagement = () => {
                 password: formData.password,
                 commissionPercentage: formData.commissionPercentage ? Number(formData.commissionPercentage) : 0,
                 canManagePayments: formData.canManagePayments || false,
+                canManageOwnDepositQr: formData.canManageOwnDepositQr || false,
                 balance: formData.balance !== '' ? Math.max(0, Number(formData.balance)) : 0,
             };
             const response = await fetchWithAuth(`${API_BASE_URL}/admin/bookies`, {
@@ -146,7 +148,7 @@ const BookieManagement = () => {
                 const phoneNumber = formData.phone.replace(/\D/g, '').slice(0, 10);
                 setSuccess(`Bookie account created successfully! Login with Phone: ${phoneNumber} and the password you set.`);
                 setShowCreateModal(false);
-                setFormData({ firstName: '', lastName: '', email: '', phone: '', password: '', confirmPassword: '', commissionPercentage: '', canManagePayments: false, balance: '' });
+                setFormData({ firstName: '', lastName: '', email: '', phone: '', password: '', confirmPassword: '', commissionPercentage: '', canManagePayments: false, canManageOwnDepositQr: false, balance: '' });
                 fetchBookies();
                 setTimeout(() => setSuccess(''), 10000); // Show for 10 seconds so user can note the credentials
             } else {
@@ -186,6 +188,7 @@ const BookieManagement = () => {
                 phone: formData.phone.replace(/\D/g, '').slice(0, 10) || formData.phone,
                 commissionPercentage: formData.commissionPercentage !== '' ? Number(formData.commissionPercentage) : undefined,
                 canManagePayments: formData.canManagePayments,
+                canManageOwnDepositQr: formData.canManageOwnDepositQr,
                 balance: formData.balance !== '' ? Math.max(0, Number(formData.balance)) : undefined,
             };
             if (formData.password) updateData.password = formData.password;
@@ -200,7 +203,7 @@ const BookieManagement = () => {
                 setSuccess('Bookie updated successfully!');
                 setShowEditModal(false);
                 setSelectedBookie(null);
-                setFormData({ firstName: '', lastName: '', email: '', phone: '', password: '', confirmPassword: '', commissionPercentage: '', canManagePayments: false, balance: '' });
+                setFormData({ firstName: '', lastName: '', email: '', phone: '', password: '', confirmPassword: '', commissionPercentage: '', canManagePayments: false, canManageOwnDepositQr: false, balance: '' });
                 fetchBookies();
                 setTimeout(() => setSuccess(''), 3000);
             } else {
@@ -321,6 +324,7 @@ const BookieManagement = () => {
             confirmPassword: '',
             commissionPercentage: bookie.commissionPercentage != null ? String(bookie.commissionPercentage) : '0',
             canManagePayments: bookie.canManagePayments || false,
+            canManageOwnDepositQr: bookie.canManageOwnDepositQr || false,
             balance: bookie.balance != null ? String(bookie.balance) : '0',
         });
         setShowEditModal(true);
@@ -353,7 +357,7 @@ const BookieManagement = () => {
                         <h1 className="text-2xl sm:text-3xl font-bold">Bookie Accounts Management</h1>
                         <button
                             onClick={() => {
-                                setFormData({ firstName: '', lastName: '', email: '', phone: '', password: '', confirmPassword: '', commissionPercentage: '', canManagePayments: false, balance: '' });
+                                setFormData({ firstName: '', lastName: '', email: '', phone: '', password: '', confirmPassword: '', commissionPercentage: '', canManagePayments: false, canManageOwnDepositQr: false, balance: '' });
                                 setShowCreateModal(true);
                             }}
                             className="w-full sm:w-auto flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-gray-800 font-bold py-2.5 px-4 rounded-lg transition-colors text-sm sm:text-base"
@@ -392,7 +396,7 @@ const BookieManagement = () => {
                             </div>
                         ) : (
                             <div className="overflow-x-auto">
-                            <table className="w-full min-w-[640px] text-sm sm:text-base">
+                            <table className="w-full min-w-[860px] text-sm sm:text-base">
                                 <thead className="bg-gray-100">
                                     <tr>
                                         <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
@@ -414,7 +418,10 @@ const BookieManagement = () => {
                                             Balance
                                         </th>
                                         <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                                            Payment Management
+                                            Approve payments
+                                        </th>
+                                        <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                                            Own deposit UPI/QR
                                         </th>
                                         <th className="px-3 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                                             Status
@@ -468,7 +475,16 @@ const BookieManagement = () => {
                                                         ? 'bg-green-100 text-green-700 border border-green-200' 
                                                         : 'bg-gray-100 text-gray-600 border border-gray-200'
                                                 }`}>
-                                                    {bookie.canManagePayments ? 'Enabled' : 'Disabled'}
+                                                    {bookie.canManagePayments ? 'On' : 'Off'}
+                                                </span>
+                                            </td>
+                                            <td className="px-3 py-3 whitespace-nowrap">
+                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                                    bookie.canManageOwnDepositQr
+                                                        ? 'bg-teal-100 text-teal-800 border border-teal-200'
+                                                        : 'bg-gray-100 text-gray-600 border border-gray-200'
+                                                }`}>
+                                                    {bookie.canManageOwnDepositQr ? 'On' : 'Off'}
                                                 </span>
                                             </td>
                                             <td className="px-3 py-3 whitespace-nowrap">
@@ -647,6 +663,19 @@ const BookieManagement = () => {
                                     <p className="mt-0.5 text-xs text-gray-500">Can approve/reject player payment requests</p>
                                 </div>
                                 <div>
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            name="canManageOwnDepositQr"
+                                            checked={formData.canManageOwnDepositQr}
+                                            onChange={(e) => setFormData({ ...formData, canManageOwnDepositQr: e.target.checked })}
+                                            className="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500"
+                                        />
+                                        <span className="text-gray-600 text-sm font-medium">Allow own UPI/QR for player add-fund</span>
+                                    </label>
+                                    <p className="mt-0.5 text-xs text-gray-500">Separate from approve/reject. Lets this bookie set the QR/UPI their players see on Add Fund.</p>
+                                </div>
+                                <div>
                                     <label className="block text-gray-600 text-sm font-medium mb-1">Password *</label>
                                     <div className="relative">
                                         <input
@@ -802,6 +831,19 @@ const BookieManagement = () => {
                                         <span className="text-gray-600 text-sm font-medium">Allow Payment Management</span>
                                     </label>
                                     <p className="mt-0.5 text-xs text-gray-500">Can approve/reject player payment requests</p>
+                                </div>
+                                <div>
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            name="canManageOwnDepositQr"
+                                            checked={formData.canManageOwnDepositQr}
+                                            onChange={(e) => setFormData({ ...formData, canManageOwnDepositQr: e.target.checked })}
+                                            className="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500"
+                                        />
+                                        <span className="text-gray-600 text-sm font-medium">Allow own UPI/QR for player add-fund</span>
+                                    </label>
+                                    <p className="mt-0.5 text-xs text-gray-500">Separate from approve/reject. Lets this bookie set the QR/UPI their players see on Add Fund.</p>
                                 </div>
                                 <div>
                                     <label className="block text-gray-600 text-sm font-medium mb-1">New Password (leave empty to keep)</label>

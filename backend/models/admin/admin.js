@@ -56,6 +56,27 @@ const adminSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    /** Bookie-only: Permission to set own UPI/QR for player add-fund (separate from approve/reject). Set by super admin. */
+    canManageOwnDepositQr: {
+        type: Boolean,
+        default: false,
+    },
+    /** Bookie-only: When canManageOwnDepositQr and UPI is set, referred players see these for add-fund (instead of platform). */
+    playerDepositUpiId: {
+        type: String,
+        trim: true,
+        default: null,
+    },
+    playerDepositUpiName: {
+        type: String,
+        trim: true,
+        default: null,
+    },
+    playerDepositQrImageUrl: {
+        type: String,
+        trim: true,
+        default: null,
+    },
     /** Bookie-only: Wallet balance. Set by super admin. */
     balance: {
         type: Number,

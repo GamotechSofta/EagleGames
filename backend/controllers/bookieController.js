@@ -1,6 +1,7 @@
 import Admin from '../models/admin/admin.js';
 import { logActivity, getClientIp } from '../utils/activityLogger.js';
 import { signAdminToken } from '../utils/adminJwt.js';
+import { uploadToCloudinary } from '../config/cloudinary.js';
 
 /**
  * Bookie login - only allows users with role 'bookie' and status 'active'
@@ -170,6 +171,72 @@ export const getProfile = async (req, res) => {
                 balance: bookie.balance || 0,
                 uiTheme: bookie.uiTheme || { themeId: 'default' },
                 canManagePayments: bookie.canManagePayments || false,
+                canManageOwnDepositQr: bookie.canManageOwnDepositQr || false,
+                playerDepositUpiId: bookie.playerDepositUpiId || '',
+                playerDepositUpiName: bookie.playerDepositUpiName || '',
+                playerDepositQrImageUrl: bookie.playerDepositQrImageUrl || '',
+            },
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+/**
+ * Bookie: set UPI / display name / QR for their players' add-fund screen.
+ * Requires canManageOwnDepositQr (super admin must enable). QR image optional (file or existing URL).
+ */
+export const updatePlayerDepositDetails = async (req, res) => {
+    try {
+        const bookie = await Admin.findOne({ _id: req.admin._id, role: 'bookie' });
+        if (!bookie) {
+            return res.status(403).json({ success: false, message: 'Bookie access required' });
+        }
+        if (!bookie.canManageOwnDepositQr) {
+            return res.status(403).json({
+                success: false,
+                message: 'Own deposit UPI/QR is not enabled for your account. Ask super admin to enable it.',
+            });
+        }
+
+        const upiRaw = req.body.playerDepositUpiId;
+        const nameRaw = req.body.playerDepositUpiName;
+        const urlRaw = req.body.playerDepositQrImageUrl;
+
+        const upiId = upiRaw != null ? String(upiRaw).trim() : '';
+        const upiName = nameRaw != null ? String(nameRaw).trim() : '';
+
+        let qrUrl = bookie.playerDepositQrImageUrl || null;
+        if (req.file?.buffer) {
+            const uploadResult = await uploadToCloudinary(req.file.buffer, 'bookie-deposit-qr');
+            qrUrl = uploadResult.secure_url;
+        } else if (urlRaw !== undefined) {
+            const v = urlRaw === null || urlRaw === '' ? '' : String(urlRaw).trim();
+            qrUrl = v || null;
+        }
+
+        bookie.playerDepositUpiId = upiId || null;
+        bookie.playerDepositUpiName = upiName || null;
+        bookie.playerDepositQrImageUrl = qrUrl;
+        await bookie.save();
+
+        await logActivity({
+            action: 'bookie_player_deposit_details_updated',
+            performedBy: bookie.username,
+            performedByType: 'bookie',
+            targetType: 'admin',
+            targetId: bookie._id.toString(),
+            details: 'Player add-fund UPI/QR updated',
+            ip: getClientIp(req),
+        });
+
+        res.status(200).json({
+            success: true,
+            message: 'Player payment details saved',
+            data: {
+                playerDepositUpiId: bookie.playerDepositUpiId || '',
+                playerDepositUpiName: bookie.playerDepositUpiName || '',
+                playerDepositQrImageUrl: bookie.playerDepositQrImageUrl || '',
             },
         });
     } catch (error) {

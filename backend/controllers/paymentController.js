@@ -2,6 +2,7 @@ import Payment from '../models/payment/payment.js';
 import BankDetail from '../models/bankDetail/bankDetail.js';
 import { Wallet } from '../models/wallet/wallet.js';
 import Admin from '../models/admin/admin.js';
+import User from '../models/user/user.js';
 import bcrypt from 'bcryptjs';
 import { getBookieUserIds } from '../utils/bookieFilter.js';
 import { logActivity, getClientIp } from '../utils/activityLogger.js';
@@ -10,22 +11,60 @@ import { uploadToCloudinary } from '../config/cloudinary.js';
 // ============ CONFIG API ============
 
 /**
- * Get payment configuration (UPI details, limits)
- * Public API - no auth required
+ * Get payment configuration (UPI details, limits).
+ * Optional Bearer (player JWT): if the user belongs to a bookie with canManageOwnDepositQr and
+ * playerDepositUpiId set, returns that bookie's UPI/QR for add-fund; otherwise platform defaults.
  */
 export const getPaymentConfig = async (req, res) => {
     try {
-        res.status(200).json({
-            success: true,
-            data: {
-                upiId: process.env.UPI_ID || 'example@paytm',
-                upiName: process.env.UPI_NAME || 'Golden Games',
-                minDeposit: parseInt(process.env.MIN_DEPOSIT) || 100,
-                maxDeposit: parseInt(process.env.MAX_DEPOSIT) || 50000,
-                minWithdrawal: parseInt(process.env.MIN_WITHDRAWAL) || 500,
-                maxWithdrawal: parseInt(process.env.MAX_WITHDRAWAL) || 25000,
-            },
-        });
+        const minDeposit = parseInt(process.env.MIN_DEPOSIT, 10) || 100;
+        const maxDeposit = parseInt(process.env.MAX_DEPOSIT, 10) || 50000;
+        const minWithdrawal = parseInt(process.env.MIN_WITHDRAWAL, 10) || 500;
+        const maxWithdrawal = parseInt(process.env.MAX_WITHDRAWAL, 10) || 25000;
+
+        let data = {
+            upiId: process.env.UPI_ID || 'example@paytm',
+            upiName: process.env.UPI_NAME || 'Golden Games',
+            qrImageUrl: process.env.PLAYER_DEPOSIT_QR_URL?.trim() || null,
+            minDeposit,
+            maxDeposit,
+            minWithdrawal,
+            maxWithdrawal,
+            depositSource: 'platform',
+        };
+
+        if (req.userId) {
+            const user = await User.findById(req.userId).select('referredBy').lean();
+            const bookieId = user?.referredBy;
+            if (bookieId) {
+                const bookie = await Admin.findById(bookieId)
+                    .select('role canManageOwnDepositQr playerDepositUpiId playerDepositUpiName playerDepositQrImageUrl username')
+                    .lean();
+                const upi = bookie?.playerDepositUpiId && String(bookie.playerDepositUpiId).trim();
+                if (
+                    bookie &&
+                    bookie.role === 'bookie' &&
+                    bookie.canManageOwnDepositQr === true &&
+                    upi
+                ) {
+                    const name =
+                        (bookie.playerDepositUpiName && String(bookie.playerDepositUpiName).trim()) ||
+                        bookie.username ||
+                        data.upiName;
+                    const qr =
+                        bookie.playerDepositQrImageUrl && String(bookie.playerDepositQrImageUrl).trim();
+                    data = {
+                        ...data,
+                        upiId: upi,
+                        upiName: name,
+                        qrImageUrl: qr || null,
+                        depositSource: 'bookie',
+                    };
+                }
+            }
+        }
+
+        res.status(200).json({ success: true, data });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -598,6 +637,16 @@ export const rejectPayment = async (req, res) => {
 
         if (payment.status !== 'pending') {
             return res.status(400).json({ success: false, message: 'Payment is not pending' });
+        }
+
+        if (
+            admin.role === 'bookie' &&
+            String(payment.userId?.referredBy || '') !== String(admin._id)
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: 'You can only process payments for your own players',
+            });
         }
 
         payment.status = 'rejected';

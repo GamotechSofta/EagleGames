@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL, getAuthHeaders, fetchWithAuth } from '../../config/api';
 
-const FIXED_UPI_ID = '9380158730-2@axl';
-const FIXED_QR_IMAGE_URL = 'https://res.cloudinary.com/dwwt5xdsz/image/upload/v1775733532/a2070441-4b78-4567-bf0b-a7c25888dbae.png';
+/** Fallback when platform config has no QR env (`PLAYER_DEPOSIT_QR_URL`). */
+const PLATFORM_FALLBACK_UPI = '9380158730-2@axl';
+const PLATFORM_FALLBACK_QR =
+    'https://res.cloudinary.com/dwwt5xdsz/image/upload/v1775733532/a2070441-4b78-4567-bf0b-a7c25888dbae.png';
 
 const AddFund = () => {
     const navigate = useNavigate();
@@ -20,13 +22,11 @@ const AddFund = () => {
     const [step, setStep] = useState(1); // 1 = Amount, 2 = Payment Details
     const [addCashLoading, setAddCashLoading] = useState(false);
 
-    useEffect(() => {
-        fetchConfig();
-    }, []);
-
+    /** Send player JWT when logged in so bookie-specific UPI/QR is returned when applicable. */
     const fetchConfig = async () => {
         try {
-            const res = await fetch(`${API_BASE_URL}/payments/config`);
+            const headers = { ...getAuthHeaders() };
+            const res = await fetch(`${API_BASE_URL}/payments/config`, { headers });
             const data = await res.json();
             if (data.success) {
                 setConfig(data.data);
@@ -35,6 +35,18 @@ const AddFund = () => {
             console.error('Failed to fetch config:', err);
         }
     };
+
+    useEffect(() => {
+        fetchConfig();
+    }, [step]);
+
+    const depositSource = config?.depositSource || 'platform';
+    const displayUpi = config?.upiId || PLATFORM_FALLBACK_UPI;
+    const displayQr =
+        depositSource === 'bookie'
+            ? config?.qrImageUrl || null
+            : config?.qrImageUrl || PLATFORM_FALLBACK_QR;
+    const displayPayeeName = config?.upiName || '';
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -305,25 +317,33 @@ const AddFund = () => {
                     {/* Payment Details */}
                     <div className="bg-[#111827] rounded-2xl p-5 border-2 border-[#374151] shadow-sm">
                         <h3 className="text-lg font-bold text-[#1a74e5] mb-4">Payment Details</h3>
+                        {depositSource === 'bookie' && (
+                            <p className="text-amber-200/90 text-sm mb-4 text-center rounded-lg border border-amber-500/40 bg-amber-900/20 px-3 py-2">
+                                Pay to your agent&apos;s UPI — funds are verified by your agent.
+                            </p>
+                        )}
 
                         {/* QR Code Section */}
                         <div className="flex flex-col items-center mb-5">
                             <div className="bg-[#111827] p-3 rounded-xl mb-3">
-                                {FIXED_QR_IMAGE_URL ? (
-                                    <img
-                                        src={FIXED_QR_IMAGE_URL}
-                                        alt="UPI QR Code"
-                                        className="w-[180px] h-[180px]"
-                                    />
+                                {displayQr ? (
+                                    <img src={displayQr} alt="UPI QR Code" className="w-[180px] h-[180px]" />
                                 ) : (
-                                    <div className="w-[180px] h-[180px] flex items-center justify-center bg-gray-200 rounded">
-                                        <span className="text-gray-500 text-sm">Loading QR...</span>
+                                    <div className="w-[180px] h-[180px] flex items-center justify-center bg-[#1f2937] rounded border border-[#374151] px-2">
+                                        <span className="text-gray-400 text-sm text-center">
+                                            No QR on file — use the UPI ID below in your UPI app
+                                        </span>
                                     </div>
                                 )}
                             </div>
                             <p className="text-gray-400 text-sm text-center">
-                                Scan QR code with any UPI app to pay
+                                {displayQr ? 'Scan QR code with any UPI app to pay' : 'Enter UPI ID manually in your app'}
                             </p>
+                            {displayPayeeName && (
+                                <p className="text-gray-300 text-sm mt-2 text-center">
+                                    Payee: <span className="font-semibold text-white">{displayPayeeName}</span>
+                                </p>
+                            )}
                         </div>
 
                         {/* OR Divider */}
@@ -337,12 +357,12 @@ const AddFund = () => {
                             <div className="flex items-center justify-between bg-[#1f2937] rounded-xl p-4 border-2 border-[#374151]">
                                 <div>
                                     <p className="text-gray-300 text-sm">UPI ID</p>
-                                    <p className="text-white font-mono text-lg">{FIXED_UPI_ID}</p>
+                                    <p className="text-white font-mono text-lg break-all">{displayUpi}</p>
                                 </div>
                                 <button
                                     type="button"
                                     onClick={() => {
-                                        navigator.clipboard.writeText(FIXED_UPI_ID);
+                                        navigator.clipboard.writeText(displayUpi);
                                         setSuccess('UPI ID copied!');
                                         setTimeout(() => setSuccess(''), 2000);
                                     }}
@@ -353,7 +373,7 @@ const AddFund = () => {
                             </div>
                             <div className="bg-[#1f2937] rounded-xl p-4 border-2 border-[#374151]">
                                 <p className="text-gray-300 text-sm">Pay to</p>
-                                <p className="text-white font-semibold">{FIXED_UPI_ID}</p>
+                                <p className="text-white font-semibold break-all">{displayUpi}</p>
                             </div>
                         </div>
                     </div>
@@ -455,8 +475,10 @@ const AddFund = () => {
                         </div>
 
                         <p className="text-gray-300 text-sm mb-6">
-                            Your deposit request has been submitted successfully. 
-                            Please wait for admin approval. Usually takes 15-30 minutes.
+                            Your deposit request has been submitted successfully.
+                            {depositSource === 'bookie'
+                                ? ' Please wait for your agent to approve. Usually takes 15–30 minutes.'
+                                : ' Please wait for admin approval. Usually takes 15–30 minutes.'}
                         </p>
 
                         <div className="space-y-3">

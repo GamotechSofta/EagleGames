@@ -49,3 +49,31 @@ export const verifyUser = async (req, res, next) => {
         });
     }
 };
+
+/**
+ * If Authorization Bearer is a valid user JWT, sets req.userId; otherwise continues without it.
+ * Use for routes that behave differently for logged-in users (e.g. payment config).
+ */
+export const optionalVerifyUser = async (req, res, next) => {
+    try {
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return next();
+        }
+        const token = authHeader.slice(7).trim();
+        if (!token) {
+            return next();
+        }
+        try {
+            const payload = verifyUserToken(token);
+            if (payload.userId) {
+                req.userId = payload.userId;
+            }
+        } catch {
+            // ignore invalid token for optional auth
+        }
+        next();
+    } catch {
+        next();
+    }
+};

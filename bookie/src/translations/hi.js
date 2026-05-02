@@ -204,6 +204,22 @@ export default {
     method: 'विधि',
     noPaymentsFound: 'कोई भुगतान नहीं मिला',
     type: 'प्रकार',
+    playerDepositSettingsTitle: 'प्लेयर जमा — आपका UPI और QR',
+    playerDepositSettingsHelp:
+        'सुपर एडमिन को आपके लिए “अपना जमा UPI/QR” अलग से चालू करना होगा (भुगतान मंजूरी से अलग)। फिर यहाँ अपना UPI सेट करें। आपके रेफ़र किए खिलाड़ी Add Fund पर कंपनी की जगह यह देखेंगे।',
+    playerDepositUpiLabel: 'आपका UPI ID (प्लेयर जमा के लिए)',
+    playerDepositNameLabel: 'नाम (वैकल्पिक)',
+    playerDepositQrLabel: 'QR कोड छवि (वैकल्पिक)',
+    playerDepositQrHint: 'JPEG, PNG या WebP · अधिकतम 5 MB. आपके खिलाड़ियों को Add Fund पर दिखेगा।',
+    playerDepositQrUpload: 'QR छवि अपलोड करें',
+    playerDepositQrChange: 'छवि बदलें',
+    playerDepositQrDiscardNew: 'नई छवि रद्द करें',
+    playerDepositQrNoImageYet: 'अभी कोई QR नहीं — अपलोड करें या केवल UPI से सहेजें',
+    playerDepositQrTooLarge: 'छवि 5 MB या उससे कम होनी चाहिए।',
+    playerDepositClearQr: 'सहेजा QR हटाएँ',
+    playerDepositSave: 'विवरण सहेजें',
+    playerDepositSaved: 'सहेजा गया।',
+    playerDepositSaveFailed: 'सहेज नहीं सके। UPI जाँचें।',
     
     // Markets
     marketsTitle: 'बाजार',

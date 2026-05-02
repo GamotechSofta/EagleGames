@@ -151,7 +151,18 @@ export const createBookie = async (req, res) => {
             });
         }
 
-        const { username, firstName, lastName, email, password, phone, commissionPercentage, balance } = req.body;
+        const {
+            username,
+            firstName,
+            lastName,
+            email,
+            password,
+            phone,
+            commissionPercentage,
+            balance,
+            canManagePayments,
+            canManageOwnDepositQr,
+        } = req.body;
 
         const derivedUsername = (firstName != null && lastName != null)
             ? `${String(firstName).trim()} ${String(lastName).trim()}`.trim()
@@ -220,6 +231,8 @@ export const createBookie = async (req, res) => {
             status: 'active',
             commissionPercentage: (commissionPercentage != null && Number.isFinite(Number(commissionPercentage))) ? Math.min(100, Math.max(0, Number(commissionPercentage))) : 0,
             balance: initialBalance,
+            canManagePayments: Boolean(canManagePayments),
+            canManageOwnDepositQr: Boolean(canManageOwnDepositQr),
         });
         await bookie.save();
         
@@ -251,6 +264,8 @@ export const createBookie = async (req, res) => {
                 status: bookie.status,
                 commissionPercentage: bookie.commissionPercentage,
                 balance: bookie.balance ?? 0,
+                canManagePayments: bookie.canManagePayments || false,
+                canManageOwnDepositQr: bookie.canManageOwnDepositQr || false,
             },
         });
     } catch (error) {
@@ -370,7 +385,23 @@ export const updateBookie = async (req, res) => {
         }
 
         const { id } = req.params;
-        const { username, firstName, lastName, email, phone, status, password, uiTheme, commissionPercentage, canManagePayments, balance } = req.body;
+        const {
+            username,
+            firstName,
+            lastName,
+            email,
+            phone,
+            status,
+            password,
+            uiTheme,
+            commissionPercentage,
+            canManagePayments,
+            canManageOwnDepositQr,
+            balance,
+            playerDepositUpiId,
+            playerDepositUpiName,
+            playerDepositQrImageUrl,
+        } = req.body;
 
         const bookie = await Admin.findOne({ _id: id, role: 'bookie' });
         if (!bookie) {
@@ -437,6 +468,21 @@ export const updateBookie = async (req, res) => {
         if (canManagePayments !== undefined) {
             bookie.canManagePayments = Boolean(canManagePayments);
         }
+        if (canManageOwnDepositQr !== undefined) {
+            bookie.canManageOwnDepositQr = Boolean(canManageOwnDepositQr);
+        }
+        if (playerDepositUpiId !== undefined) {
+            const v = playerDepositUpiId === null || playerDepositUpiId === '' ? '' : String(playerDepositUpiId).trim();
+            bookie.playerDepositUpiId = v || null;
+        }
+        if (playerDepositUpiName !== undefined) {
+            const v = playerDepositUpiName === null || playerDepositUpiName === '' ? '' : String(playerDepositUpiName).trim();
+            bookie.playerDepositUpiName = v || null;
+        }
+        if (playerDepositQrImageUrl !== undefined) {
+            const v = playerDepositQrImageUrl === null || playerDepositQrImageUrl === '' ? '' : String(playerDepositQrImageUrl).trim();
+            bookie.playerDepositQrImageUrl = v || null;
+        }
         // Update balance if provided (super admin can set bookie balance)
         console.log(`[updateBookie] Balance from request: ${balance}, type: ${typeof balance}`);
         if (balance !== undefined && balance !== null && balance !== '') {
@@ -483,6 +529,10 @@ export const updateBookie = async (req, res) => {
                 uiTheme: bookie.uiTheme,
                 commissionPercentage: bookie.commissionPercentage,
                 canManagePayments: bookie.canManagePayments,
+                canManageOwnDepositQr: bookie.canManageOwnDepositQr || false,
+                playerDepositUpiId: bookie.playerDepositUpiId || '',
+                playerDepositUpiName: bookie.playerDepositUpiName || '',
+                playerDepositQrImageUrl: bookie.playerDepositQrImageUrl || '',
             },
         });
     } catch (error) {

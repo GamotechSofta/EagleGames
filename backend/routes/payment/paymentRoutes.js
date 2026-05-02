@@ -14,7 +14,7 @@ import {
     getPaymentScreenshot,
 } from '../../controllers/paymentController.js';
 import { verifyAdmin, verifySuperAdmin } from '../../middleware/adminAuth.js';
-import { verifyUser } from '../../middleware/userAuth.js';
+import { verifyUser, optionalVerifyUser } from '../../middleware/userAuth.js';
 
 // Configure multer with memory storage for database storage
 const storage = multer.memoryStorage();
@@ -36,8 +36,8 @@ const upload = multer({
 
 const router = express.Router();
 
-// ===== Public APIs =====
-router.get('/config', getPaymentConfig);
+// ===== Public API (optional player JWT returns bookie-specific deposit UPI/QR when applicable) =====
+router.get('/config', optionalVerifyUser, getPaymentConfig);
 
 // ===== User APIs (player JWT required; userId from token) =====
 router.post('/deposit', verifyUser, upload.single('screenshot'), createDepositRequest);
