@@ -2,9 +2,25 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { API_BASE_URL, fetchWithAuth, getAuthHeaders } from '../config/api';
 import { UPI_INTENT_SESSION_KEY } from '../utils/upiIntent';
 
+function markIntentFinished(intentRef) {
+    try {
+        sessionStorage.setItem(`upi_intent_finished_${intentRef}`, '1');
+    } catch {
+        /* ignore */
+    }
+}
+
+function wasIntentAlreadyFinished(intentRef) {
+    try {
+        return sessionStorage.getItem(`upi_intent_finished_${intentRef}`) === '1';
+    } catch {
+        return false;
+    }
+}
+
 /**
- * After UPI app return: user confirms success or failure; server credits wallet or records rejection + passbook line.
- * `autoSubmitOutcome` — when set (e.g. URL ?status=success), submits once without tapping a button.
+ * After return from UPI app: automatically confirms with server (success by default).
+ * `assumeFailure` — only when URL/gateway explicitly indicates failure.
  */
 export default function UpiOutcomeModal({
     open,
@@ -14,20 +30,35 @@ export default function UpiOutcomeModal({
     onSuccess,
     onFailed,
     onResultAck,
-    autoSubmitOutcome = null,
+    assumeFailure = false,
 }) {
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState('');
     const [done, setDone] = useState(null); // 'success' | 'failed' | null
-    const autoFired = useRef(false);
+    const runOnce = useRef(false);
 
     useEffect(() => {
-        autoFired.current = false;
+        runOnce.current = false;
+        setDone(null);
+        setError('');
     }, [intentRef]);
 
     const clearSession = () => {
         try {
             sessionStorage.removeItem(UPI_INTENT_SESSION_KEY);
+        } catch {
+            /* ignore */
+        }
+    };
+
+    const applyWalletBalance = (data) => {
+        const bal = data?.data?.walletBalance;
+        if (bal == null) return;
+        try {
+            const u = JSON.parse(localStorage.getItem('user') || '{}');
+            u.balance = bal;
+            u.walletBalance = bal;
+            localStorage.setItem('user', JSON.stringify(u));
         } catch {
             /* ignore */
         }
@@ -44,31 +75,34 @@ export default function UpiOutcomeModal({
                     body: JSON.stringify({ intentRef, outcome }),
                 });
                 if (res.status === 401) return;
-                const data = await res.json();
-                if (!data.success) {
-                    setError(data.message || 'Could not update payment');
-                    setBusy(false);
+                const data = await res.json().catch(() => ({}));
+
+                const msg = String(data.message || '');
+                const alreadyDone = res.status === 404 || /no pending payment/i.test(msg);
+
+                if (data.success) {
+                    clearSession();
+                    markIntentFinished(intentRef);
+                    if (outcome === 'success') {
+                        applyWalletBalance(data);
+                        setDone('success');
+                        onSuccess?.(data);
+                    } else {
+                        setDone('failed');
+                        onFailed?.(data);
+                    }
                     return;
                 }
-                clearSession();
-                if (outcome === 'success') {
-                    const bal = data.data?.walletBalance;
-                    if (bal != null) {
-                        try {
-                            const u = JSON.parse(localStorage.getItem('user') || '{}');
-                            u.balance = bal;
-                            u.walletBalance = bal;
-                            localStorage.setItem('user', JSON.stringify(u));
-                        } catch {
-                            /* ignore */
-                        }
-                    }
+
+                if (alreadyDone && outcome === 'success') {
+                    clearSession();
+                    markIntentFinished(intentRef);
                     setDone('success');
                     onSuccess?.(data);
-                } else {
-                    setDone('failed');
-                    onFailed?.(data);
+                    return;
                 }
+
+                setError(msg || 'Could not update payment');
             } catch (e) {
                 console.error(e);
                 setError('Network error. Try again.');
@@ -80,10 +114,17 @@ export default function UpiOutcomeModal({
     );
 
     useEffect(() => {
-        if (!open || !intentRef || !autoSubmitOutcome || autoFired.current) return;
-        autoFired.current = true;
-        finish(autoSubmitOutcome);
-    }, [open, intentRef, autoSubmitOutcome, finish]);
+        if (!open || !intentRef) return;
+        if (wasIntentAlreadyFinished(intentRef)) {
+            runOnce.current = true;
+            setDone('success');
+            return;
+        }
+        if (runOnce.current) return;
+        runOnce.current = true;
+        const outcome = assumeFailure ? 'failed' : 'success';
+        finish(outcome);
+    }, [open, intentRef, assumeFailure, finish]);
 
     if (!open || !intentRef) return null;
 
@@ -148,54 +189,37 @@ export default function UpiOutcomeModal({
     return (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
             <div
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="upi-outcome-title"
-                className="bg-[#111827] rounded-2xl max-w-sm w-full p-5 sm:p-6 border-2 border-[#374151] shadow-xl"
+                role="status"
+                aria-live="polite"
+                className="bg-[#111827] rounded-2xl max-w-sm w-full p-6 border-2 border-[#374151] shadow-xl text-center"
             >
-                <h3 id="upi-outcome-title" className="text-lg font-bold text-white text-center mb-2">
-                    Payment status
-                </h3>
+                <div className="w-12 h-12 border-2 border-[#1a74e5] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                <h3 className="text-lg font-bold text-white mb-1">Back from payment app</h3>
                 {amountLabel && (
                     <p className="text-[#1a74e5] font-extrabold text-center text-lg mb-2">{amountLabel}</p>
                 )}
-                <p className="text-gray-400 text-sm text-center mb-4">
-                    After you finished in your UPI app, tell us how it went. Your passbook will update.
+                <p className="text-gray-400 text-sm mb-4">
+                    Confirming your payment with the server…
                 </p>
                 {error && (
                     <div className="mb-3 p-3 rounded-lg bg-red-900/30 border border-red-500/50 text-red-200 text-sm">
                         {error}
                     </div>
                 )}
-                <div className="grid gap-2">
-                    {busy && autoSubmitOutcome && (
-                        <p className="text-center text-gray-400 text-sm py-2">Confirming with server…</p>
-                    )}
+                {error && (
                     <button
                         type="button"
                         disabled={busy}
-                        onClick={() => finish('success')}
-                        className="w-full py-3 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold disabled:opacity-50"
+                        onClick={() => {
+                            runOnce.current = false;
+                            setError('');
+                            finish(assumeFailure ? 'failed' : 'success');
+                        }}
+                        className="w-full py-3 rounded-xl bg-[#1a74e5] text-white font-semibold disabled:opacity-50"
                     >
-                        {busy ? 'Please wait…' : 'Payment successful'}
+                        Try again
                     </button>
-                    <button
-                        type="button"
-                        disabled={busy}
-                        onClick={() => finish('failed')}
-                        className="w-full py-3 rounded-xl bg-[#1f2937] border-2 border-[#374151] text-gray-200 font-semibold hover:border-red-500/50 disabled:opacity-50"
-                    >
-                        Payment failed or cancelled
-                    </button>
-                    <button
-                        type="button"
-                        disabled={busy}
-                        onClick={onClose}
-                        className="w-full py-2 text-gray-500 text-sm hover:text-gray-300"
-                    >
-                        Close (I&apos;ll confirm later)
-                    </button>
-                </div>
+                )}
             </div>
         </div>
     );

@@ -3,7 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import UpiOutcomeModal from '../components/UpiOutcomeModal';
 
 /**
- * Optional landing when UPI passes `url=https://yoursite/upi-return?ref=...` or user opens link manually.
+ * When UPI opens `url=https://yoursite/upi-return?ref=...` after pay, we auto-complete as success
+ * unless `status` clearly indicates failure.
  */
 const UpiPaymentReturn = () => {
     const [searchParams] = useSearchParams();
@@ -11,11 +12,10 @@ const UpiPaymentReturn = () => {
     const ref = searchParams.get('ref') || '';
     const gatewayStatus = (searchParams.get('status') || '').toLowerCase();
 
-    const autoSubmitOutcome = useMemo(() => {
-        if (gatewayStatus === 'success') return 'success';
-        if (gatewayStatus === 'failure' || gatewayStatus === 'failed') return 'failed';
-        return null;
-    }, [gatewayStatus]);
+    const assumeFailure = useMemo(
+        () => gatewayStatus === 'failure' || gatewayStatus === 'failed',
+        [gatewayStatus]
+    );
 
     const amountFromSession = useMemo(() => {
         try {
@@ -50,7 +50,7 @@ const UpiPaymentReturn = () => {
                 open
                 intentRef={ref}
                 amountLabel={amountFromSession}
-                autoSubmitOutcome={autoSubmitOutcome}
+                assumeFailure={assumeFailure}
                 onClose={() => {}}
                 onSuccess={() => {}}
                 onFailed={() => {}}

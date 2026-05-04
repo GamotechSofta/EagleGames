@@ -227,7 +227,8 @@ const AddFund = () => {
 
                     {depositSource === 'bookie' && (
                         <p className="mt-3 text-amber-200/90 text-xs text-center px-2">
-                            You pay your agent&apos;s UPI — after paying, confirm status when you return to this app.
+                            You pay your agent&apos;s UPI — when you return to this app, payment is confirmed
+                            automatically.
                         </p>
                     )}
 
@@ -282,8 +283,8 @@ const AddFund = () => {
                     </div>
 
                     <div className="mt-2.5 sm:mt-3 max-w-[520px] mx-auto bg-[#1f2937] rounded-md border-2 border-[#374151] px-3 py-2 text-[10px] sm:text-[11px] text-gray-200">
-                        Pay in Google Pay / PhonePe / Paytm. Amount is filled automatically. When you come back, confirm
-                        payment status — your passbook updates. No QR or screenshot needed.
+                        Pay in Google Pay / PhonePe / Paytm. Amount is filled automatically. When you return to this
+                        page, we confirm the payment and update your passbook — no extra taps.
                     </div>
                 </div>
             </div>
@@ -303,8 +304,8 @@ const AddFund = () => {
                             ₹{qrAmount.toLocaleString('en-IN')}
                         </p>
                         <p className="text-gray-400 text-sm text-center mb-4">
-                            Choose an app. After payment, return here or use the link your app opens — then confirm
-                            status.
+                            Choose an app. After you pay, come back to this site (or open the return link if your app
+                            shows it) — we confirm your payment automatically.
                         </p>
                         <div className="grid grid-cols-1 gap-2 mb-3">
                             {UPI_APP_DEEP_LINKS.map(({ id, label, build }) => (
@@ -344,6 +345,7 @@ const AddFund = () => {
                     open={showOutcomePrompt}
                     intentRef={outcomeIntentRef}
                     amountLabel={outcomeAmountLabel}
+                    assumeFailure={false}
                     onClose={() => {
                         setShowOutcomePrompt(false);
                         setOutcomeIntentRef('');
