@@ -12,6 +12,9 @@ import {
     rejectPayment,
     updatePaymentStatus,
     getPaymentScreenshot,
+    startUpiDepositIntent,
+    finishUpiDepositIntent,
+    cancelUpiDepositIntent,
 } from '../../controllers/paymentController.js';
 import { verifyAdmin, verifySuperAdmin } from '../../middleware/adminAuth.js';
 import { verifyUser, optionalVerifyUser } from '../../middleware/userAuth.js';
@@ -41,6 +44,9 @@ router.get('/config', optionalVerifyUser, getPaymentConfig);
 
 // ===== User APIs (player JWT required; userId from token) =====
 router.post('/deposit', verifyUser, upload.single('screenshot'), createDepositRequest);
+router.post('/upi-intent/start', verifyUser, startUpiDepositIntent);
+router.post('/upi-intent/finish', verifyUser, finishUpiDepositIntent);
+router.post('/upi-intent/cancel', verifyUser, cancelUpiDepositIntent);
 router.post('/withdraw', verifyUser, createWithdrawalRequest);
 router.get('/my-deposits', verifyUser, getMyDeposits);
 router.get('/my-withdrawals', verifyUser, getMyWithdrawals);
