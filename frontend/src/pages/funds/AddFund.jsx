@@ -9,7 +9,7 @@ import {
     UPI_INTENT_SESSION_KEY,
 } from '../../utils/upiIntent';
 
-const PLATFORM_FALLBACK_UPI = '9380158730-2@axl';
+const PLATFORM_FALLBACK_UPI = 'mahajananurag629@oksbi';
 
 const AddFund = () => {
     const navigate = useNavigate();
