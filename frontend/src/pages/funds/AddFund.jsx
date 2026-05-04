@@ -1,11 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import QRCode from 'react-qr-code';
 import { API_BASE_URL, getAuthHeaders, fetchWithAuth } from '../../config/api';
 
 /** Fallback when platform config has no QR env (`PLAYER_DEPOSIT_QR_URL`). */
 const PLATFORM_FALLBACK_UPI = '9380158730-2@axl';
 const PLATFORM_FALLBACK_QR =
     'https://res.cloudinary.com/dwwt5xdsz/image/upload/v1775733532/a2070441-4b78-4567-bf0b-a7c25888dbae.png';
+
+/** NPCI-style UPI intent so the scanned QR pays `am` to `pa` (and shows `pn` when set). */
+function buildUpiPayUri(pa, payeeName, amount) {
+    const am = Number(amount);
+    if (!pa || !Number.isFinite(am) || am <= 0) return '';
+    const parts = [`pa=${encodeURIComponent(pa)}`, `am=${encodeURIComponent(am.toFixed(2))}`, 'cu=INR'];
+    const pn = String(payeeName || '').trim();
+    if (pn) parts.splice(1, 0, `pn=${encodeURIComponent(pn)}`);
+    return `upi://pay?${parts.join('&')}`;
+}
+
+function getUpiPayQueryString(upiPayUri) {
+    if (!upiPayUri || !upiPayUri.startsWith('upi://pay')) return '';
+    const q = upiPayUri.indexOf('?');
+    return q === -1 ? '' : upiPayUri.slice(q + 1);
+}
+
+/** Same query as `upi://pay?…`; each app opens with amount & payee pre-filled. */
+const UPI_APP_DEEP_LINKS = [
+    { id: 'gpay', label: 'Google Pay', build: (qs) => `tez://upi/pay?${qs}` },
+    { id: 'phonepe', label: 'PhonePe', build: (qs) => `phonepe://pay?${qs}` },
+    { id: 'paytm', label: 'Paytm', build: (qs) => `paytmmp://pay?${qs}` },
+];
+
+const ADD_FUND_RESUME_KEY = 'addFund_resume_v1';
 
 const AddFund = () => {
     const navigate = useNavigate();
@@ -20,7 +46,7 @@ const AddFund = () => {
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [submittedAmount, setSubmittedAmount] = useState(0);
     const [step, setStep] = useState(1); // 1 = Amount, 2 = Payment Details
-    const [addCashLoading, setAddCashLoading] = useState(false);
+    const [showPayAppModal, setShowPayAppModal] = useState(false);
 
     /** Send player JWT when logged in so bookie-specific UPI/QR is returned when applicable. */
     const fetchConfig = async () => {
@@ -39,6 +65,36 @@ const AddFund = () => {
     useEffect(() => {
         fetchConfig();
     }, [step]);
+
+    useEffect(() => {
+        try {
+            const raw = sessionStorage.getItem(ADD_FUND_RESUME_KEY);
+            if (!raw) return;
+            const data = JSON.parse(raw);
+            if (data.step === 2 && data.amount != null && data.amount !== '') {
+                setStep(2);
+                setAmount(String(data.amount));
+            }
+        } catch {
+            /* ignore */
+        }
+    }, []);
+
+    const persistStep2ForResume = (amt) => {
+        try {
+            sessionStorage.setItem(ADD_FUND_RESUME_KEY, JSON.stringify({ step: 2, amount: String(amt) }));
+        } catch {
+            /* ignore */
+        }
+    };
+
+    const clearAddFundResume = () => {
+        try {
+            sessionStorage.removeItem(ADD_FUND_RESUME_KEY);
+        } catch {
+            /* ignore */
+        }
+    };
 
     const depositSource = config?.depositSource || 'platform';
     const displayUpi = config?.upiId || PLATFORM_FALLBACK_UPI;
@@ -108,6 +164,7 @@ const AddFund = () => {
             if (res.status === 401) return;
             const data = await res.json();
             if (data.success) {
+                clearAddFundResume();
                 setSubmittedAmount(numAmount);
                 setShowSuccessModal(true);
                 setAmount('');
@@ -138,6 +195,12 @@ const AddFund = () => {
         return Number.isFinite(n) && n > 0 ? n : null;
     })();
 
+    const upiPayUri = useMemo(() => {
+        if (!displayUpi || qrAmount == null) return '';
+        if (qrAmount < minDeposit || qrAmount > maxDeposit) return '';
+        return buildUpiPayUri(displayUpi, displayPayeeName, qrAmount);
+    }, [displayUpi, displayPayeeName, qrAmount, minDeposit, maxDeposit]);
+
     const validateAmount = () => {
         const numAmount = Number(amount);
         if (!numAmount || numAmount < minDeposit || numAmount > maxDeposit) {
@@ -150,12 +213,27 @@ const AddFund = () => {
     const handleAddCash = () => {
         setError('');
         if (!validateAmount()) return;
-        setAddCashLoading(true);
-        window.setTimeout(() => {
-            setAddCashLoading(false);
-            setStep(2);
-        }, 3000);
+        if (!upiPayUri) {
+            setError('Unable to open payment. Check amount limits and try again.');
+            return;
+        }
+        setShowPayAppModal(true);
     };
+
+    const goToStep2Only = () => {
+        persistStep2ForResume(amount);
+        setShowPayAppModal(false);
+        setStep(2);
+    };
+
+    const launchUpiApp = (href) => {
+        persistStep2ForResume(amount);
+        setShowPayAppModal(false);
+        setStep(2);
+        window.location.href = href;
+    };
+
+    const upiQueryString = getUpiPayQueryString(upiPayUri);
 
     return (
         <div className={`space-y-4 sm:space-y-6 ${step === 2 ? 'pb-28' : ''}`}>
@@ -279,12 +357,9 @@ const AddFund = () => {
                             <button
                                 type="button"
                                 onClick={handleAddCash}
-                                disabled={addCashLoading}
-                                className={`w-full h-9 sm:h-10 rounded-md bg-gradient-to-r bg-[#1a74e5] text-white font-extrabold shadow-md  hover:bg-[#155fc2] transition-all ${
-                                    addCashLoading ? 'opacity-70 cursor-not-allowed' : ''
-                                }`}
+                                className="w-full h-9 sm:h-10 rounded-md bg-gradient-to-r bg-[#1a74e5] text-white font-extrabold shadow-md  hover:bg-[#155fc2] transition-all"
                             >
-                                {addCashLoading ? 'Loading...' : 'Add Cash'}
+                                Add Cash
                             </button>
                         </div>
 
@@ -307,7 +382,10 @@ const AddFund = () => {
                         </div>
                         <button
                             type="button"
-                            onClick={() => setStep(1)}
+                            onClick={() => {
+                                clearAddFundResume();
+                                setStep(1);
+                            }}
                             className="shrink-0 px-4 py-2 rounded-lg bg-[#111827] hover:bg-[#1f2937] text-gray-200 text-sm font-semibold border-2 border-[#374151] hover:border-[#4b5563]"
                         >
                             Back
@@ -323,10 +401,14 @@ const AddFund = () => {
                             </p>
                         )}
 
-                        {/* QR Code Section */}
+                        {/* QR Code Section — dynamic UPI intent encodes selected amount + payee VPA */}
                         <div className="flex flex-col items-center mb-5">
                             <div className="bg-[#111827] p-3 rounded-xl mb-3">
-                                {displayQr ? (
+                                {upiPayUri ? (
+                                    <div className="bg-white p-2 rounded-lg">
+                                        <QRCode value={upiPayUri} size={180} level="M" />
+                                    </div>
+                                ) : displayQr ? (
                                     <img src={displayQr} alt="UPI QR Code" className="w-[180px] h-[180px]" />
                                 ) : (
                                     <div className="w-[180px] h-[180px] flex items-center justify-center bg-[#1f2937] rounded border border-[#374151] px-2">
@@ -337,7 +419,11 @@ const AddFund = () => {
                                 )}
                             </div>
                             <p className="text-gray-400 text-sm text-center">
-                                {displayQr ? 'Scan QR code with any UPI app to pay' : 'Enter UPI ID manually in your app'}
+                                {upiPayUri
+                                    ? `Scan to pay ₹${qrAmount.toLocaleString('en-IN')} to the UPI ID below`
+                                    : displayQr
+                                      ? 'Scan QR code with any UPI app to pay'
+                                      : 'Enter UPI ID manually in your app'}
                             </p>
                             {displayPayeeName && (
                                 <p className="text-gray-300 text-sm mt-2 text-center">
@@ -446,12 +532,68 @@ const AddFund = () => {
                     <div className="bg-[#1f2937] rounded-xl p-4 border-2 border-[#374151]">
                         <h4 className="text-[#1a74e5] font-semibold mb-2">How to Add Funds:</h4>
                         <ol className="text-gray-200 text-sm space-y-2 list-decimal list-inside">
-                            <li>Scan the QR code above OR copy the UPI ID</li>
-                            <li>Open any UPI app (GPay, PhonePe, Paytm, etc.)</li>
-                            <li>Send the exact amount you want to add</li>
+                            <li>If you used Add Cash, you may have already paid from Google Pay / PhonePe / Paytm</li>
+                            <li>Otherwise scan the QR above or copy the UPI ID — amount is included in the QR</li>
+                            <li>Confirm the exact selected amount if your app shows it</li>
                             <li>Take a screenshot of the successful payment</li>
-                            <li>Enter amount and upload the screenshot above</li>
+                            <li>Enter UTR and upload the screenshot above</li>
                         </ol>
+                    </div>
+                </div>
+            )}
+
+            {/* Choose UPI app — deep links include amount + VPA (no manual amount entry in app) */}
+            {showPayAppModal && upiPayUri && qrAmount != null && (
+                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+                    <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="pay-app-title"
+                        className="bg-[#111827] rounded-2xl max-w-sm w-full p-5 sm:p-6 border-2 border-[#374151] shadow-xl"
+                    >
+                        <h3 id="pay-app-title" className="text-lg font-bold text-white text-center mb-1">
+                            Pay with UPI app
+                        </h3>
+                        <p className="text-[#1a74e5] font-extrabold text-center text-xl mb-1">
+                            ₹{qrAmount.toLocaleString('en-IN')}
+                        </p>
+                        <p className="text-gray-400 text-sm text-center mb-4">
+                            Opens with this amount and payee filled in — you only confirm the payment. Works best on
+                            your phone.
+                        </p>
+                        <div className="grid grid-cols-1 gap-2 mb-3">
+                            {UPI_APP_DEEP_LINKS.map(({ id, label, build }) => (
+                                <button
+                                    key={id}
+                                    type="button"
+                                    onClick={() => launchUpiApp(build(upiQueryString))}
+                                    className="w-full py-3 rounded-xl bg-[#1f2937] border-2 border-[#374151] text-white font-semibold hover:border-[#1a74e5] hover:bg-[#111827] transition-colors text-left px-4"
+                                >
+                                    {label}
+                                </button>
+                            ))}
+                            <button
+                                type="button"
+                                onClick={() => launchUpiApp(upiPayUri)}
+                                className="w-full py-3 rounded-xl bg-[#1f2937] border-2 border-[#374151] text-gray-200 font-semibold hover:border-[#1a74e5] transition-colors text-left px-4"
+                            >
+                                Other UPI app
+                            </button>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={goToStep2Only}
+                            className="w-full py-2.5 rounded-xl text-[#1a74e5] text-sm font-semibold border border-[#374151] bg-transparent hover:bg-[#1f2937] mb-2"
+                        >
+                            Scan QR / enter UPI manually instead
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setShowPayAppModal(false)}
+                            className="w-full py-2 text-gray-500 text-sm hover:text-gray-300"
+                        >
+                            Cancel
+                        </button>
                     </div>
                 </div>
             )}
