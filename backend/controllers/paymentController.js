@@ -1,7 +1,6 @@
-import crypto from 'crypto';
 import Payment from '../models/payment/payment.js';
 import BankDetail from '../models/bankDetail/bankDetail.js';
-import { Wallet, WalletTransaction } from '../models/wallet/wallet.js';
+import { Wallet } from '../models/wallet/wallet.js';
 import Admin from '../models/admin/admin.js';
 import User from '../models/user/user.js';
 import bcrypt from 'bcryptjs';
@@ -18,13 +17,13 @@ import { uploadToCloudinary } from '../config/cloudinary.js';
  */
 export const getPaymentConfig = async (req, res) => {
     try {
-        const minDeposit = parseInt(process.env.MIN_DEPOSIT, 10) || 1;
+        const minDeposit = parseInt(process.env.MIN_DEPOSIT, 10) || 100;
         const maxDeposit = parseInt(process.env.MAX_DEPOSIT, 10) || 50000;
         const minWithdrawal = parseInt(process.env.MIN_WITHDRAWAL, 10) || 500;
         const maxWithdrawal = parseInt(process.env.MAX_WITHDRAWAL, 10) || 25000;
 
         let data = {
-            upiId: process.env.UPI_ID || 'mahajananurag629@oksbi',
+            upiId: process.env.UPI_ID || 'example@paytm',
             upiName: process.env.UPI_NAME || 'Golden Games',
             qrImageUrl: process.env.PLAYER_DEPOSIT_QR_URL?.trim() || null,
             minDeposit,
@@ -85,7 +84,7 @@ export const createDepositRequest = async (req, res) => {
             return res.status(401).json({ success: false, message: 'Authentication required' });
         }
 
-        const minDeposit = parseInt(process.env.MIN_DEPOSIT, 10) || 1;
+        const minDeposit = parseInt(process.env.MIN_DEPOSIT) || 100;
         const maxDeposit = parseInt(process.env.MAX_DEPOSIT) || 50000;
 
         // Parse amount as number
@@ -170,7 +169,6 @@ export const createDepositRequest = async (req, res) => {
             amount: numAmount,
             method: 'upi',
             status: 'pending',
-            depositChannel: 'screenshot',
             screenshotUrl: screenshotUrl,
             upiTransactionId: upiTransactionId || '',
             userNote: userNote || '',
@@ -206,220 +204,6 @@ export const createDepositRequest = async (req, res) => {
             message: error.message || 'Internal server error. Please try again later.',
             error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
-    }
-};
-
-/**
- * User: Start UPI in-app deposit — creates pending payment and returns intent ref for `tr=` in UPI URL.
- */
-export const startUpiDepositIntent = async (req, res) => {
-    try {
-        const userId = req.userId;
-        if (!userId) {
-            return res.status(401).json({ success: false, message: 'Authentication required' });
-        }
-
-        const minDeposit = parseInt(process.env.MIN_DEPOSIT, 10) || 1;
-        const maxDeposit = parseInt(process.env.MAX_DEPOSIT, 10) || 50000;
-        const numAmount = parseFloat(req.body?.amount);
-        if (!Number.isFinite(numAmount) || numAmount < minDeposit || numAmount > maxDeposit) {
-            return res.status(400).json({
-                success: false,
-                message: `Amount must be between ₹${minDeposit} and ₹${maxDeposit}`,
-            });
-        }
-
-        await Payment.deleteMany({
-            userId,
-            type: 'deposit',
-            depositChannel: 'upi_intent',
-            status: 'pending',
-        });
-
-        const upiIntentRef = crypto.randomBytes(10).toString('hex');
-
-        const payment = await Payment.create({
-            userId,
-            type: 'deposit',
-            amount: numAmount,
-            method: 'upi',
-            status: 'pending',
-            depositChannel: 'upi_intent',
-            upiIntentRef,
-            upiTransactionId: '',
-        });
-
-        return res.status(201).json({
-            success: true,
-            data: { intentRef: upiIntentRef, paymentId: payment._id, amount: numAmount },
-        });
-    } catch (error) {
-        console.error('startUpiDepositIntent:', error);
-        return res.status(500).json({ success: false, message: error.message });
-    }
-};
-
-/**
- * User: After returning from UPI app, confirm success or failure (no screenshot).
- * Success: credits wallet + passbook entry (same bookie-balance rules as admin approve).
- */
-export const finishUpiDepositIntent = async (req, res) => {
-    try {
-        const userId = req.userId;
-        if (!userId) {
-            return res.status(401).json({ success: false, message: 'Authentication required' });
-        }
-
-        const intentRef = String(req.body?.intentRef || '').trim();
-        const outcome = String(req.body?.outcome || '').toLowerCase();
-        if (!intentRef) {
-            return res.status(400).json({ success: false, message: 'intentRef is required' });
-        }
-        if (outcome !== 'success' && outcome !== 'failed') {
-            return res.status(400).json({ success: false, message: 'outcome must be success or failed' });
-        }
-
-        const payment = await Payment.findOne({
-            userId,
-            upiIntentRef: intentRef,
-            depositChannel: 'upi_intent',
-            status: 'pending',
-            type: 'deposit',
-        }).populate('userId');
-
-        if (!payment) {
-            return res.status(404).json({
-                success: false,
-                message: 'No pending payment found for this session. Start add fund again.',
-            });
-        }
-
-        if (outcome === 'failed') {
-            payment.status = 'rejected';
-            payment.adminRemarks = 'UPI payment failed or cancelled (reported after return)';
-            payment.processedAt = new Date();
-            await payment.save();
-
-            await WalletTransaction.create({
-                userId,
-                type: 'credit',
-                amount: 0,
-                description: 'UPI add fund — failed / cancelled (not credited)',
-                referenceId: String(payment._id),
-            });
-
-            await logActivity({
-                action: 'payment_deposit_upi_intent_failed',
-                performedBy: userId,
-                performedByType: 'user',
-                targetType: 'payment',
-                targetId: String(payment._id),
-                details: `UPI intent deposit marked failed ₹${payment.amount}`,
-                ip: getClientIp(req),
-            });
-
-            return res.status(200).json({
-                success: true,
-                data: { status: 'rejected', payment },
-            });
-        }
-
-        let updatedBookieBalance = null;
-
-        if (payment.type === 'deposit') {
-            const ownerBookieId = payment.userId?.referredBy;
-            if (ownerBookieId) {
-                const ownerBookie = await Admin.findById(ownerBookieId).select('role canManagePayments');
-                if (ownerBookie && ownerBookie.role === 'bookie' && ownerBookie.canManagePayments) {
-                    const updatedBookie = await Admin.findOneAndUpdate(
-                        { _id: ownerBookie._id, balance: { $gte: payment.amount } },
-                        { $inc: { balance: -payment.amount } },
-                        { new: true }
-                    ).select('balance');
-
-                    if (!updatedBookie) {
-                        return res.status(400).json({
-                            success: false,
-                            message:
-                                'Agent wallet is insufficient to credit this deposit. Please contact support.',
-                        });
-                    }
-                    updatedBookieBalance = Number(updatedBookie.balance || 0);
-                }
-            }
-        }
-
-        payment.status = 'approved';
-        payment.adminRemarks = 'Credited via UPI (confirmed after app return)';
-        payment.processedAt = new Date();
-        await payment.save();
-
-        let wallet = await Wallet.findOne({ userId: payment.userId._id });
-        if (!wallet) {
-            wallet = new Wallet({ userId: payment.userId._id, balance: 0 });
-        }
-        wallet.balance += payment.amount;
-        await wallet.save();
-
-        await WalletTransaction.create({
-            userId: payment.userId._id,
-            type: 'credit',
-            amount: payment.amount,
-            description: 'Add fund (UPI)',
-            referenceId: String(payment._id),
-        });
-
-        await logActivity({
-            action: 'payment_deposit_upi_intent_credited',
-            performedBy: userId,
-            performedByType: 'user',
-            targetType: 'payment',
-            targetId: String(payment._id),
-            details: `UPI intent deposit credited ₹${payment.amount}`,
-            ip: getClientIp(req),
-        });
-
-        return res.status(200).json({
-            success: true,
-            data: {
-                status: 'approved',
-                payment,
-                walletBalance: wallet.balance,
-                ...(updatedBookieBalance !== null ? { bookieBalance: updatedBookieBalance } : {}),
-            },
-        });
-    } catch (error) {
-        console.error('finishUpiDepositIntent:', error);
-        return res.status(500).json({ success: false, message: error.message });
-    }
-};
-
-/**
- * User: Cancel pending UPI intent (e.g. closed pay picker without paying).
- */
-export const cancelUpiDepositIntent = async (req, res) => {
-    try {
-        const userId = req.userId;
-        if (!userId) {
-            return res.status(401).json({ success: false, message: 'Authentication required' });
-        }
-        const intentRef = String(req.body?.intentRef || '').trim();
-        if (!intentRef) {
-            return res.status(400).json({ success: false, message: 'intentRef is required' });
-        }
-
-        const result = await Payment.deleteOne({
-            userId,
-            upiIntentRef: intentRef,
-            depositChannel: 'upi_intent',
-            status: 'pending',
-            type: 'deposit',
-        });
-
-        return res.status(200).json({ success: true, data: { deleted: result.deletedCount > 0 } });
-    } catch (error) {
-        console.error('cancelUpiDepositIntent:', error);
-        return res.status(500).json({ success: false, message: error.message });
     }
 };
 

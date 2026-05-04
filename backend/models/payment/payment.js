@@ -47,19 +47,6 @@ const paymentSchema = new mongoose.Schema({
         type: String,
         trim: true,
     },
-    /** Unique ref embedded in UPI `tr=` for app-return / finish flow (depositChannel upi_intent). */
-    upiIntentRef: {
-        type: String,
-        trim: true,
-        sparse: true,
-        unique: true,
-    },
-    /** How the deposit was initiated: manual screenshot vs in-app UPI deep link. */
-    depositChannel: {
-        type: String,
-        enum: ['screenshot', 'upi_intent'],
-        default: 'screenshot',
-    },
     // Legacy field
     transactionId: {
         type: String,
@@ -101,7 +88,6 @@ const paymentSchema = new mongoose.Schema({
 // Indexes for faster queries
 paymentSchema.index({ userId: 1, type: 1, status: 1 });
 paymentSchema.index({ status: 1, createdAt: -1 });
-paymentSchema.index({ userId: 1, upiIntentRef: 1 });
 
 const Payment = mongoose.model('Payment', paymentSchema);
 export default Payment;

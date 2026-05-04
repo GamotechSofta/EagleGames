@@ -20,7 +20,6 @@ import BetHistory from '../pages/BetHistory';
 import MarketResultHistory from '../pages/MarketResultHistory';
 import TopWinners from '../pages/TopWinners';
 import GameRate from '../pages/GameRate';
-import UpiPaymentReturn from '../pages/UpiPaymentReturn';
 
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -167,7 +166,6 @@ const AppRoutes = () => {
           <Route path="/funds" element={<Funds />} />
           <Route path="/download" element={<Download />} />
           <Route path="/passbook" element={<Passbook />} />
-          <Route path="/upi-return" element={<UpiPaymentReturn />} />
           <Route path="/support" element={<SupportLanding />} />
           <Route path="/support/new" element={<SupportNew />} />
           <Route path="/support/status" element={<SupportStatus />} />
