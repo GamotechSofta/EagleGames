@@ -194,7 +194,7 @@ const Payments = () => {
                                 value={pdUpi}
                                 onChange={(e) => setPdUpi(e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900"
-                                placeholder="name@paytm"
+                                placeholder="name@upi"
                                 autoComplete="off"
                             />
                         </div>

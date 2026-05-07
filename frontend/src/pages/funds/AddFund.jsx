@@ -4,8 +4,9 @@ import QRCode from 'react-qr-code';
 import { API_BASE_URL, getAuthHeaders, fetchWithAuth } from '../../config/api';
 import platformAdminQr from '../../assets/QRforAdmin.jpeg';
 
-/** Fallback when platform config has no QR (`PLAYER_DEPOSIT_QR_URL`). Same asset as admin panel QR — used for admin-managed & self-signup players (not bookie deposit flow). */
-const PLATFORM_FALLBACK_UPI = '9380158730-2@axl';
+/** Fallback if payment config not loaded; must match server defaults in `getPaymentConfig` (UPI_ID / UPI_NAME). */
+const PLATFORM_FALLBACK_UPI = 'neelamkarande23@okicici';
+const PLATFORM_FALLBACK_PAYEE = 'Neelam Karande';
 const PLATFORM_FALLBACK_QR = platformAdminQr;
 
 /** NPCI-style UPI intent so the scanned QR pays `am` to `pa` (and shows `pn` when set). */
@@ -56,7 +57,7 @@ const AddFund = () => {
         depositSource === 'bookie'
             ? config?.qrImageUrl || null
             : config?.qrImageUrl || PLATFORM_FALLBACK_QR;
-    const displayPayeeName = config?.upiName || '';
+    const displayPayeeName = config?.upiName || PLATFORM_FALLBACK_PAYEE;
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -194,7 +195,7 @@ const AddFund = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M2 12h20" />
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 2c3.5 3.5 3.5 16.5 0 20" />
                                 </svg>
-                                <span className="font-semibold tracking-wide">GoldenBets.com</span>
+                                <span className="font-semibold tracking-wide">Eagle Games</span>
                             </div>
 
                             <div className="bg-gradient-to-r from-[#1a74e5] via-[#1a74e5] to-[#1a74e5] px-3 sm:px-4 py-2.5 sm:py-3 flex items-center gap-3">

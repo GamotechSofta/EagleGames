@@ -276,7 +276,7 @@ const BankDetail = () => {
                                 value={formData.upiId}
                                 onChange={(e) => setFormData({ ...formData, upiId: e.target.value })}
                                 className="w-full bg-[#111827] border border-[#374151] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#1B3150] focus:border-[#1a74e5]"
-                                placeholder="e.g., yourname@paytm"
+                                    placeholder="e.g., yourname@upi"
                             />
                         </div>
 

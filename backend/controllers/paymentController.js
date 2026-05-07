@@ -23,8 +23,8 @@ export const getPaymentConfig = async (req, res) => {
         const maxWithdrawal = parseInt(process.env.MAX_WITHDRAWAL, 10) || 25000;
 
         let data = {
-            upiId: process.env.UPI_ID || 'example@paytm',
-            upiName: process.env.UPI_NAME || 'Golden Games',
+            upiId: process.env.UPI_ID || 'neelamkarande23@okicici',
+            upiName: process.env.UPI_NAME || 'Neelam Karande',
             qrImageUrl: process.env.PLAYER_DEPOSIT_QR_URL?.trim() || null,
             minDeposit,
             maxDeposit,
