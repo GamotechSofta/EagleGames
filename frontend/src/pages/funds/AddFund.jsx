@@ -2,12 +2,10 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import QRCode from 'react-qr-code';
 import { API_BASE_URL, getAuthHeaders, fetchWithAuth } from '../../config/api';
-import platformAdminQr from '../../assets/QRforAdmin.jpeg';
 
-/** Used if the payment config request fails. Platform values normally come from the API (super admin + env + defaults). */
+/** Used if /payments/config fails. UPI / payee normally come from API (super admin + env + defaults). QR is never hardcoded — hosted URL from API or generated QR from pay URI. */
 const PLATFORM_FALLBACK_UPI = 'neelamkarande23@okicici';
 const PLATFORM_FALLBACK_PAYEE = 'Neelam Karande';
-const PLATFORM_FALLBACK_QR = platformAdminQr;
 
 /** NPCI-style UPI intent so the scanned QR pays `am` to `pa` (and shows `pn` when set). */
 function buildUpiPayUri(pa, payeeName, amount) {
@@ -55,10 +53,10 @@ const AddFund = () => {
     }, [step]);
 
     const depositSource = config?.depositSource || 'platform';
-    const isBookieDeposit = depositSource === 'bookie';
     const displayUpi = config?.upiId || PLATFORM_FALLBACK_UPI;
     const displayPayeeName = config?.upiName || PLATFORM_FALLBACK_PAYEE;
-    const displayQr = isBookieDeposit ? (config?.qrImageUrl || null) : (config?.qrImageUrl || PLATFORM_FALLBACK_QR);
+    /** Hosted QR image from super admin / bookie only — no bundled fallback */
+    const hostedQrUrl = config?.qrImageUrl && String(config.qrImageUrl).trim() ? String(config.qrImageUrl).trim() : null;
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -392,19 +390,33 @@ const AddFund = () => {
                                 <p className="text-[11px] font-bold text-[#1a74e5] uppercase tracking-wide">2 · Scan QR</p>
                                 <div className="flex flex-col sm:flex-row items-center gap-2 justify-center sm:justify-start">
                                     <div className="bg-white p-1 rounded-md shrink-0">
-                                        {upiPayUri ? (
+                                        {hostedQrUrl ? (
+                                            <img src={hostedQrUrl} alt="UPI QR" className="w-[112px] h-[112px] object-contain" />
+                                        ) : upiPayUri ? (
                                             <QRCode value={upiPayUri} size={112} level="M" />
-                                        ) : displayQr ? (
-                                            <img src={displayQr} alt="UPI QR" className="w-[112px] h-[112px] object-contain" />
                                         ) : (
                                             <div className="w-[112px] h-[112px] flex items-center justify-center bg-gray-100 text-[10px] text-gray-500 text-center px-1">
-                                                No QR
+                                                Set amount &amp; wait for config
                                             </div>
                                         )}
                                     </div>
                                     <p className="text-[10px] text-gray-500 text-center sm:text-left leading-tight max-w-[14rem] sm:max-w-none">
-                                        <span className="text-gray-400">Instead of the button,</span> scan with any UPI app. Same ₹
-                                        {Number(amount || 0).toLocaleString('en-IN')} &amp; payee as option 1.
+                                        {hostedQrUrl ? (
+                                            <>
+                                                <span className="text-gray-400">Scan this QR</span> with your UPI app
+                                                {upiPayUri ? (
+                                                    <>
+                                                        {' '}
+                                                        — or use option 1 for ₹{Number(amount || 0).toLocaleString('en-IN')} with payee prefilled.
+                                                    </>
+                                                ) : null}
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span className="text-gray-400">Instead of the button,</span> scan with any UPI app. Same ₹
+                                                {Number(amount || 0).toLocaleString('en-IN')} &amp; payee as option 1.
+                                            </>
+                                        )}
                                     </p>
                                 </div>
                             </div>

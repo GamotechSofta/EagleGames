@@ -45,7 +45,7 @@ const PlatformPlayerDeposit = () => {
     const load = async () => {
         setLoading(true);
         try {
-            const res = await fetchWithAuth(`${API_BASE_URL}/admin/platform/player-deposit-settings`);
+            const res = await fetchWithAuth(`${API_BASE_URL}/payments/admin/platform-player-deposit-settings`);
             if (res.status === 401) return;
             const json = await res.json();
             if (json.success && json.data) {
@@ -94,7 +94,7 @@ const PlatformPlayerDeposit = () => {
             } else if (clearQr) {
                 fd.append('playerDepositQrImageUrl', '');
             }
-            const res = await fetch(`${API_BASE_URL}/admin/platform/player-deposit-settings`, {
+            const res = await fetch(`${API_BASE_URL}/payments/admin/platform-player-deposit-settings`, {
                 method: 'PATCH',
                 headers: getAuthHeadersMultipart(),
                 body: fd,

@@ -13,6 +13,10 @@ import {
     updatePaymentStatus,
     getPaymentScreenshot,
 } from '../../controllers/paymentController.js';
+import {
+    getPlatformPlayerDepositSettings,
+    updatePlatformPlayerDepositSettings,
+} from '../../controllers/platformPaymentSettingsController.js';
 import { verifyAdmin, verifySuperAdmin } from '../../middleware/adminAuth.js';
 import { verifyUser, optionalVerifyUser } from '../../middleware/userAuth.js';
 
@@ -45,6 +49,15 @@ router.post('/withdraw', verifyUser, createWithdrawalRequest);
 router.get('/my-deposits', verifyUser, getMyDeposits);
 router.get('/my-withdrawals', verifyUser, getMyWithdrawals);
 router.get('/my-screenshot/:id', verifyUser, getPaymentScreenshot);
+
+// ===== Super admin: platform player deposit UPI/QR (same handlers as /api/v1/admin/platform/...) =====
+router.get('/admin/platform-player-deposit-settings', verifySuperAdmin, getPlatformPlayerDepositSettings);
+router.patch(
+    '/admin/platform-player-deposit-settings',
+    verifySuperAdmin,
+    upload.single('qrImage'),
+    updatePlatformPlayerDepositSettings
+);
 
 // ===== Admin APIs =====
 router.get('/', verifyAdmin, getPayments);
