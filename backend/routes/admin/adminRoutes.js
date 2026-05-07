@@ -1,4 +1,5 @@
 import express from 'express';
+import multer from 'multer';
 import { 
     adminLogin, 
     createAdmin, 
@@ -16,7 +17,22 @@ import {
 } from '../../controllers/adminController.js';
 import { getLogs } from '../../controllers/activityLogController.js';
 import { getRouletteRecords, getAdminRouletteConfig, updateRouletteConfig } from '../../controllers/adminRouletteController.js';
+import { getPlatformPlayerDepositSettings, updatePlatformPlayerDepositSettings } from '../../controllers/platformPaymentSettingsController.js';
 import { verifyAdmin, verifySuperAdmin } from '../../middleware/adminAuth.js';
+
+const storage = multer.memoryStorage();
+const uploadImage = multer({
+    storage,
+    fileFilter: (req, file, cb) => {
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        if (allowedTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Invalid file type. Only JPEG, PNG, and WebP are allowed.'), false);
+        }
+    },
+    limits: { fileSize: 5 * 1024 * 1024 },
+});
 
 const router = express.Router();
 
@@ -51,5 +67,14 @@ router.post('/create-bookie', verifyAdmin, createBookie);
 router.get('/roulette/records', verifyAdmin, getRouletteRecords);
 router.get('/roulette/config', verifyAdmin, getAdminRouletteConfig);
 router.patch('/roulette/config', verifySuperAdmin, updateRouletteConfig);
+
+// Platform player Add Fund — UPI / QR for admin & self-signup players (super admin only)
+router.get('/platform/player-deposit-settings', verifySuperAdmin, getPlatformPlayerDepositSettings);
+router.patch(
+    '/platform/player-deposit-settings',
+    verifySuperAdmin,
+    uploadImage.single('qrImage'),
+    updatePlatformPlayerDepositSettings
+);
 
 export default router;

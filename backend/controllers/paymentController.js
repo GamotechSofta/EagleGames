@@ -7,6 +7,7 @@ import bcrypt from 'bcryptjs';
 import { getBookieUserIds } from '../utils/bookieFilter.js';
 import { logActivity, getClientIp } from '../utils/activityLogger.js';
 import { uploadToCloudinary } from '../config/cloudinary.js';
+import { getPlatformPlayerDepositResolved } from '../utils/platformPlayerDepositConfig.js';
 
 // ============ CONFIG API ============
 
@@ -22,10 +23,12 @@ export const getPaymentConfig = async (req, res) => {
         const minWithdrawal = parseInt(process.env.MIN_WITHDRAWAL, 10) || 500;
         const maxWithdrawal = parseInt(process.env.MAX_WITHDRAWAL, 10) || 25000;
 
+        const platformResolved = await getPlatformPlayerDepositResolved();
+
         let data = {
-            upiId: process.env.UPI_ID || 'neelamkarande23@okicici',
-            upiName: process.env.UPI_NAME || 'Neelam Karande',
-            qrImageUrl: process.env.PLAYER_DEPOSIT_QR_URL?.trim() || null,
+            upiId: platformResolved.upiId,
+            upiName: platformResolved.upiName,
+            qrImageUrl: platformResolved.qrImageUrl,
             minDeposit,
             maxDeposit,
             minWithdrawal,

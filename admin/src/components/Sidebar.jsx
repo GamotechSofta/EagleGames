@@ -17,6 +17,7 @@ import {
     FaMoneyBillWave,
     FaLifeRing,
     FaDice,
+    FaQrcode,
 } from 'react-icons/fa';
 
 const Sidebar = ({ onLogout, isOpen = true, onClose }) => {
@@ -53,10 +54,14 @@ const Sidebar = ({ onLogout, isOpen = true, onClose }) => {
     ];
 
     if (adminRole === 'super_admin') {
-        menuItems.splice(10, 0, { path: '/help-desk', label: 'Help Desk Issues', icon: FaLifeRing });
+        menuItems.splice(10, 0, { path: '/platform-player-deposit', label: 'Player deposit (UPI)', icon: FaQrcode });
+        menuItems.splice(11, 0, { path: '/help-desk', label: 'Help Desk Issues', icon: FaLifeRing });
     }
 
     const isActive = (path) => {
+        if (path === '/platform-player-deposit') {
+            return location.pathname === '/platform-player-deposit';
+        }
         if (path === '/all-users' || path === '/self-signup-players' || path === '/markets') {
             return location.pathname === path || location.pathname.startsWith(path + '/');
         }

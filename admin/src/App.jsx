@@ -25,6 +25,7 @@ import MarketDetail from './pages/MarketDetail';
 import Settings from './pages/Settings';
 import TopWinners from './pages/TopWinners';
 import Roulette from './pages/Roulette';
+import PlatformPlayerDeposit from './pages/PlatformPlayerDeposit';
 import GoogleTranslateWidget from './components/GoogleTranslateWidget';
 
 // Scroll to top on route change
@@ -170,6 +171,14 @@ const App = () => {
                     element={
                         <PrivateRoute>
                             <PaymentManagement />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/platform-player-deposit"
+                    element={
+                        <PrivateRoute>
+                            <PlatformPlayerDeposit />
                         </PrivateRoute>
                     }
                 />

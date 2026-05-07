@@ -11,6 +11,16 @@ export function getAuthHeaders() {
     return headers;
 }
 
+/** Bearer only — use with FormData (do not set Content-Type). */
+export function getAuthHeadersMultipart() {
+    const token = localStorage.getItem('adminToken');
+    const headers = {};
+    if (token) {
+        headers.Authorization = `Bearer ${token}`;
+    }
+    return headers;
+}
+
 /**
  * Fetch with auth headers. On 401, clears session and redirects to login.
  * Use for admin API calls so expired/invalid token is handled in one place.

@@ -4,7 +4,7 @@ import QRCode from 'react-qr-code';
 import { API_BASE_URL, getAuthHeaders, fetchWithAuth } from '../../config/api';
 import platformAdminQr from '../../assets/QRforAdmin.jpeg';
 
-/** Fallback if payment config not loaded; must match server defaults in `getPaymentConfig` (UPI_ID / UPI_NAME). */
+/** Used if the payment config request fails. Platform values normally come from the API (super admin + env + defaults). */
 const PLATFORM_FALLBACK_UPI = 'neelamkarande23@okicici';
 const PLATFORM_FALLBACK_PAYEE = 'Neelam Karande';
 const PLATFORM_FALLBACK_QR = platformAdminQr;
@@ -37,7 +37,10 @@ const AddFund = () => {
     const fetchConfig = async () => {
         try {
             const headers = { ...getAuthHeaders() };
-            const res = await fetch(`${API_BASE_URL}/payments/config`, { headers });
+            const res = await fetch(`${API_BASE_URL}/payments/config`, {
+                headers,
+                cache: 'no-store',
+            });
             const data = await res.json();
             if (data.success) {
                 setConfig(data.data);
@@ -52,12 +55,10 @@ const AddFund = () => {
     }, [step]);
 
     const depositSource = config?.depositSource || 'platform';
+    const isBookieDeposit = depositSource === 'bookie';
     const displayUpi = config?.upiId || PLATFORM_FALLBACK_UPI;
-    const displayQr =
-        depositSource === 'bookie'
-            ? config?.qrImageUrl || null
-            : config?.qrImageUrl || PLATFORM_FALLBACK_QR;
     const displayPayeeName = config?.upiName || PLATFORM_FALLBACK_PAYEE;
+    const displayQr = isBookieDeposit ? (config?.qrImageUrl || null) : (config?.qrImageUrl || PLATFORM_FALLBACK_QR);
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
