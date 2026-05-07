@@ -2,11 +2,11 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import QRCode from 'react-qr-code';
 import { API_BASE_URL, getAuthHeaders, fetchWithAuth } from '../../config/api';
+import platformAdminQr from '../../assets/QRforAdmin.jpeg';
 
-/** Fallback when platform config has no QR env (`PLAYER_DEPOSIT_QR_URL`). */
+/** Fallback when platform config has no QR (`PLAYER_DEPOSIT_QR_URL`). Same asset as admin panel QR — used for admin-managed & self-signup players (not bookie deposit flow). */
 const PLATFORM_FALLBACK_UPI = '9380158730-2@axl';
-const PLATFORM_FALLBACK_QR =
-    'https://res.cloudinary.com/dwwt5xdsz/image/upload/v1775733532/a2070441-4b78-4567-bf0b-a7c25888dbae.png';
+const PLATFORM_FALLBACK_QR = platformAdminQr;
 
 /** NPCI-style UPI intent so the scanned QR pays `am` to `pa` (and shows `pn` when set). */
 function buildUpiPayUri(pa, payeeName, amount) {

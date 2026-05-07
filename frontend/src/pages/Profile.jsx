@@ -220,6 +220,19 @@ const Profile = () => {
     ? new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
     : null;
 
+  const rawBookieRef = user?.referredBy;
+  const bookieRefId = rawBookieRef
+    ? String(
+        typeof rawBookieRef === 'object' && rawBookieRef !== null
+          ? rawBookieRef._id ?? rawBookieRef
+          : rawBookieRef
+      )
+    : '';
+  const playerReferralUrl =
+    typeof window !== 'undefined' && /^[a-fA-F0-9]{24}$/.test(bookieRefId)
+      ? `${window.location.origin}/login?ref=${bookieRefId}`
+      : '';
+
   const IconStatement = () => (
     <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
@@ -355,6 +368,36 @@ const Profile = () => {
     </button>
   );
 
+  const referralInviteBlock = playerReferralUrl ? (
+    <div className="rounded-3xl bg-[#111827] border-2 border-[#374151] overflow-hidden shadow-sm">
+      <div className="px-5 pt-5 pb-3">
+        <h3 className="text-white font-semibold text-sm uppercase tracking-wider">Invite friends</h3>
+        <p className="text-gray-400 text-xs mt-1">
+          Share this link—new sign-ups stay under your bookie, even if friends forward it again.
+        </p>
+      </div>
+      <div className="px-4 pb-5">
+        <div className="flex items-center gap-2 rounded-2xl bg-[#1f2937] border border-[#374151] px-3 py-3">
+          <p className="flex-1 min-w-0 text-xs text-sky-200 font-mono break-all">{playerReferralUrl}</p>
+          <button
+            type="button"
+            onClick={() => handleCopy(playerReferralUrl, 'Referral link')}
+            className="shrink-0 p-2 rounded-lg hover:bg-[#374151] text-gray-400 hover:text-[#1a74e5]"
+            title="Copy link"
+          >
+            {copiedField === 'Referral link' ? (
+              <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              </svg>
+            ) : (
+              <IconCopy />
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  ) : null;
+
   const accountInfoBlock = (
     <div className="rounded-3xl bg-[#111827] border-2 border-[#374151] overflow-hidden shadow-sm">
       <div className="px-5 pt-5 pb-3">
@@ -446,6 +489,7 @@ const Profile = () => {
       <div className="md:hidden max-w-lg mx-auto px-4 pt-4 space-y-4">
         {heroCard}
         {quickActionsBlock('grid-cols-4')}
+        {referralInviteBlock}
         {accountInfoBlock}
         {logoutBtn}
         <div className="h-2" />
@@ -464,6 +508,7 @@ const Profile = () => {
 
           {/* ── Right Content ── */}
           <div className="space-y-5">
+            {referralInviteBlock}
             {/* Account Info — expanded for desktop */}
             <div className="rounded-3xl bg-[#111827] border-2 border-[#374151] overflow-hidden shadow-sm">
               <div className="px-6 pt-6 pb-4 border-b border-[#374151]">

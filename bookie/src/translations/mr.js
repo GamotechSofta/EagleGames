@@ -264,6 +264,11 @@ export default {
     
     // Referral Link
     referralLinkTitle: 'माझा रेफरल लिंक',
+    referralLinkBlurb:
+        'हा लिंक खेळाडांसोबत शेअर करा. याद्वारे साइन अप करणारे तुमच्या खात्याशी जोडले जातात—ते इतरांना पुढे पाठवले तरीही.',
+    referralLinkUnavailable: 'रेफरल लोड होऊ शकला नाही. साइन आउट करून पुन्हा लॉग इन करा.',
+    referralLinkEnvHint:
+        'डोमेन चुकीचे वाटल्यास बुकी अॅप बिल्डमध्ये VITE_FRONTEND_URL प्लेयर साइटवर सेट करा.',
     copyLink: 'लिंक कॉपी करा',
     linkCopied: 'लिंक क्लिपबोर्डवर कॉपी केला!',
     

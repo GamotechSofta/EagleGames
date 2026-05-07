@@ -18,6 +18,7 @@ import {
     FaCreditCard,
     FaCog,
     FaDice,
+    FaLink,
 } from 'react-icons/fa';
 import { useLanguage } from '../context/LanguageContext';
 import { LANGUAGE_OPTIONS, applyLanguage, getCurrentLanguage } from './GoogleTranslateWidget';
@@ -32,6 +33,7 @@ const Sidebar = ({ user, onLogout, isOpen = true, onClose }) => {
     const menuItems = [
         { path: '/dashboard', label: t('dashboard'), icon: FaTachometerAlt, key: 'dashboard' },
         { path: '/my-users', label: t('myPlayers'), icon: FaUsers, key: 'myPlayers' },
+        { path: '/referral-link', label: t('referralLink'), icon: FaLink, key: 'referralLink' },
         { path: '/markets', label: t('markets'), icon: FaChartBar, key: 'markets' },
         { path: '/add-user', label: t('addPlayer'), icon: FaUserPlus, key: 'addPlayer' },
         { path: '/reports', label: t('report'), icon: FaChartLine, key: 'report' },
@@ -50,6 +52,7 @@ const Sidebar = ({ user, onLogout, isOpen = true, onClose }) => {
             return location.pathname === path || location.pathname.startsWith(path + '/');
         }
         if (path === '/settings') return location.pathname === '/settings';
+        if (path === '/referral-link') return location.pathname === '/referral-link';
         return location.pathname === path;
     };
 

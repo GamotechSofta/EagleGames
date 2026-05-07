@@ -137,11 +137,15 @@ export const getReferralLink = async (req, res) => {
                 message: 'Bookie access required',
             });
         }
+        /** Public URL of the player app (e.g. https://www.eaglegames.fun). Optional; bookie UI builds links via VITE_FRONTEND_URL too. */
+        const playerAppBase = (process.env.PLAYER_APP_URL || '').replace(/\/$/, '');
         res.status(200).json({
             success: true,
             data: {
                 bookieId: bookie._id,
                 username: bookie.username,
+                /** Full player-app URL when PLAYER_APP_URL is set in backend env */
+                referralUrl: playerAppBase ? `${playerAppBase}/login?ref=${bookie._id}` : null,
             },
         });
     } catch (error) {

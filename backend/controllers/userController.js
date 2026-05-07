@@ -212,12 +212,31 @@ export const userSignup = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         // Direct frontend signup: referredBy = null -> self_signup user under admin pool.
-        // Via bookie link: referredBy = bookie ID -> bookie's user.
-        const referredByRaw = req.body.referredBy || null;
-        // Convert referredBy string to ObjectId for proper MongoDB matching
+        // Via bookie link: referredBy = bookie Admin ID -> same bookie for anyone using that link (including reshares).
+        const referredByRaw = req.body.referredBy ?? req.body.ref ?? null;
         let referredBy = null;
-        if (referredByRaw && mongoose.Types.ObjectId.isValid(referredByRaw)) {
-            referredBy = new mongoose.Types.ObjectId(referredByRaw);
+        if (referredByRaw != null && String(referredByRaw).trim() !== '') {
+            const refStr = String(referredByRaw).trim();
+            if (!mongoose.Types.ObjectId.isValid(refStr)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid referral code in link.',
+                });
+            }
+            referredBy = new mongoose.Types.ObjectId(refStr);
+            const bookieAdmin = await Admin.findOne({
+                _id: referredBy,
+                role: 'bookie',
+                status: 'active',
+            })
+                .select('_id')
+                .lean();
+            if (!bookieAdmin) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'This referral link is invalid or no longer active. You can still sign up without it.',
+                });
+            }
         }
         const source = referredBy ? 'bookie' : 'self_signup';
         const now = new Date();

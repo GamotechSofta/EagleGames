@@ -265,6 +265,11 @@ export default {
     
     // Referral Link
     referralLinkTitle: 'My Referral Link',
+    referralLinkBlurb:
+        'Share this link with players. Anyone who signs up from it is linked to your account—including friends they forward the same link to.',
+    referralLinkUnavailable: 'Unable to load your referral link. Try signing out and back in.',
+    referralLinkEnvHint:
+        'If the domain looks wrong, set VITE_FRONTEND_URL in your bookie app build to your player website URL.',
     copyLink: 'Copy Link',
     linkCopied: 'Link copied to clipboard!',
     

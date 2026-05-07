@@ -1,13 +1,19 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { API_BASE_URL } from '../config/api';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const AUTH_SIDE_IMAGE =
   'https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775826445/d40e37c1-bd75-4081-96ba-5bdf1a39a53c.png';
 
+/** Persisted so switching Sign in / Sign up tabs keeps the bookie ref */
+const SIGNUP_REF_STORAGE_KEY = 'eagle_signup_ref';
+
+const isHexObjectId = (s) => typeof s === 'string' && /^[a-fA-F0-9]{24}$/.test(s.trim());
+
 const Login = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [mode, setMode] = useState('signin');
   const [formData, setFormData] = useState({
     username: '',
@@ -21,6 +27,24 @@ const Login = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  /** Active bookie Mongo id from ?ref= / ?referredBy= — attached on signup only */
+  const [pendingBookieRef, setPendingBookieRef] = useState(null);
+
+  useEffect(() => {
+    const fromQuery = searchParams.get('ref') || searchParams.get('referredBy');
+    if (isHexObjectId(fromQuery)) {
+      const id = fromQuery.trim();
+      setPendingBookieRef(id);
+      try {
+        sessionStorage.setItem(SIGNUP_REF_STORAGE_KEY, id);
+      } catch (_) {}
+      return;
+    }
+    try {
+      const stored = sessionStorage.getItem(SIGNUP_REF_STORAGE_KEY);
+      if (isHexObjectId(stored)) setPendingBookieRef(stored.trim());
+    } catch (_) {}
+  }, [searchParams]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -172,10 +196,15 @@ const Login = () => {
           username: formData.username.trim(),
           phone: formData.phone,
           password: formData.password,
+          ...(pendingBookieRef ? { referredBy: pendingBookieRef } : {}),
         }),
       });
       const data = await response.json();
       if (data.success) {
+        try {
+          sessionStorage.removeItem(SIGNUP_REF_STORAGE_KEY);
+        } catch (_) {}
+        setPendingBookieRef(null);
         setSuccess('Sign up successful. Please sign in with phone and password.');
         setMode('signin');
         setFormData((prev) => ({
@@ -232,6 +261,12 @@ const Login = () => {
           {success && (
             <div className="mb-4 flex items-start gap-2 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
               <span>{success}</span>
+            </div>
+          )}
+
+          {mode === 'signup' && pendingBookieRef && (
+            <div className="mb-4 rounded-lg border border-sky-400/40 bg-sky-950/40 px-3 py-2 text-sm text-sky-100">
+              You are signing up with a bookie invitation. New accounts created here are linked to that bookie.
             </div>
           )}
 

@@ -24,6 +24,7 @@ import BookieGameBid from './pages/GameBid/index';
 import Shortcuts from './pages/Shortcuts';
 import Receipt from './pages/Receipt';
 import Settings from './pages/Settings';
+import ReferralLinkPage from './pages/ReferralLink';
 import { BetLayoutProvider } from './context/BetLayoutContext';
 import GoogleTranslateWidget from './components/GoogleTranslateWidget';
 
@@ -73,6 +74,7 @@ const AppRoutes = () => (
         <Route path="/" element={<Login />} />
         <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
         <Route path="/my-users" element={<PrivateRoute><MyUsers /></PrivateRoute>} />
+        <Route path="/referral-link" element={<PrivateRoute><ReferralLinkPage /></PrivateRoute>} />
         <Route path="/my-users/:userId" element={<PrivateRoute><PlayerDetail /></PrivateRoute>} />
         <Route path="/games" element={<PrivateRoute><GamesMarkets /></PrivateRoute>} />
         <Route path="/games/:marketId" element={<PrivateRoute><GameTypes /></PrivateRoute>} />
