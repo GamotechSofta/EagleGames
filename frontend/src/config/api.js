@@ -2,6 +2,15 @@
 // Local + production API without CORS: use VITE_API_BASE_URL=/api/v1 and Vite proxy (see vite.config.js + .env.development).
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3010/api/v1';
 
+/** Avoid stale CDN/browser cache when switching UI language; backend also reads x-lang. */
+export function marketsListFetchInit(language) {
+  const lang = (language || 'en').toString();
+  return {
+    cache: 'no-store',
+    headers: { 'x-lang': lang },
+  };
+}
+
 // Backend base URL for static assets (downloads, etc.) – derived from API or set via VITE_BACKEND_BASE_URL
 const _api = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3010/api/v1';
 const isRelativeApi = typeof _api === 'string' && _api.startsWith('/');

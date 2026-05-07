@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { API_BASE_URL, getBookieAuthHeaders, fetchWithAuth } from '../../utils/api';
+import { API_BASE_URL, getBookieAuthHeaders, fetchWithAuth, buildGetMarketsUrl } from '../../utils/api';
+import { useLanguage } from '../../context/LanguageContext';
 import { placeBetForPlayer } from './bookieApi';
 
 const PlayerBetContext = createContext({});
@@ -8,6 +9,7 @@ const PlayerBetContext = createContext({});
 export const PlayerBetProvider = ({ children }) => {
     const { marketId } = useParams();
     const [searchParams] = useSearchParams();
+    const { language } = useLanguage();
     const preSelectedPlayerId = searchParams.get('playerId') || '';
 
     const [market, setMarket] = useState(null);
@@ -38,7 +40,7 @@ export const PlayerBetProvider = ({ children }) => {
     useEffect(() => {
         const fetchMarket = async () => {
             try {
-                const res = await fetchWithAuth(`${API_BASE_URL}/markets/get-markets`);
+                const res = await fetchWithAuth(buildGetMarketsUrl(language));
                 if (res.status === 401) return;
                 const data = await res.json();
                 if (data.success && Array.isArray(data.data)) {
@@ -47,7 +49,7 @@ export const PlayerBetProvider = ({ children }) => {
                         const hasOpening = found.openingNumber && /^\d{3}$/.test(String(found.openingNumber));
                         const hasClosing = found.closingNumber && /^\d{3}$/.test(String(found.closingNumber));
                         found.status = hasOpening && hasClosing ? 'closed' : hasOpening ? 'running' : 'open';
-                        found.gameName = found.marketName;
+                        found.gameName = found.name || found.marketName;
                     }
                     setMarket(found || null);
                 }
@@ -58,7 +60,7 @@ export const PlayerBetProvider = ({ children }) => {
             }
         };
         fetchMarket();
-    }, [marketId]);
+    }, [marketId, language]);
 
     // Fetch players
     useEffect(() => {

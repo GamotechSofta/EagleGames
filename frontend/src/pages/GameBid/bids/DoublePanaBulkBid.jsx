@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useMarketBetContextTitle } from '../../../hooks/useMarketBetContextTitle';
 import BidLayout from '../BidLayout';
 import BidReviewModal from './BidReviewModal';
 import { placeBet, updateUserBalance } from '../../../api/bets';
@@ -114,7 +115,7 @@ const DoublePanaBulkBid = ({ market, title }) => {
         }
     }, []);
 
-    const marketTitle = market?.gameName || market?.marketName || title;
+    const marketTitle = useMarketBetContextTitle(market, title);
     const dateText = new Date().toLocaleDateString('en-GB');
 
     const doublePanas = useMemo(() => buildDoublePanas(), []);

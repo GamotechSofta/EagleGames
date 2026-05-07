@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Layout from '../components/Layout';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { API_BASE_URL, getBookieAuthHeaders } from '../utils/api';
+import { API_BASE_URL, getBookieAuthHeaders, buildGetMarketsUrl } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
 import {
     FaArrowLeft,
@@ -74,7 +74,7 @@ const getBetTypeLabel = (betType, t, betNumber) => {
 };
 
 const PlayerDetail = () => {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const { userId } = useParams();
     const navigate = useNavigate();
     const [player, setPlayer] = useState(null);
@@ -179,10 +179,10 @@ const PlayerDetail = () => {
         }
     }, [player]);
 
-    // Fetch markets when component mounts
+    // Fetch markets when language changes (localized names)
     useEffect(() => {
         fetchMarkets();
-    }, []);
+    }, [language]);
 
     // Fetch tab data when tab/date changes
     useEffect(() => {
@@ -227,7 +227,7 @@ const PlayerDetail = () => {
 
     const fetchMarkets = async () => {
         try {
-            const res = await fetch(`${API_BASE_URL}/markets/get-markets?marketType=main`, { headers: getBookieAuthHeaders() });
+            const res = await fetch(buildGetMarketsUrl(language, { marketType: 'main' }), { headers: getBookieAuthHeaders() });
             const data = await res.json();
             if (data.success) {
                 setMarkets(data.data || []);

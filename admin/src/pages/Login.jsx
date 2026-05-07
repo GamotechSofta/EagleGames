@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useLanguage } from '../context/LanguageContext';
+import { LANGUAGE_OPTIONS } from '../constants/languages';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3010/api/v1';
 
@@ -11,6 +13,7 @@ const Login = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { language, changeLanguage, t } = useLanguage();
 
     // If already logged in (token or admin), go to dashboard immediately
     React.useEffect(() => {
@@ -25,7 +28,7 @@ const Login = () => {
         const u = (username || '').trim();
         const p = (password || '').trim();
         if (!u || !p) {
-            setError('Username and password are required');
+            setError(t('login_required'));
             return;
         }
 
@@ -42,7 +45,7 @@ const Login = () => {
             try {
                 data = await response.json();
             } catch (parseError) {
-                setError('Invalid response from server. Please try again.');
+                setError(t('login_invalid_response'));
                 setLoading(false);
                 return;
             }
@@ -56,7 +59,7 @@ const Login = () => {
                 setError(data.message || 'Login failed');
             }
         } catch (err) {
-            setError('Network error. Please check if the server is running.');
+            setError(t('login_network_error'));
         } finally {
             setLoading(false);
         }
@@ -80,9 +83,9 @@ const Login = () => {
 
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                        Super Admin
+                        {t('login_title')}
                     </h1>
-                    <p className="text-gray-500 text-sm">Secure access to your dashboard</p>
+                    <p className="text-gray-500 text-sm">{t('login_subtitle')}</p>
                 </div>
 
                 {error && (
@@ -94,7 +97,7 @@ const Login = () => {
                 <form onSubmit={handleSubmit} className="space-y-5">
                     <div className="relative group">
                         <label className="block text-sm font-medium text-gray-500 mb-2 group-focus-within:text-orange-500 transition-colors">
-                            Username
+                            {t('username')}
                         </label>
                         <div className="relative">
                             <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors">
@@ -109,7 +112,7 @@ const Login = () => {
                                 className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-800 placeholder-gray-400 
                                          focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 
                                          transition-all duration-200 hover:border-gray-400"
-                                placeholder="Enter your username"
+                                placeholder={t('login_placeholder_username')}
                                 autoComplete="username"
                                 autoFocus
                                 required
@@ -119,7 +122,7 @@ const Login = () => {
 
                     <div className="relative group">
                         <label className="block text-sm font-medium text-gray-500 mb-2 group-focus-within:text-orange-500 transition-colors">
-                            Password
+                            {t('password')}
                         </label>
                         <div className="relative">
                             <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors">
@@ -134,7 +137,7 @@ const Login = () => {
                                 className="w-full pl-11 pr-12 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-800 placeholder-gray-400 
                                          focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 
                                          transition-all duration-200 hover:border-gray-400"
-                                placeholder="Enter your password"
+                                placeholder={t('login_placeholder_password')}
                                 autoComplete="current-password"
                                 required
                             />
@@ -142,7 +145,7 @@ const Login = () => {
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
                                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
-                                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                aria-label={showPassword ? t('hide_password') : t('show_password')}
                             >
                                 {showPassword ? (
                                     <FaEyeSlash className="w-5 h-5" />
@@ -165,7 +168,7 @@ const Login = () => {
                         {loading && (
                             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                         )}
-                        {loading ? 'Signing in...' : 'Sign In'}
+                        {loading ? t('signingIn') : t('signIn')}
                     </button>
                 </form>
 
@@ -175,7 +178,7 @@ const Login = () => {
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                         </svg>
-                        Secured connection (HTTPS)
+                        {t('secured_connection')}
                     </p>
                 </div>
             </div>

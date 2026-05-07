@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL, marketsListFetchInit } from '../config/api';
 import { isPastClosingTime } from '../utils/marketTiming';
 import { useRefreshOnMarketReset } from '../hooks/useRefreshOnMarketReset';
+import { useLanguage } from '../context/LanguageContext';
+import { getMarketDisplayName } from '../utils/marketDisplayName';
 
 const Section1 = () => {
   const navigate = useNavigate();
+  const { language, t } = useLanguage();
   const [markets, setMarkets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [, setTick] = useState(0);
@@ -47,7 +50,10 @@ const Section1 = () => {
   const fetchMarkets = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/markets/get-markets`);
+      const response = await fetch(
+        `${API_BASE_URL}/markets/get-markets?lang=${encodeURIComponent(language)}`,
+        marketsListFetchInit(language)
+      );
       const data = await response.json();
 
       if (data.success) {
@@ -55,8 +61,9 @@ const Section1 = () => {
         const transformedMarkets = mainOnly.map((market) => {
           const st = getMarketStatus(market);
           return {
+            ...market,
             id: market._id,
-            gameName: market.marketName,
+            gameName: getMarketDisplayName(market, language),
             timeRange: `${formatTime(market.startingTime)} - ${formatTime(market.closingTime)}`,
             result: market.displayResult || '***-**-***',
             status: st.status,
@@ -66,7 +73,7 @@ const Section1 = () => {
             closingTime: market.closingTime,
             betClosureTime: market.betClosureTime ?? 0,
             openingNumber: market.openingNumber,
-            closingNumber: market.closingNumber
+            closingNumber: market.closingNumber,
           };
         });
         setMarkets(transformedMarkets);
@@ -82,7 +89,7 @@ const Section1 = () => {
     fetchMarkets();
     const dataInterval = setInterval(fetchMarkets, 30000);
     return () => clearInterval(dataInterval);
-  }, []);
+  }, [language]);
 
   useRefreshOnMarketReset(fetchMarkets);
 
@@ -105,7 +112,7 @@ const Section1 = () => {
         {/* ── MARKETS center ── */}
         <div className="flex items-center gap-2 shrink-0">
           <svg className="w-2.5 h-2.5 text-[#1a74e5]" viewBox="0 0 12 12" fill="currentColor"><path d="M6 0l1.8 4.2L12 6l-4.2 1.8L6 12l-1.8-4.2L0 6l4.2-1.8z"/></svg>
-          <h2 className="text-white text-lg font-bold tracking-[0.15em] uppercase">Markets</h2>
+          <h2 className="text-white text-lg font-bold tracking-[0.15em] uppercase">{t('markets_sectionTitle')}</h2>
           <svg className="w-2.5 h-2.5 text-[#1a74e5]" viewBox="0 0 12 12" fill="currentColor"><path d="M6 0l1.8 4.2L12 6l-4.2 1.8L6 12l-1.8-4.2L0 6l4.2-1.8z"/></svg>
         </div>
 
@@ -119,7 +126,7 @@ const Section1 = () => {
         <div className="flex-1 h-[1px] bg-gray-400 min-w-[20px] shrink-0 shadow-sm" />
         <div className="flex items-center gap-1.5 shrink-0">
           <span className="text-[#1a74e5] font-bold text-sm min-[375px]:text-base sm:text-lg">+</span>
-          <h2 className="text-[#1a74e5] font-bold text-sm min-[375px]:text-base sm:text-lg tracking-wider uppercase">MARKETS</h2>
+          <h2 className="text-[#1a74e5] font-bold text-sm min-[375px]:text-base sm:text-lg tracking-wider uppercase">{t('markets_sectionTitle')}</h2>
           <span className="text-[#1a74e5] font-bold text-sm min-[375px]:text-base sm:text-lg">+</span>
         </div>
         <div className="flex-1 h-[1px] bg-gray-400 min-w-[20px] shrink-0 shadow-sm" />
@@ -127,17 +134,22 @@ const Section1 = () => {
       {/* Market Cards Grid */}
       {loading ? (
         <div className="text-center py-12">
-          <p className="text-gray-300">Loading markets...</p>
+          <p className="text-gray-300">{t('markets_loading')}</p>
         </div>
       ) : markets.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-300">No markets available</p>
+          <p className="text-gray-300">{t('markets_empty')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-2 min-[375px]:gap-3 sm:gap-4">
           {markets.map((market) => {
             const isClickable = market.status === 'open' || market.status === 'running';
-            const statusText = market.status === 'closed' ? 'Closed' : market.status === 'running' ? 'Running' : 'Open';
+            const statusText =
+              market.status === 'closed'
+                ? t('market_status_closed')
+                : market.status === 'running'
+                  ? t('market_status_running')
+                  : t('market_status_open');
             return (
             <div
               key={market.id}
@@ -169,11 +181,11 @@ const Section1 = () => {
 
                 <div className="flex items-end justify-between gap-2 text-gray-300">
                   <div className="space-y-0">
-                    <p className="text-[10px] uppercase tracking-wide text-gray-400 leading-tight">Open Bids</p>
+                    <p className="text-[10px] uppercase tracking-wide text-gray-400 leading-tight">{t('market_openBids')}</p>
                     <p className="text-xs sm:text-sm font-semibold leading-tight">{formatTime(market.startingTime) || '-'}</p>
                   </div>
                   <div className="space-y-0">
-                    <p className="text-[10px] uppercase tracking-wide text-gray-400 leading-tight">Close Bids</p>
+                    <p className="text-[10px] uppercase tracking-wide text-gray-400 leading-tight">{t('market_closeBids')}</p>
                     <p className="text-xs sm:text-sm font-semibold leading-tight">{formatTime(market.closingTime) || '-'}</p>
                   </div>
                   <div className="shrink-0 pl-0.5">
@@ -182,7 +194,7 @@ const Section1 = () => {
                         type="button"
                         onClick={(e) => { e.stopPropagation(); navigate('/bidoptions', { state: { market } }); }}
                         className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#00d35a] flex items-center justify-center text-white hover:bg-[#00bc50] active:scale-95"
-                        aria-label="Play"
+                        aria-label={t('market_playAria')}
                       >
                         <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M8 5v14l11-7z" />
@@ -212,16 +224,18 @@ const Section1 = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </div>
-            <h3 className="text-white text-lg font-bold mb-1">Market Closed</h3>
+            <h3 className="text-white text-lg font-bold mb-1">{t('market_closedTitle')}</h3>
             <p className="text-gray-300 text-sm mb-5">
-              <span className="font-semibold">{closedModal.marketName}</span> is closed right now.
+              {t('market_closedBody', {
+                name: closedModal.marketName || t('market_closed_fallback'),
+              })}
             </p>
             <button
               type="button"
               onClick={() => setClosedModal({ open: false, marketName: '' })}
               className="w-full py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-semibold transition-colors"
             >
-              OK
+              {t('ok')}
             </button>
           </div>
         </div>

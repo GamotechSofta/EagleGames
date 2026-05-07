@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { LanguageProvider } from './context/LanguageContext';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import Markets from './pages/Markets';
@@ -26,7 +27,6 @@ import Settings from './pages/Settings';
 import TopWinners from './pages/TopWinners';
 import Roulette from './pages/Roulette';
 import PlatformPlayerDeposit from './pages/PlatformPlayerDeposit';
-import GoogleTranslateWidget from './components/GoogleTranslateWidget';
 
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -50,9 +50,10 @@ const PrivateRoute = ({ children }) => {
 
 const App = () => {
     return (
-        <Router>
-            <ScrollToTop />
-            <Routes>
+        <LanguageProvider>
+            <Router>
+                <ScrollToTop />
+                <Routes>
                 <Route path="/" element={<Login />} />
                 <Route
                     path="/dashboard"
@@ -218,7 +219,7 @@ const App = () => {
                     path="/self-signup-players"
                     element={
                         <PrivateRoute>
-                            <AllUsers defaultTab="self_signup_users" title="Self Signup Players" />
+                            <AllUsers defaultTab="self_signup_users" />
                         </PrivateRoute>
                     }
                 />
@@ -265,8 +266,8 @@ const App = () => {
                     }
                 />
             </Routes>
-            <GoogleTranslateWidget />
-        </Router>
+            </Router>
+        </LanguageProvider>
     );
 };
 

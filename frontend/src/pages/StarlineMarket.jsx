@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL, marketsListFetchInit } from '../config/api';
 import { isPastClosingTime } from '../utils/marketTiming';
+import { useLanguage } from '../context/LanguageContext';
+import { getMarketDisplayName } from '../utils/marketDisplayName';
 
 const STARLINE_MARKET_IMAGE_URL =
   'https://res.cloudinary.com/dzd47mpdo/image/upload/v1770641576/Untitled_1080_x_1080_px_1_gyjbpl.svg';
@@ -129,6 +131,7 @@ const formatCountdown = (ms) => {
 const StarlineMarket = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { language } = useLanguage();
   const marketKey = (location.state?.marketKey || location.state?.key || '').toString().trim().toLowerCase();
   const marketLabel = (location.state?.marketLabel || location.state?.label || 'Starline').toString();
 
@@ -147,14 +150,20 @@ const StarlineMarket = () => {
     const run = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${API_BASE_URL}/markets/get-markets`);
+        const res = await fetch(
+          `${API_BASE_URL}/markets/get-markets?lang=${encodeURIComponent(language)}`,
+          marketsListFetchInit(language)
+        );
         const data = await res.json();
         const list = Array.isArray(data?.data) ? data.data : [];
         const keyNorm = (marketKey || '').toString().trim().toLowerCase();
 
         const filtered = list.filter((m) => {
-          const name = (m?.marketName || m?.gameName || '').toString().toLowerCase();
-          const isStar = m?.marketType === 'startline' || name.includes('starline') || name.includes('startline');
+          const canonical = (m?.marketName || '').toString().toLowerCase();
+          const isStar =
+            m?.marketType === 'startline' ||
+            canonical.includes('starline') ||
+            canonical.includes('startline');
           if (!isStar) return false;
           const group = (m?.starlineGroup || '').toString().trim().toLowerCase();
           if (!keyNorm) return true;
@@ -167,7 +176,8 @@ const StarlineMarket = () => {
             const status = isPastClosingTime(m) ? 'closed' : (m.openingNumber && /^\d{3}$/.test(String(m.openingNumber)) ? 'closed' : 'open');
             return {
               id: m._id,
-              marketName: m.marketName || m.gameName || marketLabel,
+              marketName: m.marketName || '',
+              displayLabel: getMarketDisplayName(m, language) || m.marketName || marketLabel,
               startingTime: st || null,
               closingTime: m.closingTime || m.startingTime || null,
               openingNumber: m.openingNumber || null,
@@ -186,7 +196,7 @@ const StarlineMarket = () => {
     };
     run();
     return () => { cancelled = true; };
-  }, [marketKey, marketLabel]);
+  }, [marketKey, marketLabel, language]);
 
   const title = marketLabel || 'Starline';
 
@@ -259,7 +269,7 @@ const StarlineMarket = () => {
                         market: {
                           _id: m.id,
                           marketName: m.marketName,
-                          gameName: m.marketName,
+                          gameName: m.displayLabel,
                           startingTime: m.startingTime,
                           closingTime: m.closingTime,
                           openingNumber: m.openingNumber,

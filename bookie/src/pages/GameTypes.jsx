@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { API_BASE_URL, getMarketDisplayName, fetchWithAuth } from '../utils/api';
+import { API_BASE_URL, getMarketDisplayName, fetchWithAuth, buildGetMarketsUrl } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
@@ -95,7 +95,7 @@ const GameTypes = () => {
     useEffect(() => {
         const fetchMarket = async () => {
             try {
-                const res = await fetchWithAuth(`${API_BASE_URL}/markets/get-markets`);
+                const res = await fetchWithAuth(buildGetMarketsUrl(language));
                 if (res.status === 401) return;
                 const data = await res.json();
                 if (data.success && Array.isArray(data.data)) {
@@ -114,7 +114,7 @@ const GameTypes = () => {
             }
         };
         fetchMarket();
-    }, [marketId]);
+    }, [marketId, language]);
 
     const handleGameClick = (game) => {
         const query = playerId ? `?playerId=${playerId}` : '';

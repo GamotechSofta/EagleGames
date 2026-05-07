@@ -1,9 +1,88 @@
+import mongoose from 'mongoose';
 import { Wallet, WalletTransaction } from '../models/wallet/wallet.js';
 import User from '../models/user/user.js';
 import Bet from '../models/bet/bet.js';
 import Admin from '../models/admin/admin.js';
 import { getBookieUserIds } from '../utils/bookieFilter.js';
 import { logActivity, getClientIp } from '../utils/activityLogger.js';
+
+function httpError(status, message) {
+    const err = new Error(message);
+    err.status = status;
+    return err;
+}
+
+/**
+ * Shared admin wallet mutation (credit/debit). `amount` must be a validated positive finite number.
+ */
+async function applyWalletAdjustment(req, { userId, amount: numAmount, type, description }) {
+    const bookieUserIds = await getBookieUserIds(req.admin);
+    if (bookieUserIds !== null && !bookieUserIds.some((id) => String(id) === String(userId))) {
+        throw httpError(403, 'You can only adjust wallet for your assigned players');
+    }
+
+    if (type === 'credit' && req.admin?.role === 'bookie') {
+        const updatedBookie = await Admin.findOneAndUpdate(
+            { _id: req.admin._id, balance: { $gte: numAmount } },
+            { $inc: { balance: -numAmount } },
+            { new: true }
+        ).select('balance');
+
+        if (!updatedBookie) {
+            throw httpError(400, 'Insufficient bookie balance');
+        }
+    }
+
+    let wallet = await Wallet.findOne({ userId });
+    if (!wallet) {
+        wallet = new Wallet({ userId, balance: 0 });
+    }
+
+    if (type === 'credit') {
+        wallet.balance += numAmount;
+    } else if (type === 'debit') {
+        if (wallet.balance < numAmount) {
+            throw httpError(400, 'Insufficient balance');
+        }
+        wallet.balance -= numAmount;
+    } else {
+        throw httpError(400, 'type must be credit or debit');
+    }
+
+    await wallet.save();
+
+    if (type === 'debit' && req.admin?.role === 'bookie') {
+        await Admin.updateOne({ _id: req.admin._id }, { $inc: { balance: numAmount } });
+    }
+
+    const desc =
+        typeof description === 'string' && description.trim()
+            ? description.trim()
+            : `Admin ${type}: ₹${numAmount}`;
+
+    await WalletTransaction.create({
+        userId,
+        type,
+        amount: numAmount,
+        description: desc,
+    });
+
+    const player = await User.findById(userId).select('username').lean();
+    if (req.admin) {
+        await logActivity({
+            action: 'wallet_adjust',
+            performedBy: req.admin.username,
+            performedByType: req.admin.role || 'admin',
+            targetType: 'wallet',
+            targetId: String(userId),
+            details: `Wallet ${type} ₹${numAmount} for player "${player?.username || userId}"`,
+            meta: { userId, amount: numAmount, type },
+            ip: getClientIp(req),
+        });
+    }
+
+    return wallet;
+}
 
 export const getAllWallets = async (req, res) => {
     try {
@@ -157,6 +236,13 @@ export const adjustBalance = async (req, res) => {
             });
         }
 
+        if (type !== 'credit' && type !== 'debit') {
+            return res.status(400).json({
+                success: false,
+                message: 'type must be credit or debit',
+            });
+        }
+
         const numAmount = Number(amount);
         if (!Number.isFinite(numAmount) || numAmount <= 0) {
             return res.status(400).json({
@@ -165,86 +251,140 @@ export const adjustBalance = async (req, res) => {
             });
         }
 
-        const bookieUserIds = await getBookieUserIds(req.admin);
-        if (bookieUserIds !== null && !bookieUserIds.some((id) => String(id) === String(userId))) {
-            return res.status(403).json({
-                success: false,
-                message: 'You can only adjust wallet for your assigned players',
-            });
-        }
-
-        // When a bookie adds funds to a player, deduct the same amount from the bookie's balance.
-        if (type === 'credit' && req.admin?.role === 'bookie') {
-            const updatedBookie = await Admin.findOneAndUpdate(
-                { _id: req.admin._id, balance: { $gte: numAmount } },
-                { $inc: { balance: -numAmount } },
-                { new: true }
-            ).select('balance');
-
-            if (!updatedBookie) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Insufficient bookie balance',
-                });
-            }
-        }
-
-        let wallet = await Wallet.findOne({ userId });
-        if (!wallet) {
-            wallet = new Wallet({ userId, balance: 0 });
-        }
-
-        if (type === 'credit') {
-            wallet.balance += numAmount;
-        } else if (type === 'debit') {
-            if (wallet.balance < numAmount) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Insufficient balance',
-                });
-            }
-            wallet.balance -= numAmount;
-        } else {
-            return res.status(400).json({
-                success: false,
-                message: 'type must be credit or debit',
-            });
-        }
-
-        await wallet.save();
-
-        // When a bookie withdraws funds from a player, add that amount to the bookie's balance.
-        if (type === 'debit' && req.admin?.role === 'bookie') {
-            await Admin.updateOne(
-                { _id: req.admin._id },
-                { $inc: { balance: numAmount } }
-            );
-        }
-
-        await WalletTransaction.create({
-            userId,
-            type,
-            amount: numAmount,
-            description: `Admin ${type}: ₹${numAmount}`,
-        });
-
-        const player = await User.findById(userId).select('username').lean();
-        if (req.admin) {
-            await logActivity({
-                action: 'wallet_adjust',
-                performedBy: req.admin.username,
-                performedByType: req.admin.role || 'admin',
-                targetType: 'wallet',
-                targetId: String(userId),
-                details: `Wallet ${type} ₹${numAmount} for player "${player?.username || userId}"`,
-                meta: { userId, amount: numAmount, type },
-                ip: getClientIp(req),
-            });
-        }
-
+        const wallet = await applyWalletAdjustment(req, { userId, amount: numAmount, type });
         res.status(200).json({ success: true, data: wallet });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        const status = typeof error.status === 'number' ? error.status : 500;
+        res.status(status).json({ success: false, message: error.message });
+    }
+};
+
+/** Admin: credit player wallet. Body: { userId, amount, description? } */
+export const creditWallet = async (req, res) => {
+    try {
+        const { userId, amount, description } = req.body;
+
+        if (!userId || amount == null || amount === '') {
+            return res.status(400).json({
+                success: false,
+                message: 'userId and amount are required',
+            });
+        }
+
+        const numAmount = Number(amount);
+        if (!Number.isFinite(numAmount) || numAmount <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Amount must be a positive number',
+            });
+        }
+
+        const wallet = await applyWalletAdjustment(req, {
+            userId,
+            amount: numAmount,
+            type: 'credit',
+            description,
+        });
+        res.status(200).json({ success: true, data: wallet });
+    } catch (error) {
+        const status = typeof error.status === 'number' ? error.status : 500;
+        res.status(status).json({ success: false, message: error.message });
+    }
+};
+
+/** Admin: debit player wallet. Body: { userId, amount, description? } */
+export const debitWallet = async (req, res) => {
+    try {
+        const { userId, amount, description } = req.body;
+
+        if (!userId || amount == null || amount === '') {
+            return res.status(400).json({
+                success: false,
+                message: 'userId and amount are required',
+            });
+        }
+
+        const numAmount = Number(amount);
+        if (!Number.isFinite(numAmount) || numAmount <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Amount must be a positive number',
+            });
+        }
+
+        const wallet = await applyWalletAdjustment(req, {
+            userId,
+            amount: numAmount,
+            type: 'debit',
+            description,
+        });
+        res.status(200).json({ success: true, data: wallet });
+    } catch (error) {
+        const status = typeof error.status === 'number' ? error.status : 500;
+        res.status(status).json({ success: false, message: error.message });
+    }
+};
+
+async function assertCanAccessPlayerWallet(req, userId) {
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        throw httpError(400, 'Invalid player id');
+    }
+    const bookieUserIds = await getBookieUserIds(req.admin);
+    if (bookieUserIds !== null && !bookieUserIds.some((id) => String(id) === String(userId))) {
+        throw httpError(403, 'You can only view wallets for your assigned players');
+    }
+}
+
+/** Admin: player id + profile + wallet balance */
+export const getPlayerWallet = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        await assertCanAccessPlayerWallet(req, userId);
+
+        const user = await User.findById(userId).select('username email').lean();
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Player not found' });
+        }
+
+        let wallet = await Wallet.findOne({ userId }).lean();
+        const balance = wallet?.balance ?? 0;
+
+        res.status(200).json({
+            success: true,
+            data: {
+                userId,
+                username: user.username,
+                email: user.email,
+                balance,
+            },
+        });
+    } catch (error) {
+        const status = typeof error.status === 'number' ? error.status : 500;
+        res.status(status).json({ success: false, message: error.message });
+    }
+};
+
+/** Admin: generic amount (balance) for a player id */
+export const getPlayerAmount = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        await assertCanAccessPlayerWallet(req, userId);
+
+        const exists = await User.exists({ _id: userId });
+        if (!exists) {
+            return res.status(404).json({ success: false, message: 'Player not found' });
+        }
+
+        let wallet = await Wallet.findOne({ userId }).lean();
+        const amount = wallet?.balance ?? 0;
+
+        res.status(200).json({
+            success: true,
+            data: { userId, amount },
+        });
+    } catch (error) {
+        const status = typeof error.status === 'number' ? error.status : 500;
+        res.status(status).json({ success: false, message: error.message });
     }
 };
 

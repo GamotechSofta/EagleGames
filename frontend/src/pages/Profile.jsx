@@ -1,6 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL, getAuthHeaders, fetchWithAuth } from '../config/api';
+import { useLanguage } from '../context/LanguageContext';
+
+const DATE_LOCALE_BY_LANG = {
+  en: 'en-IN',
+  hi: 'hi-IN',
+  mr: 'mr-IN',
+  te: 'te-IN',
+  ta: 'ta-IN',
+  kn: 'kn-IN',
+  ml: 'ml-IN',
+};
 
 const readUserFromStorage = () => {
   try {
@@ -109,6 +120,7 @@ const IconCopy = () => (
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { t, language } = useLanguage();
   const [user, setUser] = useState(() => readUserFromStorage());
   const [toast, setToast] = useState('');
   const [copiedField, setCopiedField] = useState('');
@@ -185,7 +197,7 @@ const Profile = () => {
     };
   }, []);
 
-  const avatarInitial = (form.username || 'U').charAt(0).toUpperCase();
+  const avatarInitial = (form.username || t('profile_avatarFallback')).charAt(0).toUpperCase();
 
   const walletValue = useMemo(() => {
     const v = pick(user, ['wallet', 'balance', 'points', 'walletAmount', 'wallet_amount', 'amount']);
@@ -199,10 +211,13 @@ const Profile = () => {
     showToast._t = window.setTimeout(() => setToast(''), 2000);
   };
 
-  const handleCopy = (text, label) => {
-    if (!text || text === 'Not set' || text === 'N/A') return;
+  const notSetLabel = t('profile_notSet');
+  const naLabel = t('profile_na');
+
+  const handleCopy = (text, copyKey) => {
+    if (!text || text === notSetLabel || text === naLabel) return;
     navigator.clipboard?.writeText(String(text)).then(() => {
-      setCopiedField(label);
+      setCopiedField(copyKey);
       setTimeout(() => setCopiedField(''), 1500);
     });
   };
@@ -215,9 +230,10 @@ const Profile = () => {
 
   if (!user) return null;
 
-  const userId = user?.id || user?._id || 'N/A';
+  const dateLocale = DATE_LOCALE_BY_LANG[language] || 'en-IN';
+  const userId = user?.id || user?._id || naLabel;
   const memberSince = user?.createdAt
-    ? new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    ? new Date(user.createdAt).toLocaleDateString(dateLocale, { year: 'numeric', month: 'long', day: 'numeric' })
     : null;
 
   const rawBookieRef = user?.referredBy;
@@ -241,9 +257,9 @@ const Profile = () => {
 
   const handleDownloadStatement = async () => {
     try {
-      const user = JSON.parse(localStorage.getItem('user') || 'null');
-      if (!user?.id && !user?._id) {
-        showToast('Please log in to download statement');
+      const stored = JSON.parse(localStorage.getItem('user') || 'null');
+      if (!stored?.id && !stored?._id) {
+        showToast(t('profile_statementLoginRequired'));
         return;
       }
 
@@ -257,33 +273,40 @@ const Profile = () => {
       const res = await fetchWithAuth(url);
       if (res.status === 401) return;
       if (!res.ok) {
-        showToast('Failed to download statement');
+        showToast(t('profile_statementDownloadFailed'));
         return;
       }
       const blob = await res.blob();
       const blobUrl = URL.createObjectURL(blob);
       window.open(blobUrl, '_blank');
-      showToast('Downloading statement...');
+      showToast(t('profile_statementDownloading'));
       setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
     } catch (err) {
-      showToast('Failed to download statement');
+      showToast(t('profile_statementDownloadFailed'));
     }
   };
 
   /* ───────── Quick action buttons ───────── */
   const quickActions = [
-    { icon: <IconAddFund />, label: 'Add Fund', path: '/funds?tab=add-fund', color: 'from-emerald-500 to-emerald-600' },
-    { icon: <IconWithdraw />, label: 'Withdraw', path: '/funds?tab=withdraw-fund', color: 'from-blue-500 to-blue-600' },
-    { icon: <IconPassbook />, label: 'Passbook', path: '/passbook', color: 'from-purple-500 to-purple-600' },
-    { icon: <IconHistory />, label: 'History', path: '/bet-history', color: 'bg-[#1a74e5]' },
+    { id: 'addFund', icon: <IconAddFund />, label: t('profile_addFund'), path: '/funds?tab=add-fund', color: 'from-emerald-500 to-emerald-600' },
+    { id: 'withdraw', icon: <IconWithdraw />, label: t('profile_withdraw'), path: '/funds?tab=withdraw-fund', color: 'from-blue-500 to-blue-600' },
+    { id: 'passbook', icon: <IconPassbook />, label: t('profile_passbook'), path: '/passbook', color: 'from-purple-500 to-purple-600' },
+    { id: 'history', icon: <IconHistory />, label: t('profile_history'), path: '/bet-history', color: 'bg-[#1a74e5]' },
   ];
 
   /* ───────── Info field data ───────── */
   const infoFields = [
-    { icon: <IconUser />, label: 'Username', value: form.username || 'Not set', color: 'text-[#1a74e5]', copyable: true },
-    { icon: <IconMail />, label: 'Email', value: form.email || 'Not set', color: 'text-[#1a74e5]', copyable: true },
-    { icon: <IconPhone />, label: 'Phone', value: form.phone || 'Not set', color: 'text-[#1a74e5]', copyable: true },
+    { copyKey: 'username', icon: <IconUser />, label: t('profile_username'), value: form.username || notSetLabel, color: 'text-[#1a74e5]', copyable: true },
+    { copyKey: 'email', icon: <IconMail />, label: t('profile_email'), value: form.email || notSetLabel, color: 'text-[#1a74e5]', copyable: true },
+    { copyKey: 'phone', icon: <IconPhone />, label: t('profile_phone'), value: form.phone || notSetLabel, color: 'text-[#1a74e5]', copyable: true },
   ];
+
+  const getCopyText = (copyKey) => {
+    if (copyKey === 'userId') return userId;
+    if (copyKey === 'referralLink') return playerReferralUrl;
+    const f = infoFields.find((x) => x.copyKey === copyKey);
+    return f?.value ?? '';
+  };
 
   /* ── Reusable blocks (rendered in both mobile & desktop layouts) ── */
 
@@ -301,14 +324,14 @@ const Profile = () => {
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="text-white font-bold text-lg md:text-xl truncate leading-tight">
-              {form.username || 'User'}
+              {form.username || t('profile_user')}
             </h3>
             <p className="text-gray-300 text-sm truncate mt-0.5">
-              {form.email || form.phone || 'No contact info'}
+              {form.email || form.phone || t('profile_noContact')}
             </p>
             <div className="flex items-center gap-1.5 mt-1.5">
               <div className="px-2 py-0.5 rounded-full bg-green-100/10 border border-green-500/30">
-                <span className="text-green-400 text-[10px] font-semibold uppercase tracking-wider">Active</span>
+                <span className="text-green-400 text-[10px] font-semibold uppercase tracking-wider">{t('profile_active')}</span>
               </div>
             </div>
           </div>
@@ -316,9 +339,9 @@ const Profile = () => {
         <div className="rounded-2xl bg-[#111827] border-2 border-[#374151] p-4 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Wallet Balance</p>
+              <p className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">{t('profile_walletBalance')}</p>
               <p className="text-white text-2xl md:text-3xl font-extrabold tracking-tight">
-                ₹{walletValue !== null ? walletValue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
+                ₹{walletValue !== null ? walletValue.toLocaleString(dateLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
               </p>
             </div>
             <div className="w-12 h-12 rounded-2xl bg-[#1f2937] border-2 border-[#374151] flex items-center justify-center text-[#1a74e5]">
@@ -334,7 +357,7 @@ const Profile = () => {
     <div className={`grid ${cols} gap-2.5`}>
       {quickActions.map((action) => (
         <button
-          key={action.label}
+          key={action.id}
           type="button"
           onClick={() => navigate(action.path)}
           className="flex flex-col items-center gap-2 py-3 px-1 rounded-2xl bg-[#111827] border-2 border-[#374151] hover:border-[#1a74e5] hover:bg-[#1f2937] active:scale-95 transition-all md:py-4 shadow-sm group"
@@ -348,17 +371,14 @@ const Profile = () => {
     </div>
   );
 
-  const renderCopyBtn = (label) => (
+  const renderCopyBtn = (copyKey, titleLabel) => (
     <button
       type="button"
-      onClick={() => handleCopy(
-        label === 'User ID' ? userId : infoFields.find(f => f.label === label)?.value,
-        label
-      )}
+      onClick={() => handleCopy(getCopyText(copyKey), copyKey)}
       className="p-1.5 rounded-lg hover:bg-[#374151] text-gray-400 hover:text-[#1a74e5] transition-colors"
-      title={`Copy ${label}`}
+      title={t('profile_copyTitle', { label: titleLabel })}
     >
-      {copiedField === label ? (
+      {copiedField === copyKey ? (
         <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
         </svg>
@@ -371,9 +391,9 @@ const Profile = () => {
   const referralInviteBlock = playerReferralUrl ? (
     <div className="rounded-3xl bg-[#111827] border-2 border-[#374151] overflow-hidden shadow-sm">
       <div className="px-5 pt-5 pb-3">
-        <h3 className="text-white font-semibold text-sm uppercase tracking-wider">Invite friends</h3>
+        <h3 className="text-white font-semibold text-sm uppercase tracking-wider">{t('profile_inviteFriends')}</h3>
         <p className="text-gray-400 text-xs mt-1">
-          Share this link—new sign-ups stay under your bookie, even if friends forward it again.
+          {t('profile_inviteBody')}
         </p>
       </div>
       <div className="px-4 pb-5">
@@ -381,11 +401,11 @@ const Profile = () => {
           <p className="flex-1 min-w-0 text-xs text-sky-200 font-mono break-all">{playerReferralUrl}</p>
           <button
             type="button"
-            onClick={() => handleCopy(playerReferralUrl, 'Referral link')}
+            onClick={() => handleCopy(playerReferralUrl, 'referralLink')}
             className="shrink-0 p-2 rounded-lg hover:bg-[#374151] text-gray-400 hover:text-[#1a74e5]"
-            title="Copy link"
+            title={t('profile_copyLink')}
           >
-            {copiedField === 'Referral link' ? (
+            {copiedField === 'referralLink' ? (
               <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
               </svg>
@@ -401,7 +421,7 @@ const Profile = () => {
   const accountInfoBlock = (
     <div className="rounded-3xl bg-[#111827] border-2 border-[#374151] overflow-hidden shadow-sm">
       <div className="px-5 pt-5 pb-3">
-        <h3 className="text-white font-semibold text-sm uppercase tracking-wider">Account Information</h3>
+        <h3 className="text-white font-semibold text-sm uppercase tracking-wider">{t('profile_accountInformation')}</h3>
       </div>
       <div className="px-4 pb-2">
         {/* User ID */}
@@ -410,15 +430,15 @@ const Profile = () => {
             <IconId />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-gray-400 text-[10px] font-medium uppercase tracking-wider">User ID</p>
+            <p className="text-gray-400 text-[10px] font-medium uppercase tracking-wider">{t('profile_userId')}</p>
             <p className="text-white text-sm font-mono truncate mt-0.5">{userId}</p>
           </div>
-          {renderCopyBtn('User ID')}
+          {userId !== naLabel && renderCopyBtn('userId', t('profile_userId'))}
         </div>
 
         {/* Info fields */}
         {infoFields.map((field) => (
-          <div key={field.label} className="group flex items-center gap-3.5 px-3 py-3.5 rounded-2xl hover:bg-[#1f2937] transition-colors">
+          <div key={field.copyKey} className="group flex items-center gap-3.5 px-3 py-3.5 rounded-2xl hover:bg-[#1f2937] transition-colors">
             <div className={`w-10 h-10 rounded-xl bg-[#374151] flex items-center justify-center shrink-0 text-[#1a74e5]`}>
               {field.icon}
             </div>
@@ -428,7 +448,7 @@ const Profile = () => {
                 {field.value}
               </p>
             </div>
-            {field.copyable && field.value !== 'Not set' && renderCopyBtn(field.label)}
+            {field.copyable && field.value !== notSetLabel && renderCopyBtn(field.copyKey, field.label)}
           </div>
         ))}
 
@@ -439,7 +459,7 @@ const Profile = () => {
               <IconCalendar />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-gray-400 text-[10px] font-medium uppercase tracking-wider">Member Since</p>
+              <p className="text-gray-400 text-[10px] font-medium uppercase tracking-wider">{t('profile_memberSince')}</p>
               <p className="text-white text-sm font-medium mt-0.5">{memberSince}</p>
             </div>
           </div>
@@ -455,7 +475,7 @@ const Profile = () => {
       className="w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl bg-red-500/10 border-2 border-red-500/30 text-red-500 font-semibold hover:bg-red-500/20 active:scale-[0.98] transition-all"
     >
       <IconLogout />
-      <span>Sign Out</span>
+      <span>{t('profile_signOut')}</span>
     </button>
   );
 
@@ -477,11 +497,11 @@ const Profile = () => {
             type="button"
             onClick={() => navigate(-1)}
             className="w-9 h-9 rounded-full bg-[#374151] border border-[#4b5563] flex items-center justify-center hover:bg-[#2563eb] hover:border-[#1a74e5] hover:text-white active:scale-95 transition-all text-gray-300"
-            aria-label="Back"
+            aria-label={t('bidopt_backAria')}
           >
             <IconBack />
           </button>
-          <h2 className="text-base md:text-lg font-semibold tracking-wide flex-1 text-white">My Profile</h2>
+          <h2 className="text-base md:text-lg font-semibold tracking-wide flex-1 text-white">{t('profile_title')}</h2>
         </div>
       </div>
 
@@ -512,8 +532,8 @@ const Profile = () => {
             {/* Account Info — expanded for desktop */}
             <div className="rounded-3xl bg-[#111827] border-2 border-[#374151] overflow-hidden shadow-sm">
               <div className="px-6 pt-6 pb-4 border-b border-[#374151]">
-                <h3 className="text-white font-semibold text-base uppercase tracking-wider">Account Information</h3>
-                <p className="text-gray-400 text-sm mt-1">Your personal details and account data</p>
+                <h3 className="text-white font-semibold text-base uppercase tracking-wider">{t('profile_accountInformation')}</h3>
+                <p className="text-gray-400 text-sm mt-1">{t('profile_accountDetailsSubtitle')}</p>
               </div>
 
               {/* 2-col grid for info fields on desktop */}
@@ -524,15 +544,15 @@ const Profile = () => {
                     <IconId />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-400 text-[10px] font-medium uppercase tracking-wider">User ID</p>
+                    <p className="text-gray-400 text-[10px] font-medium uppercase tracking-wider">{t('profile_userId')}</p>
                     <p className="text-white text-sm font-mono truncate mt-0.5">{userId}</p>
                   </div>
-                  {renderCopyBtn('User ID')}
+                  {userId !== naLabel && renderCopyBtn('userId', t('profile_userId'))}
                 </div>
 
                 {/* Info fields as cards */}
                 {infoFields.map((field) => (
-                  <div key={field.label} className="group flex items-center gap-4 px-4 py-4 rounded-2xl bg-[#1f2937] border-2 border-[#374151] hover:border-[#4b5563] transition-colors">
+                  <div key={field.copyKey} className="group flex items-center gap-4 px-4 py-4 rounded-2xl bg-[#1f2937] border-2 border-[#374151] hover:border-[#4b5563] transition-colors">
                     <div className={`w-11 h-11 rounded-xl bg-[#374151] flex items-center justify-center shrink-0 text-[#1a74e5]`}>
                       {field.icon}
                     </div>
@@ -542,7 +562,7 @@ const Profile = () => {
                         {field.value}
                       </p>
                     </div>
-                    {field.copyable && field.value !== 'Not set' && renderCopyBtn(field.label)}
+                    {field.copyable && field.value !== notSetLabel && renderCopyBtn(field.copyKey, field.label)}
                   </div>
                 ))}
 
@@ -552,9 +572,9 @@ const Profile = () => {
                     <IconWallet />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-400 text-[10px] font-medium uppercase tracking-wider">Account Balance</p>
+                    <p className="text-gray-400 text-[10px] font-medium uppercase tracking-wider">{t('profile_accountBalance')}</p>
                     <p className="text-white text-base font-bold mt-0.5">
-                      ₹{walletValue !== null ? walletValue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
+                      ₹{walletValue !== null ? walletValue.toLocaleString(dateLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
                     </p>
                   </div>
                 </div>
@@ -566,7 +586,7 @@ const Profile = () => {
                       <IconCalendar />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-gray-400 text-[10px] font-medium uppercase tracking-wider">Member Since</p>
+                      <p className="text-gray-400 text-[10px] font-medium uppercase tracking-wider">{t('profile_memberSince')}</p>
                       <p className="text-white text-sm font-medium mt-0.5">{memberSince}</p>
                     </div>
                   </div>
@@ -577,18 +597,18 @@ const Profile = () => {
             {/* Quick Stats Bar */}
             <div className="grid grid-cols-3 gap-4">
               <div className="rounded-2xl bg-[#111827] border-2 border-[#374151] p-5 text-center hover:border-[#4b5563] transition-colors shadow-sm">
-                <p className="text-gray-400 text-[10px] font-semibold uppercase tracking-wider mb-2">Account Status</p>
+                <p className="text-gray-400 text-[10px] font-semibold uppercase tracking-wider mb-2">{t('profile_accountStatus')}</p>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/30">
                   <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  <span className="text-green-400 text-xs font-bold">Active</span>
+                  <span className="text-green-400 text-xs font-bold">{t('profile_active')}</span>
                 </div>
               </div>
               <div className="rounded-2xl bg-[#111827] border-2 border-[#374151] p-5 text-center hover:border-[#4b5563] transition-colors shadow-sm">
-                <p className="text-gray-400 text-[10px] font-semibold uppercase tracking-wider mb-2">Total Bets</p>
+                <p className="text-gray-400 text-[10px] font-semibold uppercase tracking-wider mb-2">{t('profile_totalBets')}</p>
                 <p className="text-white text-lg font-bold">{quickStats.totalBets}</p>
               </div>
               <div className="rounded-2xl bg-[#111827] border-2 border-[#374151] p-5 text-center hover:border-[#4b5563] transition-colors shadow-sm">
-                <p className="text-gray-400 text-[10px] font-semibold uppercase tracking-wider mb-2">This Month</p>
+                <p className="text-gray-400 text-[10px] font-semibold uppercase tracking-wider mb-2">{t('profile_thisMonth')}</p>
                 <p className="text-white text-lg font-bold">{quickStats.monthBets}</p>
               </div>
             </div>

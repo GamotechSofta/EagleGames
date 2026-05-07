@@ -1,7 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL, fetchWithAuth } from '../../config/api';
+import { useLanguage } from '../../context/LanguageContext';
+
+const DATE_LOCALE_BY_LANG = {
+  en: 'en-IN',
+  hi: 'hi-IN',
+  mr: 'mr-IN',
+  te: 'te-IN',
+  ta: 'ta-IN',
+  kn: 'kn-IN',
+  ml: 'ml-IN',
+};
 
 const WithdrawFundHistory = () => {
+    const { t, language } = useLanguage();
+    const dateLocale = DATE_LOCALE_BY_LANG[language] || 'en-IN';
     const [withdrawals, setWithdrawals] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
@@ -41,7 +54,7 @@ const WithdrawFundHistory = () => {
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-IN', {
+        return date.toLocaleDateString(dateLocale, {
             day: '2-digit',
             month: 'short',
             year: 'numeric',
@@ -65,12 +78,18 @@ const WithdrawFundHistory = () => {
         .filter(w => w.status === 'approved')
         .reduce((sum, w) => sum + w.amount, 0);
 
+    const statusLabel = (status) => {
+        const known = ['pending', 'approved', 'rejected', 'completed'];
+        if (known.includes(status)) return t(`fundhist_status_${status}`);
+        return status ? status.charAt(0).toUpperCase() + status.slice(1) : '';
+    };
+
     return (
         <div className="space-y-6">
             {/* Total Withdrawn */}
             <div className="bg-[#111827] rounded-2xl p-5 border border-[#374151]">
-                <p className="text-gray-400 text-sm">Total Withdrawn</p>
-                <p className="text-3xl font-bold text-[#1a74e5]">₹{totalWithdrawn.toLocaleString()}</p>
+                <p className="text-gray-400 text-sm">{t('fundhist_totalWithdrawn')}</p>
+                <p className="text-3xl font-bold text-[#1a74e5]">₹{totalWithdrawn.toLocaleString(dateLocale)}</p>
             </div>
 
             {/* Stats */}
@@ -82,7 +101,7 @@ const WithdrawFundHistory = () => {
                     }`}
                 >
                     <p className="text-lg font-bold">{stats.total}</p>
-                    <p className="text-xs">Total</p>
+                    <p className="text-xs">{t('fundhist_total')}</p>
                 </div>
                 <div 
                     onClick={() => setFilter('pending')}
@@ -91,7 +110,7 @@ const WithdrawFundHistory = () => {
                     }`}
                 >
                     <p className="text-lg font-bold text-[#1a74e5]">{stats.pending}</p>
-                    <p className="text-xs text-gray-300">Pending</p>
+                    <p className="text-xs text-gray-300">{t('fundhist_pending')}</p>
                 </div>
                 <div 
                     onClick={() => setFilter('approved')}
@@ -100,7 +119,7 @@ const WithdrawFundHistory = () => {
                     }`}
                 >
                     <p className="text-lg font-bold text-green-600">{stats.approved}</p>
-                    <p className="text-xs text-gray-300">Approved</p>
+                    <p className="text-xs text-gray-300">{t('fundhist_approved')}</p>
                 </div>
                 <div 
                     onClick={() => setFilter('rejected')}
@@ -109,7 +128,7 @@ const WithdrawFundHistory = () => {
                     }`}
                 >
                     <p className="text-lg font-bold text-red-600">{stats.rejected}</p>
-                    <p className="text-xs text-gray-300">Rejected</p>
+                    <p className="text-xs text-gray-300">{t('fundhist_rejected')}</p>
                 </div>
             </div>
 
@@ -117,20 +136,20 @@ const WithdrawFundHistory = () => {
             {loading ? (
                 <div className="text-center py-8">
                     <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-red-500 mx-auto"></div>
-                    <p className="text-gray-400 mt-3">Loading history...</p>
+                    <p className="text-gray-400 mt-3">{t('fundhist_loading')}</p>
                 </div>
             ) : filteredWithdrawals.length === 0 ? (
                 <div className="text-center py-8 bg-[#111827] rounded-xl border border-[#374151]">
                     <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <p className="text-gray-300">No withdrawal history found</p>
+                    <p className="text-gray-300">{t('fundhist_noWithdrawals')}</p>
                     {filter !== 'all' && (
                         <button
                             onClick={() => setFilter('all')}
                             className="mt-2 text-[#1a74e5] text-sm hover:text-[#1a74e5]"
                         >
-                            View all withdrawals
+                            {t('fundhist_viewAllWithdrawals')}
                         </button>
                     )}
                 </div>
@@ -162,12 +181,12 @@ const WithdrawFundHistory = () => {
                                         )}
                                     </div>
                                     <div>
-                                        <p className="text-white font-semibold">₹{withdrawal.amount.toLocaleString()}</p>
+                                        <p className="text-white font-semibold">₹{withdrawal.amount.toLocaleString(dateLocale)}</p>
                                         <p className="text-gray-500 text-xs">{formatDate(withdrawal.createdAt)}</p>
                                     </div>
                                 </div>
                                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(withdrawal.status)}`}>
-                                    {withdrawal.status.charAt(0).toUpperCase() + withdrawal.status.slice(1)}
+                                    {statusLabel(withdrawal.status)}
                                 </span>
                             </div>
 
@@ -175,7 +194,7 @@ const WithdrawFundHistory = () => {
                             {withdrawal.bankDetailId && (
                                 <div className="mt-3 pt-3 border-t border-gray-100">
                                     <p className="text-gray-300 text-sm">
-                                        <span className="text-gray-500">To:</span> {withdrawal.bankDetailId.accountHolderName}
+                                        <span className="text-gray-500">{t('fundhist_to')}</span> {withdrawal.bankDetailId.accountHolderName}
                                     </p>
                                     {withdrawal.bankDetailId.bankName && (
                                         <p className="text-gray-500 text-xs">
@@ -184,7 +203,7 @@ const WithdrawFundHistory = () => {
                                     )}
                                     {withdrawal.bankDetailId.upiId && (
                                         <p className="text-gray-500 text-xs">
-                                            UPI: {withdrawal.bankDetailId.upiId}
+                                            {t('bank_upiPrefix')} {withdrawal.bankDetailId.upiId}
                                         </p>
                                     )}
                                 </div>
@@ -195,12 +214,12 @@ const WithdrawFundHistory = () => {
                                 <div className="mt-2 pt-2 border-t border-gray-100 space-y-1">
                                     {withdrawal.adminRemarks && (
                                         <p className="text-gray-300 text-sm">
-                                            <span className="text-gray-500">Admin:</span> {withdrawal.adminRemarks}
+                                            <span className="text-gray-500">{t('fundhist_admin')}</span> {withdrawal.adminRemarks}
                                         </p>
                                     )}
                                     {withdrawal.processedAt && (
                                         <p className="text-gray-500 text-xs">
-                                            Processed: {formatDate(withdrawal.processedAt)}
+                                            {t('fundhist_processed')} {formatDate(withdrawal.processedAt)}
                                         </p>
                                     )}
                                 </div>

@@ -5,6 +5,7 @@ import MarketList from '../components/MarketList';
 import MarketForm from '../components/MarketForm';
 import { useRefreshOnMarketReset } from '../hooks/useRefreshOnMarketReset';
 import { FaChartBar } from 'react-icons/fa';
+import { useLanguage } from '../context/LanguageContext';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3010/api/v1';
 import { getAuthHeaders, clearAdminSession, fetchWithAuth } from '../lib/auth';
@@ -15,6 +16,7 @@ const TABS = [
 
 const Markets = () => {
     const location = useLocation();
+    const { t } = useLanguage();
     const [markets, setMarkets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -43,10 +45,10 @@ const Markets = () => {
             if (data.success) {
                 setMarkets(data.data || []);
             } else {
-                setError('Failed to fetch markets');
+                setError(t('failedFetchMarkets'));
             }
         } catch (err) {
-            setError('Network error. Please check if the server is running.');
+            setError(t('login_network_error'));
         } finally {
             setLoading(false);
         }
@@ -87,7 +89,7 @@ const Markets = () => {
     };
 
     return (
-        <AdminLayout onLogout={handleLogout} title="Markets">
+        <AdminLayout onLogout={handleLogout} title={t('markets')}>
             <div className="min-w-0 px-1 sm:px-0">
                 {error && (
                     <div className="mb-3 sm:mb-4 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm sm:text-base">
@@ -95,7 +97,7 @@ const Markets = () => {
                     </div>
                 )}
 
-                <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold mb-3 sm:mb-6 truncate">Markets Management</h1>
+                <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold mb-3 sm:mb-6 truncate">{t('markets_management')}</h1>
 
                 {showForm && (
                     <MarketForm
@@ -111,7 +113,7 @@ const Markets = () => {
                 {activeTab === 'regular' && (
                     loading ? (
                         <div className="text-center py-8 sm:py-12">
-                            <p className="text-gray-400 text-sm sm:text-base">Loading markets...</p>
+                            <p className="text-gray-400 text-sm sm:text-base">{t('loadingMarkets')}</p>
                         </div>
                     ) : (
                         <section>
@@ -121,7 +123,7 @@ const Markets = () => {
                                     onClick={handleCreate}
                                     className="w-full sm:w-auto px-4 py-2.5 sm:py-2.5 bg-orange-500 hover:bg-orange-600 text-gray-800 font-semibold rounded-xl transition-colors text-sm sm:text-base touch-manipulation"
                                 >
-                                    + Add Market
+                                    + {t('title_addMarketPage')}
                                 </button>
                             </div>
                             <div className="mb-4">
@@ -129,7 +131,7 @@ const Markets = () => {
                                     type="text"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder="Search market..."
+                                    placeholder={t('searchMarketPlaceholder')}
                                     className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                 />
                             </div>

@@ -45,6 +45,27 @@ const marketSchema = new mongoose.Schema({
         type: String,
         default: null,
     },
+    /** Marathi display name (optional). Used when client requests lang=mr. */
+    marketNameMr: {
+        type: String,
+        default: null,
+    },
+    marketNameTe: {
+        type: String,
+        default: null,
+    },
+    marketNameTa: {
+        type: String,
+        default: null,
+    },
+    marketNameKn: {
+        type: String,
+        default: null,
+    },
+    marketNameMl: {
+        type: String,
+        default: null,
+    },
     startingTime: {
         type: String,
         required: true,

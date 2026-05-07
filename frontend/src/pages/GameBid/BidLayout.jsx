@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useBettingWindow } from './BettingWindowContext';
+import { useMarketBetContextTitle } from '../../hooks/useMarketBetContextTitle';
 
 const getWalletFromStorage = () => {
     try {
@@ -49,6 +50,7 @@ const BidLayout = ({
 }) => {
     const navigate = useNavigate();
     const location = useLocation();
+    const marketSubtitle = useMarketBetContextTitle(market, '');
     const contentRef = useRef(null);
     const dateInputRef = React.useRef(null);
     const { allowed: bettingAllowed, closeOnly: bettingCloseOnly, message: bettingMessage } = useBettingWindow();
@@ -167,7 +169,7 @@ const BidLayout = ({
                     </svg>
                 </button>
                 <h1 className="text-xs sm:text-sm md:text-base font-bold uppercase tracking-wide truncate flex-1 text-center mx-1 text-white min-w-0">
-                    {market?.gameName ? `${market.gameName} - ${title}` : title}
+                    {marketSubtitle ? `${marketSubtitle} - ${title}` : title}
                 </h1>
                 <div className="bg-[#4b5563] text-white px-2 sm:px-2.5 py-0.5 rounded-full flex items-center gap-1.5 text-[11px] sm:text-sm font-bold shadow-md shrink-0 border-2 border-[#374151]">
                     <img

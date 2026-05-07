@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 const heroImageDesktop =
   'https://res.cloudinary.com/dwwt5xdsz/image/upload/v1775804007/desktopBanner_nukh3f.jpg';
@@ -38,6 +39,7 @@ const hideScrollbarStyle = {
 };
 
 const HeroSection = () => {
+  const { t } = useLanguage();
   return (
     <>
       {/* Desktop: section with aspect ratio so the background has height */}
@@ -62,14 +64,14 @@ const HeroSection = () => {
         <div className="mb-3 flex items-start justify-between gap-3">
           <div>
             <h2 className="text-white text-lg md:text-xl font-semibold leading-tight">
-              Play &amp; Win
+              {t('hero_playWin')}
             </h2>
             <p className="text-[#AAB3C5] text-xs md:text-sm mt-0.5">
-              Instant games, tap to play now
+              {t('hero_subtitle')}
             </p>
           </div>
           <span className="hidden sm:inline-flex shrink-0 rounded-full bg-[#1a74e5]/20 border border-[#1a74e5]/50 text-[#cbe0ff] text-[10px] md:text-xs font-semibold px-2.5 py-1">
-            Tap &amp; Play
+            {t('hero_tapPlay')}
           </span>
         </div>
         <div

@@ -22,6 +22,43 @@ import { ensureResultsResetForNewDay } from '../utils/resultReset.js';
 import { getRatesMap } from '../models/rate/rate.js';
 import bcrypt from 'bcryptjs';
 
+/** Normalize API/lang header to a supported ISO639-1 code. */
+function normalizeMarketLang(langRaw) {
+    const s = String(langRaw || '')
+        .toLowerCase()
+        .trim()
+        .replace(/_/g, '-');
+    if (!s) return 'en';
+    const primary = s.split('-')[0];
+    const supported = new Set(['en', 'hi', 'mr', 'te', 'ta', 'kn', 'ml']);
+    if (supported.has(s)) return s;
+    if (supported.has(primary)) return primary;
+    return 'en';
+}
+
+/** Set `name` and `name_*` helpers from stored per-language market names. */
+function applyLocalizedMarketFields(doc, langRaw) {
+    const lang = normalizeMarketLang(langRaw);
+    const en = doc.marketName || '';
+    const hi = doc.marketNameHi || '';
+    const mr = doc.marketNameMr || '';
+    const te = doc.marketNameTe || '';
+    const ta = doc.marketNameTa || '';
+    const kn = doc.marketNameKn || '';
+    const ml = doc.marketNameMl || '';
+
+    doc.name_hi = hi;
+    doc.name_mr = mr;
+    doc.name_te = te;
+    doc.name_ta = ta;
+    doc.name_kn = kn;
+    doc.name_ml = ml;
+
+    const byLang = { en, hi, mr, te, ta, kn, ml };
+    const picked = byLang[lang];
+    doc.name = picked && String(picked).trim() ? picked : en;
+}
+
 /** Last digit of sum of 3 digits (0–9). e.g. "156" → "2" */
 function digitFromPatti(threeDigitStr) {
     const s = String(threeDigitStr || '').trim();
@@ -90,7 +127,19 @@ const upsertMarketResultSnapshot = async (marketDoc, dateKey) => {
  */
 export const createMarket = async (req, res) => {
     try {
-        const { marketName, marketNameHi, startingTime, closingTime, betClosureTime, marketType } = req.body;
+        const {
+            marketName,
+            marketNameHi,
+            marketNameMr,
+            marketNameTe,
+            marketNameTa,
+            marketNameKn,
+            marketNameMl,
+            startingTime,
+            closingTime,
+            betClosureTime,
+            marketType,
+        } = req.body;
         if (!marketName || !startingTime || !closingTime) {
             return res.status(400).json({
                 success: false,
@@ -99,7 +148,13 @@ export const createMarket = async (req, res) => {
         }
         const betClosureSec = betClosureTime != null && betClosureTime !== '' ? Number(betClosureTime) : null;
         const payload = { marketName, startingTime, closingTime, betClosureTime: betClosureSec, marketType: 'main' };
-        if (marketNameHi !== undefined) payload.marketNameHi = marketNameHi && String(marketNameHi).trim() ? String(marketNameHi).trim() : null;
+        const optName = (v) => (v !== undefined ? (v && String(v).trim() ? String(v).trim() : null) : undefined);
+        if (marketNameHi !== undefined) payload.marketNameHi = optName(marketNameHi);
+        if (marketNameMr !== undefined) payload.marketNameMr = optName(marketNameMr);
+        if (marketNameTe !== undefined) payload.marketNameTe = optName(marketNameTe);
+        if (marketNameTa !== undefined) payload.marketNameTa = optName(marketNameTa);
+        if (marketNameKn !== undefined) payload.marketNameKn = optName(marketNameKn);
+        if (marketNameMl !== undefined) payload.marketNameMl = optName(marketNameMl);
         const market = new Market(payload);
         await market.save();
 
@@ -145,16 +200,14 @@ export const getMarkets = async (req, res) => {
         await ensureResultsResetForNewDay(Market);
         const markets = await Market.find().sort({ startingTime: 1 });
         const lang = (req.query.lang || req.get('x-lang') || '').toString().toLowerCase();
-        const useHi = lang === 'hi' || lang.includes('hi');
         let data = markets.map((m) => {
             const doc = m.toObject();
             doc.displayResult = m.getDisplayResult();
-            doc.name = doc.marketName || '';
-            doc.name_hi = doc.marketNameHi || '';
-            if (useHi && doc.marketNameHi) doc.name = doc.marketNameHi;
+            applyLocalizedMarketFields(doc, lang);
             return doc;
         });
         data = data.filter((m) => (m.marketType || '').toString().toLowerCase() !== 'startline');
+        res.set('Cache-Control', 'private, no-store');
         res.status(200).json({ success: true, data });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -168,7 +221,12 @@ export const getMarkets = async (req, res) => {
 export const getMarketsListForDashboard = async (req, res) => {
     try {
         await ensureResultsResetForNewDay(Market);
-        const markets = await Market.find().sort({ startingTime: 1 }).select('marketName marketNameHi marketType starlineGroup startingTime').lean();
+        const markets = await Market.find()
+            .sort({ startingTime: 1 })
+            .select(
+                'marketName marketNameHi marketNameMr marketNameTe marketNameTa marketNameKn marketNameMl marketType starlineGroup startingTime'
+            )
+            .lean();
         const data = (markets || []).map((m) => ({
             ...m,
             _id: m._id,
@@ -197,6 +255,8 @@ export const getMarketById = async (req, res) => {
         }
         const response = market.toObject();
         response.displayResult = market.getDisplayResult();
+        const lang = (req.query.lang || req.get('x-lang') || '').toString().toLowerCase();
+        applyLocalizedMarketFields(response, lang);
         res.status(200).json({ success: true, data: response });
     } catch (error) {
         if (error.name === 'CastError') {
@@ -217,10 +277,28 @@ export const updateMarket = async (req, res) => {
         if (!existing) {
             return res.status(404).json({ success: false, message: 'Market not found' });
         }
-        const { marketName, marketNameHi, startingTime, closingTime, betClosureTime, marketType } = req.body;
+        const {
+            marketName,
+            marketNameHi,
+            marketNameMr,
+            marketNameTe,
+            marketNameTa,
+            marketNameKn,
+            marketNameMl,
+            startingTime,
+            closingTime,
+            betClosureTime,
+            marketType,
+        } = req.body;
         const updates = {};
+        const optName = (v) => (v !== undefined ? (v && String(v).trim() ? String(v).trim() : null) : undefined);
         if (marketName !== undefined) updates.marketName = marketName;
-        if (marketNameHi !== undefined) updates.marketNameHi = marketNameHi && String(marketNameHi).trim() ? String(marketNameHi).trim() : null;
+        if (marketNameHi !== undefined) updates.marketNameHi = optName(marketNameHi);
+        if (marketNameMr !== undefined) updates.marketNameMr = optName(marketNameMr);
+        if (marketNameTe !== undefined) updates.marketNameTe = optName(marketNameTe);
+        if (marketNameTa !== undefined) updates.marketNameTa = optName(marketNameTa);
+        if (marketNameKn !== undefined) updates.marketNameKn = optName(marketNameKn);
+        if (marketNameMl !== undefined) updates.marketNameMl = optName(marketNameMl);
         if (startingTime !== undefined) updates.startingTime = startingTime;
         if (closingTime !== undefined) updates.closingTime = closingTime;
         if (betClosureTime !== undefined) updates.betClosureTime = betClosureTime != null && betClosureTime !== '' ? Number(betClosureTime) : null;

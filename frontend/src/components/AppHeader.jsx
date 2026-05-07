@@ -1,25 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { getBalance, updateUserBalance } from '../api/bets';
 import { BACKEND_BASE_URL } from '../config/api';
-import { LANGUAGE_OPTIONS, applyLanguage, getCurrentLanguage } from './GoogleTranslateWidget';
+import { LANGUAGE_OPTIONS } from '../constants/languages';
+import { useLanguage } from '../context/LanguageContext';
 
 const AppHeader = () => {
   const navigate = useNavigate();
+  const { language, changeLanguage, t } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [balance, setBalance] = useState(null);
-  const [selectedLang, setSelectedLang] = useState(getCurrentLanguage());
 
-  const menuItems = [
-    { label: 'My Bets', path: '/bids' },
-    { label: 'Bank', path: '/funds?tab=bank-detail' },
-    { label: 'Funds', path: '/funds' },
-    { label: 'Download App', path: null, isDownload: true },
-    { label: 'Game Rate', path: '/game-rate' },
-    { label: 'Help Desk', path: '/support' },
-    { label: 'Logout', path: '/login' }
-  ];
+  const menuItems = useMemo(
+    () => [
+      { id: 'myBets', labelKey: 'menu_myBets', path: '/bids' },
+      { id: 'bank', labelKey: 'menu_bank', path: '/funds?tab=bank-detail' },
+      { id: 'funds', labelKey: 'menu_funds', path: '/funds' },
+      { id: 'download', labelKey: 'menu_downloadApp', path: null, isDownload: true },
+      { id: 'gameRate', labelKey: 'menu_gameRate', path: '/game-rate' },
+      { id: 'helpDesk', labelKey: 'menu_helpDesk', path: '/support' },
+      { id: 'logout', labelKey: 'menu_logout', path: '/login' },
+    ],
+    []
+  );
 
   const loadStoredBalance = () => {
     try {
@@ -98,7 +102,7 @@ const AppHeader = () => {
     navigate('/login', { replace: true });
   };
 
-  const displayName = user?.username || 'Sign In';
+  const displayName = user?.username || t('header_signIn');
   const displayPhone =
     user?.phone ||
     user?.mobile ||
@@ -110,9 +114,24 @@ const AppHeader = () => {
     '-';
   const sinceDateRaw = user?.createdAt || user?.created_at || user?.createdOn;
   const sinceDate = sinceDateRaw ? new Date(sinceDateRaw) : null;
-  const sinceText = sinceDate && !Number.isNaN(sinceDate.getTime())
-    ? `Since ${sinceDate.toLocaleDateString('en-GB')}`
-    : 'Since -';
+  const dateLocale =
+    language === 'hi'
+      ? 'hi-IN'
+      : language === 'mr'
+        ? 'mr-IN'
+        : language === 'te'
+          ? 'te-IN'
+          : language === 'ta'
+            ? 'ta-IN'
+            : language === 'kn'
+              ? 'kn-IN'
+              : language === 'ml'
+                ? 'ml-IN'
+                : 'en-GB';
+  const sinceText =
+    sinceDate && !Number.isNaN(sinceDate.getTime())
+      ? `${t('header_since')} ${sinceDate.toLocaleDateString(dateLocale)}`
+      : t('header_sinceDash');
   const avatarInitial = displayName ? displayName.charAt(0).toUpperCase() : 'U';
 
   const handleProfileClick = () => {
@@ -174,14 +193,10 @@ const AppHeader = () => {
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 5h12M9 3v2m1.5 13.5L7 10h2l3.5 8.5M12 21l4-9 4 9m-.9-2h-6.2" />
             </svg>
             <select
-              value={selectedLang}
-              onChange={(e) => {
-                const nextLang = e.target.value;
-                setSelectedLang(nextLang);
-                applyLanguage(nextLang);
-              }}
+              value={language}
+              onChange={(e) => changeLanguage(e.target.value)}
               className="bg-transparent text-[11px] sm:text-xs md:text-sm font-semibold text-gray-100 outline-none w-full pr-1"
-              aria-label="Select language"
+              aria-label={t('lang_label')}
             >
               {LANGUAGE_OPTIONS.map((lang) => (
                 <option
@@ -305,11 +320,11 @@ const AppHeader = () => {
             <div className="px-4 sm:px-5 py-4 space-y-2.5 overflow-y-auto h-[calc(100%-140px)] scrollbar-hidden">
               {menuItems.map((item) => (
                 <button
-                  key={item.label}
+                  key={item.id}
                   type="button"
                   onClick={() => {
                     setIsMenuOpen(false);
-                    if (item.label === 'Logout') {
+                    if (item.id === 'logout') {
                       handleLogout();
                     } else if (item.isDownload) {
                       window.open(`${BACKEND_BASE_URL}/downloads/myapp.apk`, '_blank', 'noopener,noreferrer');
@@ -321,90 +336,54 @@ const AppHeader = () => {
                 >
                   {/* Icon Container */}
                   <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#1f2937] border-2 border-[#374151] flex items-center justify-center shrink-0 group-hover:border-[#1a74e5] group-hover:bg-[#374151] group-hover:shadow-md transition-all duration-200">
-                    {item.label === 'Top Winners' ? (
-                      <img
-                        src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769797561/podium_swqjij.png"
-                        alt={item.label}
-                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
-                      />
-                    ) : item.label === 'Telegram Channel' ? (
-                      <img
-                        src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769797952/telegram_yw9hf1.png"
-                        alt="Telegram"
-                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
-                      />
-                    ) : item.label === 'My Bets' ? (
+                    {item.id === 'myBets' ? (
                       <img
                         src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769777192/auction_ofhpps.png"
-                        alt="My Bets"
+                        alt=""
                         className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
                       />
-                    ) : item.label === 'Bank' ? (
+                    ) : item.id === 'bank' ? (
                       <img
                         src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769777283/bank_il6uwi.png"
-                        alt="Bank"
+                        alt=""
                         className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
                       />
-                    ) : item.label === 'Funds' ? (
+                    ) : item.id === 'funds' ? (
                       <img
                         src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769777500/funding_zjmbzp.png"
-                        alt="Funds"
+                        alt=""
                         className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
                       />
-                    ) : item.label === 'Notification' ? (
-                      <img
-                        src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769798359/notification_1_pflwit.png"
-                        alt="Notification"
-                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
-                      />
-                    ) : item.label === 'Game Chart' ? (
-                      <img
-                        src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769798462/start_eotpxc.png"
-                        alt="Game Chart"
-                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
-                      />
-                    ) : item.label === 'Game Rate' ? (
+                    ) : item.id === 'gameRate' ? (
                       <img
                         src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769798548/stars_v1jfzk.png"
-                        alt="Game Rate"
+                        alt=""
                         className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
                       />
-                    ) : item.label === 'Time Table' ? (
-                      <img
-                        src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769798627/schedule_frf8zc.png"
-                        alt="Time Table"
-                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
-                      />
-                    ) : item.label === 'Help Desk' ? (
+                    ) : item.id === 'helpDesk' ? (
                       <img
                         src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769777618/customer-support_du0zcj.png"
-                        alt="Help Desk"
+                        alt=""
                         className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
                       />
-                    ) : item.label === 'Share App' ? (
-                      <img
-                        src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769798998/share_a6shgt.png"
-                        alt="Share App"
-                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
-                      />
-                    ) : item.label === 'Logout' ? (
+                    ) : item.id === 'logout' ? (
                       <img
                         src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769798997/logout_mttqvy.png"
-                        alt="Logout"
+                        alt=""
                         className="w-6 h-6 sm:w-7 sm:h-7 object-contain brightness-0 invert opacity-80"
                       />
-                    ) : item.label === 'Download App' ? (
+                    ) : item.id === 'download' ? (
                       <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                       </svg>
                     ) : (
-                      <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-[#4b5563]"></div>
+                      <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-[#4b5563]" />
                     )}
                   </div>
-                  
+
                   {/* Menu Text */}
                   <span className="text-sm sm:text-base font-semibold text-white group-hover:text-[#1a74e5] transition-colors duration-200 flex-1 text-left">
-                    {item.label}
+                    {t(item.labelKey)}
                   </span>
                   
                   {/* Arrow Indicator */}

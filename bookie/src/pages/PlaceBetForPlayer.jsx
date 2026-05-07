@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Layout from '../components/Layout';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { API_BASE_URL, getBookieAuthHeaders, fetchWithAuth } from '../utils/api';
+import { API_BASE_URL, getBookieAuthHeaders, fetchWithAuth, buildGetMarketsUrl } from '../utils/api';
 import { FaArrowLeft, FaDice, FaCheck, FaTimes, FaPlus, FaTrash, FaSearch, FaUser } from 'react-icons/fa';
+import { useLanguage } from '../context/LanguageContext';
 
 /* ─── Game type metadata ─── */
 const GAME_META = {
@@ -21,6 +22,7 @@ const GAME_META = {
 
 const PlaceBetForPlayer = () => {
     const navigate = useNavigate();
+    const { language } = useLanguage();
     const { marketId, gameType } = useParams();
     const [searchParams] = useSearchParams();
     const preSelectedPlayerId = searchParams.get('playerId') || '';
@@ -46,7 +48,7 @@ const PlaceBetForPlayer = () => {
     useEffect(() => {
         const fetchMarket = async () => {
             try {
-                const res = await fetchWithAuth(`${API_BASE_URL}/markets/get-markets`);
+                const res = await fetchWithAuth(buildGetMarketsUrl(language));
                 if (res.status === 401) return;
                 const data = await res.json();
                 if (data.success && Array.isArray(data.data)) {
@@ -66,7 +68,7 @@ const PlaceBetForPlayer = () => {
             }
         };
         fetchMarket();
-    }, [marketId]);
+    }, [marketId, language]);
 
     // Fetch players
     useEffect(() => {

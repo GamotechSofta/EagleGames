@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useMarketBetContextTitle } from '../../../hooks/useMarketBetContextTitle';
 import BidLayout from '../BidLayout';
 import BidReviewModal from './BidReviewModal';
 import { placeBet, updateUserBalance } from '../../../api/bets';
@@ -133,7 +134,7 @@ const SingleDigitBid = ({ market, title }) => {
         };
     }, [bids, totalPoints, activeTab, specialModeInputs, inputNumber, inputPoints]);
     const dateText = new Date().toLocaleDateString('en-GB');
-    const marketTitle = market?.gameName || market?.marketName || title;
+    const marketTitle = useMarketBetContextTitle(market, title);
     const isRunning = market?.status === 'running'; // "CLOSED IS RUNNING"
 
     useEffect(() => {

@@ -51,10 +51,26 @@ export const getReferralUrl = (bookieId) => {
  */
 export const getMarketDisplayName = (market, language) => {
     if (!market) return '';
+    const ml = market.marketNameMl ?? market.name_ml ?? '';
+    const kn = market.marketNameKn ?? market.name_kn ?? '';
+    const ta = market.marketNameTa ?? market.name_ta ?? '';
+    const te = market.marketNameTe ?? market.name_te ?? '';
+    const mr = market.marketNameMr ?? market.name_mr ?? '';
     const hi = market.marketNameHi ?? market.name_hi ?? '';
     const en = market.marketName ?? market.name ?? '';
+    if (language === 'ml' && ml) return ml;
+    if (language === 'kn' && kn) return kn;
+    if (language === 'ta' && ta) return ta;
+    if (language === 'te' && te) return te;
+    if (language === 'mr' && mr) return mr;
     if (language === 'hi' && hi) return hi;
-    return en || hi;
+    return en || hi || mr || te || ta || kn || ml;
+};
+
+/** Markets list with optional filters + lang for localized `name` from API. */
+export const buildGetMarketsUrl = (language, query = {}) => {
+    const params = new URLSearchParams({ lang: language || 'en', ...query });
+    return `${API_BASE_URL}/markets/get-markets?${params}`;
 };
 
 export { API_BASE_URL, FRONTEND_URL };

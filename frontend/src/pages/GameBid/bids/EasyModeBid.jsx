@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useMarketBetContextTitle } from '../../../hooks/useMarketBetContextTitle';
 import BidLayout from '../BidLayout';
 import BidReviewModal from './BidReviewModal';
 import { placeBet, updateUserBalance } from '../../../api/bets';
@@ -377,7 +378,7 @@ const EasyModeBid = ({
     }, [showModeTabs, activeTab, specialModeType, bids, totalPoints, specialInputs, session]);
     const labelKey = label?.split(' ').pop() || 'Number';
     const dateText = new Date().toLocaleDateString('en-GB'); // dd/mm/yyyy
-    const marketTitle = market?.gameName || market?.marketName || title;
+    const marketTitle = useMarketBetContextTitle(market, title);
     const showInvalidNumberStyle = maxLength === 3; // Pana inputs
     const isNumberComplete = !!inputNumber && (!!maxLength ? String(inputNumber).length === maxLength : true);
     const isNumberInvalid = showInvalidNumberStyle && isNumberComplete && !isValid(inputNumber);

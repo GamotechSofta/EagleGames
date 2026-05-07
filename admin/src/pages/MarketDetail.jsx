@@ -3,6 +3,7 @@ import AdminLayout from '../components/AdminLayout';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { FaArrowLeft, FaClock, FaHashtag, FaChartBar, FaEdit } from 'react-icons/fa';
 import { useRefreshOnMarketReset } from '../hooks/useRefreshOnMarketReset';
+import { useLanguage } from '../context/LanguageContext';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3010/api/v1';
 import { getAuthHeaders, clearAdminSession, fetchWithAuth } from '../lib/auth';
@@ -80,9 +81,6 @@ const mergeSessionStatsForView = (open, close) => {
     };
 };
 
-/** Display label for bet type (super admin panel) */
-const getBetTypeLabel = (t) => ({ 'sp-motor': 'SP Motor', 'dp-motor': 'DP Motor', 't-motor': 'T Motor', 'single': 'Single', 'jodi': 'Jodi', 'panna': 'Panna', 'half-sangam': 'Half Sangam', 'full-sangam': 'Full Sangam', 'odd-even': 'Odd Even', 'sp-common': 'SP Common', 'cp-common': 'CP (Common Pana)', 'dp-common': 'DP Common', chart: 'Chart Game' }[String(t || '').toLowerCase()] || (t ? String(t).toUpperCase() : 'N/A'));
-
 /** Card container matching AddResult/UpdateRate style */
 const SectionCard = ({ title, children, className = '' }) => (
     <div className={`rounded-xl border border-gray-200 bg-white shadow-lg overflow-hidden ${className}`}>
@@ -94,7 +92,7 @@ const SectionCard = ({ title, children, className = '' }) => (
 );
 
 /** Stat table: dark theme, same as admin tables */
-const StatTable = ({ title, rowLabel1, rowLabel2, columns, getAmount, getCount, totalAmount, totalBets }) => (
+const StatTable = ({ title, rowLabel1, rowLabel2, columns, getAmount, getCount, totalAmount, totalBets, labelTotal, labelNoOfBets }) => (
     <SectionCard title={title}>
         <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
             <table className="w-full text-sm border-collapse">
@@ -104,7 +102,7 @@ const StatTable = ({ title, rowLabel1, rowLabel2, columns, getAmount, getCount, 
                         {columns.map((c) => (
                             <th key={c} className="py-2.5 px-2 text-center font-semibold text-gray-600">{c}</th>
                         ))}
-                        <th className="py-2.5 px-3 text-center font-semibold text-orange-500">Total</th>
+                        <th className="py-2.5 px-3 text-center font-semibold text-orange-500">{labelTotal}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -118,7 +116,7 @@ const StatTable = ({ title, rowLabel1, rowLabel2, columns, getAmount, getCount, 
                         <td className="py-2 px-3 text-center font-semibold text-orange-500">{formatNum(totalAmount)}</td>
                     </tr>
                     <tr className="bg-gray-100/30">
-                        <td className="py-2 px-3 font-medium text-gray-400">No. of Bets</td>
+                        <td className="py-2 px-3 font-medium text-gray-400">{labelNoOfBets}</td>
                         {columns.map((c) => (
                             <td key={c} className="py-2 px-2 text-center text-gray-600">
                                 {getCount(c)}
@@ -1257,6 +1255,28 @@ const ProfitTargetFinder = ({ marketId, hasOpenDeclared, statusView }) => {
 const MarketDetail = () => {
     const { marketId } = useParams();
     const navigate = useNavigate();
+    const { t } = useLanguage();
+
+    const resolveBetTypeLabel = (betType) => {
+        const k = String(betType || '').toLowerCase();
+        const map = {
+            'sp-motor': t('betType_spMotor'),
+            'dp-motor': t('betType_dpMotor'),
+            't-motor': t('betType_tMotor'),
+            single: t('betType_single'),
+            jodi: t('betType_jodi'),
+            panna: t('betType_panna'),
+            'half-sangam': t('betType_halfSangam'),
+            'full-sangam': t('betType_fullSangam'),
+            'odd-even': t('betType_oddEven'),
+            'sp-common': t('betType_spCommon'),
+            'cp-common': t('betType_cpCommon'),
+            'dp-common': t('betType_dpCommon'),
+            chart: t('betType_chart'),
+        };
+        return map[k] || (betType ? String(betType).toUpperCase() : t('na'));
+    };
+
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -1280,7 +1300,7 @@ const MarketDetail = () => {
             if (statsRes.status === 401 || summaryRes.status === 401) return;
             const statsJson = await statsRes.json();
             if (!statsJson.success) {
-                setError(statsJson.message || 'Failed to load market detail');
+                setError(statsJson.message || t('failedLoadMarketDetail'));
                 setLoading(false);
                 return;
             }
@@ -1302,7 +1322,7 @@ const MarketDetail = () => {
                 setSinglePattiSummary(null);
             }
         } catch (err) {
-            setError('Network error. Please try again.');
+            setError(t('networkErrorTryAgain'));
         } finally {
             setLoading(false);
         }
@@ -1419,7 +1439,7 @@ const MarketDetail = () => {
 
     if (loading) {
         return (
-            <AdminLayout onLogout={handleLogout} title="Market Detail">
+            <AdminLayout onLogout={handleLogout} title={t('title_marketDetail')}>
                 <div className="flex items-center justify-center py-16">
                     <div className="animate-spin rounded-full h-12 w-12 border-2 border-gray-200 border-t-yellow-500" />
                 </div>
@@ -1429,15 +1449,15 @@ const MarketDetail = () => {
 
     if (error || !data) {
         return (
-            <AdminLayout onLogout={handleLogout} title="Market Detail">
+            <AdminLayout onLogout={handleLogout} title={t('title_marketDetail')}>
                 <div className="rounded-xl border border-red-200/60 bg-red-900/20 p-4 text-red-600">
-                    {error || 'Market not found'}
+                    {error || t('md_marketNotFound')}
                 </div>
                 <Link
                     to="/markets"
                     className="inline-flex items-center gap-2 mt-4 px-4 py-2.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-gray-800 font-semibold transition-colors"
                 >
-                    <FaArrowLeft /> Back to Markets
+                    <FaArrowLeft /> {t('md_backToMarkets')}
                 </Link>
             </AdminLayout>
         );
@@ -1457,15 +1477,15 @@ const MarketDetail = () => {
 
     if (!market) {
         return (
-            <AdminLayout onLogout={handleLogout} title="Market Detail">
+            <AdminLayout onLogout={handleLogout} title={t('title_marketDetail')}>
                 <div className="rounded-xl border border-red-200/60 bg-red-900/20 p-4 text-red-600">
-                    Market data not available
+                    {t('md_marketDataUnavailable')}
                 </div>
                 <Link
                     to="/markets"
                     className="inline-flex items-center gap-2 mt-4 px-4 py-2.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-gray-800 font-semibold transition-colors"
                 >
-                    <FaArrowLeft /> Back to Markets
+                    <FaArrowLeft /> {t('md_backToMarkets')}
                 </Link>
             </AdminLayout>
         );
@@ -1573,29 +1593,29 @@ const MarketDetail = () => {
     };
 
     const viewTotalsLabel =
-        statusView === 'open' ? 'Open' : statusView === 'closed' ? 'Closed' : 'All (open + close)';
+        statusView === 'open' ? t('md_viewTotalsOpen') : statusView === 'closed' ? t('md_viewTotalsClosed') : t('md_viewTotalsAll');
     const viewTotalsSubLabel =
         statusView === 'open'
-            ? 'Open bets only'
+            ? t('md_viewSubOpen')
             : statusView === 'closed'
-              ? 'Closed bets only'
-              : 'All bets (open + close sessions)';
+              ? t('md_viewSubClosed')
+              : t('md_viewSubAll');
 
     return (
-        <AdminLayout onLogout={handleLogout} title="Market Detail">
+        <AdminLayout onLogout={handleLogout} title={t('title_marketDetail')}>
             <div className="w-full min-w-0 px-0 sm:px-1 pb-6 sm:pb-8">
                 <Link
                     to="/markets"
                     className="inline-flex items-center gap-2 text-gray-400 hover:text-orange-500 text-sm mb-4 transition-colors"
                 >
-                    <FaArrowLeft className="w-4 h-4" /> Markets Management
+                    <FaArrowLeft className="w-4 h-4" /> {t('markets_management')}
                 </Link>
 
                 {/* Overview card – updates when Open/Closed view changes (key forces refresh) */}
                 <div key={`overview-${statusView}`} className="rounded-xl border border-gray-200 bg-white shadow-xl overflow-hidden mb-6 sm:mb-8">
                     <div className="bg-white border-b border-gray-200 px-4 py-3">
-                        <h1 className="text-xl sm:text-2xl font-bold text-gray-800 truncate">{market?.marketName || 'Market'}</h1>
-                        <p className="text-gray-400 text-sm mt-0.5">Market overview & result</p>
+                        <h1 className="text-xl sm:text-2xl font-bold text-gray-800 truncate">{market?.marketName || t('market')}</h1>
+                        <p className="text-gray-400 text-sm mt-0.5">{t('md_overviewSubtitle')}</p>
                         {marketId && (
                             <p className="text-[11px] text-gray-500 mt-1 font-mono" title="Same ID as in Add Result → Check">ID: {marketId}</p>
                         )}
@@ -1606,9 +1626,9 @@ const MarketDetail = () => {
                                 <FaClock className="text-orange-500 w-5 h-5" />
                             </div>
                             <div>
-                                <p className="text-xs text-gray-400 uppercase tracking-wider">Timeline</p>
+                                <p className="text-xs text-gray-400 uppercase tracking-wider">{t('timeline')}</p>
                                 <p className="font-mono text-gray-800 text-sm sm:text-base">{timeline}</p>
-                                <p className="text-xs text-gray-500">Opens 12:00 AM · closes at closing time</p>
+                                <p className="text-xs text-gray-500">{t('md_opensHint')}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
@@ -1616,45 +1636,48 @@ const MarketDetail = () => {
                                 <FaHashtag className="text-orange-500 w-5 h-5" />
                             </div>
                             <div>
-                                <p className="text-xs text-gray-400 uppercase tracking-wider">Result</p>
+                                <p className="text-xs text-gray-400 uppercase tracking-wider">{t('result')}</p>
                                 <p className="font-mono text-orange-500 text-lg font-bold">{resultDisplay}</p>
                                 <p className="text-xs text-gray-500">
-                                    Open: {hasOpen ? market.openingNumber : '—'} · Close: {hasClose ? market.closingNumber : '—'} ·
-                                    {' '}Viewing totals: <strong>{viewTotalsLabel}</strong> bets
+                                    {t('md_viewingTotalsLine', {
+                                        openNum: hasOpen ? market.openingNumber : '—',
+                                        closeNum: hasClose ? market.closingNumber : '—',
+                                        view: viewTotalsLabel,
+                                    })}
                                 </p>
                                 {(resultOnPatti?.open || resultOnPatti?.close) && (
                                     <div className="mt-3 pt-3 border-t border-gray-200 space-y-2 text-[11px]">
-                                        <p className="text-gray-400 font-semibold uppercase tracking-wider">Result on Patti</p>
+                                        <p className="text-gray-400 font-semibold uppercase tracking-wider">{t('md_resultOnPatti')}</p>
                                         {resultOnPatti?.open && (
                                             <div className="rounded bg-gray-100/40 border border-gray-200 p-2 space-y-1">
-                                                <p className="text-gray-500 font-medium mb-1">Open</p>
+                                                <p className="text-gray-500 font-medium mb-1">{t('md_open')}</p>
                                                 <div className="flex justify-between items-center gap-2">
-                                                    <span className="text-gray-400 shrink-0">Total Bet Amount on Patti (open) + single Digit (open)</span>
+                                                    <span className="text-gray-400 shrink-0">{t('md_totalBetOnPattiOpen')}</span>
                                                     <span className="font-mono text-orange-500">₹{formatNum(resultOnPatti.open.totalBetAmountOnPatti)}</span>
                                                 </div>
                                                 <div className="flex justify-between items-center gap-2">
-                                                    <span className="text-gray-400 shrink-0">Total Win Amount on Patti (open) + single Digit (open)</span>
+                                                    <span className="text-gray-400 shrink-0">{t('md_totalWinOnPattiOpen')}</span>
                                                     <span className="font-mono text-orange-500">₹{formatNum(resultOnPatti.open.totalWinAmountOnPatti)}</span>
                                                 </div>
                                                 <div className="flex justify-between items-center gap-2">
-                                                    <span className="text-gray-400 shrink-0">total no of players Won</span>
+                                                    <span className="text-gray-400 shrink-0">{t('md_totalPlayersWon')}</span>
                                                     <span className="font-mono text-orange-500">{formatNum(resultOnPatti.open.totalPlayersBetOnPatti)}</span>
                                                 </div>
                                             </div>
                                         )}
                                         {resultOnPatti?.close && (
                                             <div className="rounded bg-gray-100/40 border border-gray-200 p-2 space-y-1">
-                                                <p className="text-gray-500 font-medium mb-1">Close</p>
+                                                <p className="text-gray-500 font-medium mb-1">{t('md_close')}</p>
                                                 <div className="flex justify-between items-center gap-2">
-                                                    <span className="text-gray-400 shrink-0">Total Bet Amount on Patti (close) + single Digit (close)</span>
+                                                    <span className="text-gray-400 shrink-0">{t('md_totalBetOnPattiClose')}</span>
                                                     <span className="font-mono text-orange-500">₹{formatNum(resultOnPatti.close.totalBetAmountOnPatti)}</span>
                                                 </div>
                                                 <div className="flex justify-between items-center gap-2">
-                                                    <span className="text-gray-400 shrink-0">Total Win Amount on Patti (close) + single Digit (close)</span>
+                                                    <span className="text-gray-400 shrink-0">{t('md_totalWinOnPattiClose')}</span>
                                                     <span className="font-mono text-orange-500">₹{formatNum(resultOnPatti.close.totalWinAmountOnPatti)}</span>
                                                 </div>
                                                 <div className="flex justify-between items-center gap-2">
-                                                    <span className="text-gray-400 shrink-0">total no of players Won</span>
+                                                    <span className="text-gray-400 shrink-0">{t('md_totalPlayersWon')}</span>
                                                     <span className="font-mono text-orange-500">{formatNum(resultOnPatti.close.totalPlayersBetOnPatti)}</span>
                                                 </div>
                                             </div>
@@ -1668,25 +1691,25 @@ const MarketDetail = () => {
                                 <FaChartBar className="text-orange-500 w-5 h-5" />
                             </div>
                             <div>
-                                <p className="text-xs text-gray-400 uppercase tracking-wider">Total Bet Amount</p>
+                                <p className="text-xs text-gray-400 uppercase tracking-wider">{t('md_totalBetAmountShort')}</p>
                                 <p className="font-mono text-lg font-semibold text-gray-800">₹{formatNum(displayAmount)}</p>
-                                <p className="text-xs text-gray-500">{formatNum(displayBets)} bets</p>
+                                <p className="text-xs text-gray-500">{t('md_betsCount', { n: formatNum(displayBets) })}</p>
                                 <p className="text-[10px] text-gray-500">({viewTotalsSubLabel})</p>
                             </div>
                         </div>
                         {(
                         <div className="flex items-center gap-3">
                             <div className="shrink-0 w-full sm:w-auto">
-                                <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">View</p>
+                                <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">{t('md_viewLabel')}</p>
                                 <select
                                     value={statusView}
                                     onChange={handleStatusViewChange}
-                                    aria-label="View open, closed, or all bets"
+                                    aria-label={t('md_aria_viewBets')}
                                     className="w-full sm:w-auto min-w-[200px] rounded-lg border border-gray-200 bg-gray-100 text-gray-800 px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none cursor-pointer"
                                 >
-                                    <option value="open">Open bets only</option>
-                                    <option value="closed">Closed bets only</option>
-                                    <option value="all">All bets (open + close)</option>
+                                    <option value="open">{t('md_viewOpenOnly')}</option>
+                                    <option value="closed">{t('md_viewClosedOnly')}</option>
+                                    <option value="all">{t('md_viewAllSessions')}</option>
                                 </select>
                             </div>
                         </div>
@@ -1697,14 +1720,16 @@ const MarketDetail = () => {
                 {/* All games shown in both views; section data updates by Open/Closed (other view = blank). */}
                 <div key={`sections-${statusView}`} className="space-y-6">
                     <StatTable
-                        title="Single Digit"
-                        rowLabel1="Digit"
-                        rowLabel2="Amount (₹)"
+                        title={t('md_singleDigit')}
+                        rowLabel1={t('digit')}
+                        rowLabel2={t('amountRupee')}
                         columns={DIGITS}
                         getAmount={(d) => formatNum(singleDigitDisplay.digits?.[d]?.amount)}
                         getCount={(d) => singleDigitDisplay.digits?.[d]?.count ?? 0}
                         totalAmount={singleDigitDisplay.totalAmount}
                         totalBets={singleDigitDisplay.totalBets}
+                        labelTotal={t('total')}
+                        labelNoOfBets={t('noOfBets')}
                     />
 
                     <SectionCard title="Jodi">
@@ -1962,14 +1987,16 @@ const MarketDetail = () => {
                     </SectionCard>
 
                     <StatTable
-                        title="Triple Patti"
-                        rowLabel1="Patti"
-                        rowLabel2="Amount (₹)"
+                        title={t('md_triplePatti')}
+                        rowLabel1={t('patti')}
+                        rowLabel2={t('amountRupee')}
                         columns={TRIPLE_PATTI_DIGITS}
                         getAmount={(d) => formatNum(triplePattiDisplay.items?.[d]?.amount)}
                         getCount={(d) => triplePattiDisplay.items?.[d]?.count ?? 0}
                         totalAmount={triplePattiDisplay.totalAmount}
                         totalBets={triplePattiDisplay.totalBets}
+                        labelTotal={t('total')}
+                        labelNoOfBets={t('noOfBets')}
                     />
 
                     {(statusView === 'closed' || statusView === 'all') && (
@@ -1989,11 +2016,11 @@ const MarketDetail = () => {
                 <ProfitTargetFinder marketId={marketId} hasOpenDeclared={!!hasOpen} statusView={statusView} />
 
                 {/* Detailed Bet Analysis Section */}
-                <SectionCard title="Detailed Bet Analysis" className="mt-8">
+                <SectionCard title={t('md_detailedBetAnalysis')} className="mt-8">
                     {loadingBets ? (
                         <div className="text-center py-8">
                             <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-orange-500 mx-auto" />
-                            <p className="text-gray-500 mt-2">Loading bets...</p>
+                            <p className="text-gray-500 mt-2">{t('loadingBets')}</p>
                         </div>
                     ) : allBets ? (
                         <div className="space-y-6">
@@ -2002,27 +2029,27 @@ const MarketDetail = () => {
                                 <div className="flex items-center justify-between mb-4">
                                     <h3 className="text-lg font-bold text-orange-600 flex items-center gap-2">
                                         <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                                        Opening Bets ({allBets.totalOpen})
+                                        {t('md_openingBets', { n: allBets.totalOpen })}
                                     </h3>
                                     <span className="text-sm text-gray-600">
-                                        Total: ₹{formatNum(allBets.open.reduce((sum, b) => sum + (b.amount || 0), 0))}
+                                        {t('md_totalLabel')} ₹{formatNum(allBets.open.reduce((sum, b) => sum + (b.amount || 0), 0))}
                                     </span>
                                 </div>
                                 {allBets.open.length === 0 ? (
-                                    <p className="text-gray-500 text-center py-4">No opening bets found</p>
+                                    <p className="text-gray-500 text-center py-4">{t('md_noOpeningBets')}</p>
                                 ) : (
                                     <div className="overflow-x-auto rounded-lg border border-gray-200">
                                         <table className="w-full text-sm">
                                             <thead className="bg-gray-50">
                                                 <tr>
-                                                    <th className="px-3 py-2 text-left font-semibold text-gray-700">Time</th>
-                                                    <th className="px-3 py-2 text-left font-semibold text-gray-700">Player</th>
-                                                    <th className="px-3 py-2 text-left font-semibold text-gray-700">Phone</th>
-                                                    <th className="px-3 py-2 text-center font-semibold text-gray-700">Game Type</th>
-                                                    <th className="px-3 py-2 text-center font-semibold text-gray-700">Number</th>
-                                                    <th className="px-3 py-2 text-right font-semibold text-gray-700">Amount</th>
-                                                    <th className="px-3 py-2 text-center font-semibold text-gray-700">Status</th>
-                                                    <th className="px-3 py-2 text-center font-semibold text-gray-700">Placed By</th>
+                                                    <th className="px-3 py-2 text-left font-semibold text-gray-700">{t('time')}</th>
+                                                    <th className="px-3 py-2 text-left font-semibold text-gray-700">{t('player')}</th>
+                                                    <th className="px-3 py-2 text-left font-semibold text-gray-700">{t('phone')}</th>
+                                                    <th className="px-3 py-2 text-center font-semibold text-gray-700">{t('gameType')}</th>
+                                                    <th className="px-3 py-2 text-center font-semibold text-gray-700">{t('number')}</th>
+                                                    <th className="px-3 py-2 text-right font-semibold text-gray-700">{t('amount')}</th>
+                                                    <th className="px-3 py-2 text-center font-semibold text-gray-700">{t('status')}</th>
+                                                    <th className="px-3 py-2 text-center font-semibold text-gray-700">{t('placedBy')}</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-200">
@@ -2031,11 +2058,11 @@ const MarketDetail = () => {
                                                         <td className="px-3 py-2 text-gray-600 font-mono text-xs">
                                                             {new Date(bet.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                                                         </td>
-                                                        <td className="px-3 py-2 text-gray-800 font-medium">{bet.userId?.username || 'N/A'}</td>
+                                                        <td className="px-3 py-2 text-gray-800 font-medium">{bet.userId?.username || t('na')}</td>
                                                         <td className="px-3 py-2 text-gray-600 text-xs">{bet.userId?.phone || '—'}</td>
                                                         <td className="px-3 py-2 text-center">
                                                             <span className="px-2 py-1 rounded text-xs font-semibold bg-blue-100 text-blue-700">
-                                                                {getBetTypeLabel(bet.betType)}
+                                                                {resolveBetTypeLabel(bet.betType)}
                                                             </span>
                                                         </td>
                                                         <td className="px-3 py-2 text-center font-mono font-bold text-orange-600">{bet.betNumber || '—'}</td>
@@ -2046,11 +2073,11 @@ const MarketDetail = () => {
                                                                 bet.status === 'lost' ? 'bg-red-100 text-red-700' :
                                                                 'bg-yellow-100 text-yellow-700'
                                                             }`}>
-                                                                {bet.status?.toUpperCase() || 'PENDING'}
+                                                                {bet.status?.toUpperCase() || t('pending')}
                                                             </span>
                                                         </td>
                                                         <td className="px-3 py-2 text-center text-xs text-gray-600">
-                                                            {bet.placedByBookie ? (bet.placedByBookieId?.username || 'Bookie') : 'Player'}
+                                                            {bet.placedByBookie ? (bet.placedByBookieId?.username || t('bookie')) : t('player')}
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -2065,27 +2092,27 @@ const MarketDetail = () => {
                                 <div className="flex items-center justify-between mb-4">
                                     <h3 className="text-lg font-bold text-orange-600 flex items-center gap-2">
                                         <span className="w-2 h-2 rounded-full bg-red-500"></span>
-                                        Closing Bets ({allBets.totalClose})
+                                        {t('md_closingBets', { n: allBets.totalClose })}
                                     </h3>
                                     <span className="text-sm text-gray-600">
-                                        Total: ₹{formatNum(allBets.close.reduce((sum, b) => sum + (b.amount || 0), 0))}
+                                        {t('md_totalLabel')} ₹{formatNum(allBets.close.reduce((sum, b) => sum + (b.amount || 0), 0))}
                                     </span>
                                 </div>
                                 {allBets.close.length === 0 ? (
-                                    <p className="text-gray-500 text-center py-4">No closing bets found</p>
+                                    <p className="text-gray-500 text-center py-4">{t('md_noClosingBets')}</p>
                                 ) : (
                                     <div className="overflow-x-auto rounded-lg border border-gray-200">
                                         <table className="w-full text-sm">
                                             <thead className="bg-gray-50">
                                                 <tr>
-                                                    <th className="px-3 py-2 text-left font-semibold text-gray-700">Time</th>
-                                                    <th className="px-3 py-2 text-left font-semibold text-gray-700">Player</th>
-                                                    <th className="px-3 py-2 text-left font-semibold text-gray-700">Phone</th>
-                                                    <th className="px-3 py-2 text-center font-semibold text-gray-700">Game Type</th>
-                                                    <th className="px-3 py-2 text-center font-semibold text-gray-700">Number</th>
-                                                    <th className="px-3 py-2 text-right font-semibold text-gray-700">Amount</th>
-                                                    <th className="px-3 py-2 text-center font-semibold text-gray-700">Status</th>
-                                                    <th className="px-3 py-2 text-center font-semibold text-gray-700">Placed By</th>
+                                                    <th className="px-3 py-2 text-left font-semibold text-gray-700">{t('time')}</th>
+                                                    <th className="px-3 py-2 text-left font-semibold text-gray-700">{t('player')}</th>
+                                                    <th className="px-3 py-2 text-left font-semibold text-gray-700">{t('phone')}</th>
+                                                    <th className="px-3 py-2 text-center font-semibold text-gray-700">{t('gameType')}</th>
+                                                    <th className="px-3 py-2 text-center font-semibold text-gray-700">{t('number')}</th>
+                                                    <th className="px-3 py-2 text-right font-semibold text-gray-700">{t('amount')}</th>
+                                                    <th className="px-3 py-2 text-center font-semibold text-gray-700">{t('status')}</th>
+                                                    <th className="px-3 py-2 text-center font-semibold text-gray-700">{t('placedBy')}</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-200">
@@ -2094,11 +2121,11 @@ const MarketDetail = () => {
                                                         <td className="px-3 py-2 text-gray-600 font-mono text-xs">
                                                             {new Date(bet.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                                                         </td>
-                                                        <td className="px-3 py-2 text-gray-800 font-medium">{bet.userId?.username || 'N/A'}</td>
+                                                        <td className="px-3 py-2 text-gray-800 font-medium">{bet.userId?.username || t('na')}</td>
                                                         <td className="px-3 py-2 text-gray-600 text-xs">{bet.userId?.phone || '—'}</td>
                                                         <td className="px-3 py-2 text-center">
                                                             <span className="px-2 py-1 rounded text-xs font-semibold bg-blue-100 text-blue-700">
-                                                                {getBetTypeLabel(bet.betType)}
+                                                                {resolveBetTypeLabel(bet.betType)}
                                                             </span>
                                                         </td>
                                                         <td className="px-3 py-2 text-center font-mono font-bold text-orange-600">{bet.betNumber || '—'}</td>
@@ -2109,11 +2136,11 @@ const MarketDetail = () => {
                                                                 bet.status === 'lost' ? 'bg-red-100 text-red-700' :
                                                                 'bg-yellow-100 text-yellow-700'
                                                             }`}>
-                                                                {bet.status?.toUpperCase() || 'PENDING'}
+                                                                {bet.status?.toUpperCase() || t('pending')}
                                                             </span>
                                                         </td>
                                                         <td className="px-3 py-2 text-center text-xs text-gray-600">
-                                                            {bet.placedByBookie ? (bet.placedByBookieId?.username || 'Bookie') : 'Player'}
+                                                            {bet.placedByBookie ? (bet.placedByBookieId?.username || t('bookie')) : t('player')}
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -2124,7 +2151,7 @@ const MarketDetail = () => {
                             </div>
                         </div>
                     ) : (
-                        <p className="text-gray-500 text-center py-4">No bet data available</p>
+                        <p className="text-gray-500 text-center py-4">{t('md_noBetData')}</p>
                     )}
                 </SectionCard>
 
@@ -2133,7 +2160,7 @@ const MarketDetail = () => {
                         to="/markets"
                         className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold border border-gray-200 transition-colors shrink-0 whitespace-nowrap text-xs sm:text-sm"
                     >
-                        <FaArrowLeft /> Back to Markets
+                        <FaArrowLeft /> {t('md_backToMarkets')}
                     </Link>
                     <Link
                         to="/add-result"
@@ -2141,7 +2168,7 @@ const MarketDetail = () => {
                         className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-gray-800 font-semibold border border-amber-400 transition-colors min-w-0 flex-1 text-xs sm:text-sm"
                     >
                         <FaEdit className="shrink-0" />
-                        <span className="truncate">Add Result for {market?.marketName || 'Market'}</span>
+                        <span className="truncate">{t('md_addResultFor', { name: market?.marketName || t('market') })}</span>
                     </Link>
                 </div>
             </div>

@@ -1,30 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import AdminLayout from '../components/AdminLayout';
 import { useNavigate, Link } from 'react-router-dom';
 import { FaUserSlash, FaUserCheck, FaUserPlus, FaSearch, FaWallet, FaKey, FaExternalLinkAlt } from 'react-icons/fa';
 import useModalBackHandler from '../hooks/useModalBackHandler';
+import { useLanguage } from '../context/LanguageContext';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3010/api/v1';
 import { getAuthHeaders, clearAdminSession, fetchWithAuth } from '../lib/auth';
 const ONLINE_THRESHOLD_MS = 5 * 60 * 1000;
+
+const TAB_LAYOUT_KEYS = {
+    all: 'allPlayers',
+    super_admins: 'tab_superAdmins',
+    all_bookies: 'tab_allBookies',
+    bookie_users: 'tab_bookiePlayers',
+    self_signup_users: 'selfSignupPlayers',
+    super_admin_users: 'tab_superAdminPlayers',
+};
 
 const computeIsOnline = (item) => {
     const lastActive = item?.lastActiveAt ? new Date(item.lastActiveAt).getTime() : 0;
     return lastActive > 0 && Date.now() - lastActive < ONLINE_THRESHOLD_MS;
 };
 
-const TABS = [
-    { id: 'all', label: 'All Players', value: 'all' },
-    { id: 'super_admins', label: 'All Super Admins', value: 'super_admins' },
-    { id: 'all_bookies', label: 'All Bookies', value: 'all_bookies' },
-    { id: 'bookie_users', label: 'All Bookies Players', value: 'bookie_users' },
-    { id: 'self_signup_users', label: 'Self Signup Players', value: 'self_signup_users' },
-    { id: 'super_admin_users', label: 'Super Admin Players', value: 'super_admin_users' },
-];
-
-const AllUsers = ({ defaultTab = 'all', title = 'All Players' }) => {
+const AllUsers = ({ defaultTab = 'all' }) => {
     const navigate = useNavigate();
+    const { t } = useLanguage();
+    const TABS = useMemo(
+        () => [
+            { id: 'all', label: t('tab_allPlayers'), value: 'all' },
+            { id: 'super_admins', label: t('tab_superAdmins'), value: 'super_admins' },
+            { id: 'all_bookies', label: t('tab_allBookies'), value: 'all_bookies' },
+            { id: 'bookie_users', label: t('tab_bookiePlayers'), value: 'bookie_users' },
+            { id: 'self_signup_users', label: t('tab_selfSignup'), value: 'self_signup_users' },
+            { id: 'super_admin_users', label: t('tab_superAdminPlayers'), value: 'super_admin_users' },
+        ],
+        [t]
+    );
     const [activeTab, setActiveTab] = useState(defaultTab);
+    const layoutTitle = t(TAB_LAYOUT_KEYS[activeTab] || 'allPlayers');
     const [expandedBookieId, setExpandedBookieId] = useState(null);
     const [allUsers, setAllUsers] = useState([]);
     const [superAdminUsersList, setSuperAdminUsersList] = useState([]);
@@ -353,9 +367,9 @@ const AllUsers = ({ defaultTab = 'all', title = 'All Players' }) => {
     };
 
     return (
-        <AdminLayout onLogout={handleLogout} title={title}>
+        <AdminLayout onLogout={handleLogout} title={layoutTitle}>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
-                <h1 className="text-2xl sm:text-3xl font-bold">{title}</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold">{layoutTitle}</h1>
                 <button
                     type="button"
                     onClick={() => navigate('/add-user')}

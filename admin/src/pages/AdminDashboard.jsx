@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import AdminLayout from '../components/AdminLayout';
 import { useNavigate, Link } from 'react-router-dom';
 import { SkeletonCard } from '../components/Skeleton';
@@ -16,26 +16,27 @@ import {
     FaArrowRight,
     FaExclamationTriangle,
 } from 'react-icons/fa';
+import { useLanguage } from '../context/LanguageContext';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3010/api/v1';
 import { getAuthHeaders, clearAdminSession, fetchWithAuth } from '../lib/auth';
 
-const PRESETS = [
-    { id: 'all', label: 'All', getRange: () => ({ from: '', to: '' }) },
-    { id: 'today', label: 'Today', getRange: () => {
+const buildDatePresets = (t) => [
+    { id: 'all', label: t('preset_all'), getRange: () => ({ from: '', to: '' }) },
+    { id: 'today', label: t('preset_today'), getRange: () => {
         const d = new Date();
         const y = d.getFullYear(), m = d.getMonth(), day = d.getDate();
         const from = `${y}-${String(m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         return { from, to: from };
     }},
-    { id: 'yesterday', label: 'Yesterday', getRange: () => {
+    { id: 'yesterday', label: t('preset_yesterday'), getRange: () => {
         const d = new Date();
         d.setDate(d.getDate() - 1);
         const y = d.getFullYear(), m = d.getMonth(), day = d.getDate();
         const from = `${y}-${String(m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         return { from, to: from };
     }},
-    { id: 'this_week', label: 'This Week', getRange: () => {
+    { id: 'this_week', label: t('preset_thisWeek'), getRange: () => {
         const d = new Date();
         const day = d.getDay();
         const sun = new Date(d);
@@ -45,7 +46,7 @@ const PRESETS = [
         const fmt = (x) => `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}`;
         return { from: fmt(sun), to: fmt(sat) };
     }},
-    { id: 'last_week', label: 'Last Week', getRange: () => {
+    { id: 'last_week', label: t('preset_lastWeek'), getRange: () => {
         const d = new Date();
         const day = d.getDay();
         const sun = new Date(d);
@@ -55,7 +56,7 @@ const PRESETS = [
         const fmt = (x) => `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}`;
         return { from: fmt(sun), to: fmt(sat) };
     }},
-    { id: 'this_month', label: 'This Month', getRange: () => {
+    { id: 'this_month', label: t('preset_thisMonth'), getRange: () => {
         const d = new Date();
         const y = d.getFullYear(), m = d.getMonth();
         const last = new Date(y, m + 1, 0);
@@ -63,7 +64,7 @@ const PRESETS = [
         const to = `${y}-${String(m + 1).padStart(2, '0')}-${String(last.getDate()).padStart(2, '0')}`;
         return { from, to };
     }},
-    { id: 'last_month', label: 'Last Month', getRange: () => {
+    { id: 'last_month', label: t('preset_lastMonth'), getRange: () => {
         const d = new Date();
         const y = d.getFullYear(), m = d.getMonth() - 1;
         const from = `${y}-${String(m + 1).padStart(2, '0')}-01`;
@@ -73,8 +74,8 @@ const PRESETS = [
     }},
 ];
 
-const formatRangeLabel = (from, to) => {
-    if (!from || !to) return 'Today';
+const formatRangeLabel = (from, to, t) => {
+    if (!from || !to) return t('preset_today');
     if (from === to) {
         const d = new Date(from + 'T12:00:00');
         return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -97,7 +98,7 @@ const SectionCard = ({ title, description, icon: Icon, children, linkTo, linkLab
             </div>
             {linkTo && (
                 <Link to={linkTo} className="text-xs font-medium text-orange-500 hover:text-orange-600 flex items-center gap-1">
-                    {linkLabel || 'View'} <FaArrowRight className="w-3 h-3" />
+                    {linkLabel} <FaArrowRight className="w-3 h-3" />
                 </Link>
             )}
         </div>
@@ -118,6 +119,8 @@ const StatRow = ({ label, value, subValue, colorClass = 'text-gray-800' }) => (
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
+    const { t } = useLanguage();
+    const PRESETS = useMemo(() => buildDatePresets(t), [t]);
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -193,10 +196,10 @@ const AdminDashboard = () => {
             if (data.success) {
                 setStats(data.data);
             } else {
-                setError('Failed to fetch dashboard stats');
+                setError(t('failedFetchDashboardStats'));
             }
         } catch (err) {
-            setError('Network error. Please check if the server is running.');
+            setError(t('login_network_error'));
         } finally {
             setLoading(false);
             setRefreshing(false);
@@ -244,10 +247,10 @@ const AdminDashboard = () => {
 
     if (loading) {
         return (
-            <AdminLayout onLogout={handleLogout} title="Dashboard">
+            <AdminLayout onLogout={handleLogout} title={t('dashboard')}>
                 <div className="mb-6">
-                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Dashboard Overview</h1>
-                    <p className="text-gray-400 text-sm mt-2">Loading your admin overview...</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">{t('dash_overviewTitle')}</h1>
+                    <p className="text-gray-400 text-sm mt-2">{t('dash_loadingHint')}</p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     {[...Array(4)].map((_, i) => <SkeletonCard key={i} />)}
@@ -261,25 +264,25 @@ const AdminDashboard = () => {
 
     if (error) {
         return (
-            <AdminLayout onLogout={handleLogout} title="Dashboard">
+            <AdminLayout onLogout={handleLogout} title={t('dashboard')}>
                 <div className="flex flex-col items-center justify-center min-h-[50vh]">
                     <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
                         <FaExclamationTriangle className="w-8 h-8 text-red-500" />
                     </div>
                     <p className="text-red-500 text-lg font-medium mb-2">{error}</p>
                     <button onClick={fetchDashboardStats} className="mt-4 px-6 py-2 bg-orange-600 hover:bg-orange-500 text-white font-semibold rounded-xl">
-                        Retry
+                        {t('retry')}
                     </button>
                 </div>
             </AdminLayout>
         );
     }
 
-    const displayLabel = customMode && customFrom && customTo ? formatRangeLabel(customFrom, customTo) : (PRESETS.find((p) => p.id === datePreset)?.label || 'Today');
-    const selectedMarketName = marketOptions.find((m) => m.id === selectedMarketId)?.name || 'All Markets';
+    const displayLabel = customMode && customFrom && customTo ? formatRangeLabel(customFrom, customTo, t) : (PRESETS.find((p) => p.id === datePreset)?.label || t('preset_today'));
+    const selectedMarketName = marketOptions.find((m) => m.id === selectedMarketId)?.name || t('allMarkets');
 
     return (
-        <AdminLayout onLogout={handleLogout} title="Dashboard">
+        <AdminLayout onLogout={handleLogout} title={t('dashboard')}>
             {/* Header */}
             <div className="mb-6">
                 <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
@@ -288,7 +291,7 @@ const AdminDashboard = () => {
                             <span className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center">
                                 <FaChartLine className="w-5 h-5 text-orange-500" />
                             </span>
-                            Dashboard Overview
+                            {t('dash_overviewTitle')}
                         </h1>
                     </div>
                 </div>
@@ -296,7 +299,7 @@ const AdminDashboard = () => {
                 {/* Date Filter */}
                 <div className="bg-white rounded-xl p-4 border border-gray-200">
                     <div className="flex items-center justify-between gap-2 mb-2">
-                        <p className="text-xs text-gray-500 uppercase tracking-wider">Date Range</p>
+                        <p className="text-xs text-gray-500 uppercase tracking-wider">{t('dateRange')}</p>
                         <button
                             type="button"
                             onClick={handleRefresh}
@@ -304,7 +307,7 @@ const AdminDashboard = () => {
                             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-orange-500/20 border border-gray-200 hover:border-orange-300 text-gray-600 hover:text-orange-500 transition-all disabled:opacity-60 text-xs font-medium"
                         >
                             <FaSyncAlt className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
-                            Refresh
+                            {t('refresh')}
                         </button>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
@@ -326,27 +329,27 @@ const AdminDashboard = () => {
                             onClick={handleCustomToggle}
                             className={`px-4 py-2 rounded-lg text-sm font-semibold ${customMode ? 'bg-orange-500 text-white' : 'bg-gray-100 border border-gray-200 text-gray-600 hover:bg-gray-200'}`}
                         >
-                            Custom
+                            {t('custom')}
                         </button>
                         {customOpen && (
                             <div className="flex flex-wrap items-end gap-3 w-full mt-3 p-3 rounded-lg bg-white border border-gray-200">
                                 <div>
-                                    <label className="block text-xs text-gray-400 mb-1">From</label>
+                                    <label className="block text-xs text-gray-400 mb-1">{t('from')}</label>
                                     <input type="date" value={customFrom} onChange={(e) => setCustomFrom(e.target.value)} className="px-3 py-2 rounded-lg bg-gray-100 border border-gray-200 text-sm text-gray-800" />
                                 </div>
                                 <div>
-                                    <label className="block text-xs text-gray-400 mb-1">To</label>
+                                    <label className="block text-xs text-gray-400 mb-1">{t('to')}</label>
                                     <input type="date" value={customTo} onChange={(e) => setCustomTo(e.target.value)} className="px-3 py-2 rounded-lg bg-gray-100 border border-gray-200 text-sm text-gray-800" />
                                 </div>
                                 <button type="button" onClick={handleCustomApply} className="px-4 py-2 rounded-lg bg-orange-500 text-white font-semibold text-sm">
-                                    Apply
+                                    {t('apply')}
                                 </button>
                             </div>
                         )}
                     </div>
-                    <p className="text-xs text-gray-500 mt-2">Showing data for: <span className="text-orange-500 font-medium">{displayLabel}</span></p>
+                    <p className="text-xs text-gray-500 mt-2">{t('showingDataFor')} <span className="text-orange-500 font-medium">{displayLabel}</span></p>
                     <div className="mt-3">
-                        <p className="text-xs text-gray-500 mb-1 uppercase tracking-wider">Market</p>
+                        <p className="text-xs text-gray-500 mb-1 uppercase tracking-wider">{t('marketFilter')}</p>
                         <select
                             value={selectedMarketId}
                             onChange={(e) => {
@@ -359,12 +362,12 @@ const AdminDashboard = () => {
                             }}
                             className="w-full sm:w-auto min-w-[260px] px-3 py-2 rounded-lg bg-gray-100 border border-gray-200 text-sm text-gray-800"
                         >
-                            <option value="">All Markets</option>
+                            <option value="">{t('allMarkets')}</option>
                             {marketOptions.map((m) => (
                                 <option key={m.id} value={m.id}>{m.name}</option>
                             ))}
                         </select>
-                        <p className="text-xs text-gray-500 mt-2">Selected market: <span className="text-orange-500 font-medium">{selectedMarketName}</span></p>
+                        <p className="text-xs text-gray-500 mt-2">{t('selectedMarketLine')} <span className="text-orange-500 font-medium">{selectedMarketName}</span></p>
                     </div>
                 </div>
             </div>
@@ -374,34 +377,40 @@ const AdminDashboard = () => {
                 <div className="mb-6 p-4 rounded-xl bg-orange-500/10 border border-orange-200">
                     <h3 className="text-sm font-semibold text-orange-500 flex items-center gap-2 mb-3">
                         <FaExclamationTriangle className="w-4 h-4" />
-                        Action Required
+                        {t('dash_actionRequired')}
                     </h3>
                     <div className="flex flex-wrap gap-3">
                         {pendingPayments > 0 && (
                             <Link to="/payment-management" className="px-4 py-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-white font-medium text-sm">
-                                {pendingPayments} Pending Payment{pendingPayments !== 1 ? 's' : ''} →
+                                {pendingPayments === 1
+                                    ? t('dash_payment_pending_one', { count: pendingPayments })
+                                    : t('dash_payment_pending_many', { count: pendingPayments })}
                             </Link>
                         )}
                         {/* Help Desk tickets are shown only inside the Help Desk section-card (super admin). */}
                         {starlinePendingCount > 0 && (
                             <Link to="/markets" state={{ marketType: 'starline' }} className="px-4 py-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-white font-medium text-sm">
-                                {starlinePendingCount} Starline slot{starlinePendingCount !== 1 ? 's' : ''} result pending →
+                                {starlinePendingCount === 1
+                                    ? t('dash_starline_pending_one', { count: starlinePendingCount })
+                                    : t('dash_starline_pending_many', { count: starlinePendingCount })}
                             </Link>
                         )}
                         {mainPendingCount > 0 && (
                             <Link to="/add-result" className="px-4 py-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-white font-medium text-sm">
-                                {mainPendingCount} Market{mainPendingCount !== 1 ? 's' : ''} result pending →
+                                {mainPendingCount === 1
+                                    ? t('dash_market_pending_one', { count: mainPendingCount })
+                                    : t('dash_market_pending_many', { count: mainPendingCount })}
                             </Link>
                         )}
                     </div>
                     {(starlinePendingList.length > 0 || mainPendingList.length > 0) && (
                         <p className="text-xs text-orange-700 mt-2">
                             {starlinePendingList.length > 0 && (
-                                <span>Starline: {starlinePendingList.map((m) => m.marketName).join(', ')}</span>
+                                <span>{t('dash_starlinePrefix')} {starlinePendingList.map((m) => m.marketName).join(', ')}</span>
                             )}
                             {starlinePendingList.length > 0 && mainPendingList.length > 0 && ' · '}
                             {mainPendingList.length > 0 && (
-                                <span>Markets: {mainPendingList.map((m) => m.marketName).join(', ')}</span>
+                                <span>{t('dash_marketsPrefix')} {mainPendingList.map((m) => m.marketName).join(', ')}</span>
                             )}
                         </p>
                     )}
@@ -411,89 +420,89 @@ const AdminDashboard = () => {
             {/* Primary KPIs */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <div className="bg-gradient-to-br from-green-50 to-transparent rounded-xl p-5 border border-green-200">
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Total Revenue (period)</p>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">{t('dash_totalRevenuePeriod')}</p>
                     <p className="text-2xl font-bold text-green-600 font-mono">{formatCurrency(stats?.revenue?.total)}</p>
-                    <p className="text-xs text-gray-500 mt-1">Bet amount collected in selected range</p>
+                    <p className="text-xs text-gray-500 mt-1">{t('dash_betAmountCollected')}</p>
                 </div>
                 <div className="bg-gradient-to-br from-blue-50 to-transparent rounded-xl p-5 border border-blue-200">
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Net Profit (period)</p>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">{t('dash_netProfitPeriod')}</p>
                     <p className="text-2xl font-bold text-blue-600 font-mono">{formatCurrency(stats?.revenue?.netProfit)}</p>
-                    <p className="text-xs text-gray-500 mt-1">Revenue − Payouts in selected range</p>
+                    <p className="text-xs text-gray-500 mt-1">{t('dash_revenueMinusPayouts')}</p>
                 </div>
                 <div className="bg-gradient-to-br from-purple-50 to-transparent rounded-xl p-5 border border-purple-200">
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Total Players (all-time)</p>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">{t('dash_totalPlayersAllTime')}</p>
                     <p className="text-2xl font-bold text-purple-600 font-mono">{stats?.users?.total ?? 0}</p>
-                    <p className="text-xs text-gray-500 mt-1">{stats?.users?.active ?? 0} active · {stats?.users?.newToday ?? 0} new in range</p>
+                    <p className="text-xs text-gray-500 mt-1">{t('dash_activeNewInRange', { active: stats?.users?.active ?? 0, newInRange: stats?.users?.newToday ?? 0 })}</p>
                 </div>
                 <div className="bg-gradient-to-br from-orange-50 to-transparent rounded-xl p-5 border border-orange-200">
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Total Bets (period)</p>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">{t('dash_totalBetsPeriod')}</p>
                     <p className="text-2xl font-bold text-orange-500 font-mono">{stats?.bets?.total ?? 0}</p>
-                    <p className="text-xs text-gray-500 mt-1">Win rate: {stats?.bets?.winRate ?? 0}%</p>
+                    <p className="text-xs text-gray-500 mt-1">{t('dash_winRate', { pct: stats?.bets?.winRate ?? 0 })}</p>
                 </div>
             </div>
 
             {/* Detailed Sections */}
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 mb-6">
                 {/* Revenue Details */}
-                <SectionCard title="Revenue & Payouts" description="Selected period" icon={FaMoneyBillWave} linkTo="/reports" linkLabel="Reports">
-                    <StatRow label="Total Revenue" value={formatCurrency(stats?.revenue?.total)} colorClass="text-green-600" />
-                    <StatRow label="Total Payouts" value={formatCurrency(stats?.revenue?.payouts)} colorClass="text-red-500" />
-                    <StatRow label="Net Profit" value={formatCurrency(stats?.revenue?.netProfit)} colorClass="text-blue-600" />
+                <SectionCard title={t('dash_revenuePayouts')} description={t('dash_selectedPeriod')} icon={FaMoneyBillWave} linkTo="/reports" linkLabel={t('dash_reportsLink')}>
+                    <StatRow label={t('dash_totalRevenue')} value={formatCurrency(stats?.revenue?.total)} colorClass="text-green-600" />
+                    <StatRow label={t('dash_totalPayouts')} value={formatCurrency(stats?.revenue?.payouts)} colorClass="text-red-500" />
+                    <StatRow label={t('dash_netProfit')} value={formatCurrency(stats?.revenue?.netProfit)} colorClass="text-blue-600" />
                 </SectionCard>
 
                 {/* Players */}
-                <SectionCard title="Players" description="All-time counts" icon={FaUserFriends} linkTo="/all-users" linkLabel="All Players">
-                    <StatRow label="Total Players" value={stats?.users?.total ?? 0} />
-                    <StatRow label="Active Players" value={stats?.users?.active ?? 0} colorClass="text-green-600" />
-                    <StatRow label="New in Period" value={stats?.users?.newToday ?? 0} colorClass="text-orange-500" />
+                <SectionCard title={t('dash_playersSection')} description={t('dash_allTimeCounts')} icon={FaUserFriends} linkTo="/all-users" linkLabel={t('allPlayers')}>
+                    <StatRow label={t('dash_totalPlayers')} value={stats?.users?.total ?? 0} />
+                    <StatRow label={t('dash_activePlayers')} value={stats?.users?.active ?? 0} colorClass="text-green-600" />
+                    <StatRow label={t('dash_newInPeriod')} value={stats?.users?.newToday ?? 0} colorClass="text-orange-500" />
                 </SectionCard>
 
                 {/* Bets */}
-                <SectionCard title="Bets" description="Selected period" icon={FaChartBar} linkTo="/bet-history" linkLabel="Bet History">
-                    <StatRow label="Total Bets" value={stats?.bets?.total ?? 0} />
-                    <StatRow label="Winning Bets" value={stats?.bets?.winning ?? 0} colorClass="text-green-600" />
-                    <StatRow label="Losing Bets" value={stats?.bets?.losing ?? 0} colorClass="text-red-500" />
-                    <StatRow label="Pending Bets" value={stats?.bets?.pending ?? 0} colorClass="text-orange-500" />
-                    <StatRow label="Win Rate" value={`${stats?.bets?.winRate ?? 0}%`} />
+                <SectionCard title={t('dash_betsSection')} description={t('dash_selectedPeriod')} icon={FaChartBar} linkTo="/bet-history" linkLabel={t('title_betHistory')}>
+                    <StatRow label={t('dash_totalBets')} value={stats?.bets?.total ?? 0} />
+                    <StatRow label={t('dash_winningBets')} value={stats?.bets?.winning ?? 0} colorClass="text-green-600" />
+                    <StatRow label={t('dash_losingBets')} value={stats?.bets?.losing ?? 0} colorClass="text-red-500" />
+                    <StatRow label={t('dash_pendingBets')} value={stats?.bets?.pending ?? 0} colorClass="text-orange-500" />
+                    <StatRow label={t('dash_winRateRow')} value={`${stats?.bets?.winRate ?? 0}%`} />
                 </SectionCard>
 
                 {/* Markets */}
-                <SectionCard title="Markets" description="Main + Starline" icon={FaChartBar} linkTo="/markets" linkLabel="Markets">
-                    <StatRow label="Total Markets" value={stats?.markets?.total ?? 0} />
-                    <StatRow label="Open Now" value={stats?.markets?.open ?? 0} colorClass="text-green-600" />
-                    <StatRow label="Result Pending" value={marketsPendingResult} colorClass={marketsPendingResult > 0 ? 'text-orange-500' : 'text-gray-400'} />
-                    <StatRow label="Main Markets" value={stats?.markets?.main ?? stats?.markets?.total ?? 0} subValue={`${stats?.markets?.openMain ?? 0} open`} />
-                    <StatRow label="Starline Markets" value={stats?.markets?.starline ?? 0} subValue={`${stats?.markets?.openStarline ?? 0} open`} />
+                <SectionCard title={t('markets')} description={t('dash_mainStarline')} icon={FaChartBar} linkTo="/markets" linkLabel={t('markets')}>
+                    <StatRow label={t('dash_totalMarkets')} value={stats?.markets?.total ?? 0} />
+                    <StatRow label={t('dash_openNow')} value={stats?.markets?.open ?? 0} colorClass="text-green-600" />
+                    <StatRow label={t('dash_resultPending')} value={marketsPendingResult} colorClass={marketsPendingResult > 0 ? 'text-orange-500' : 'text-gray-400'} />
+                    <StatRow label={t('dash_mainMarkets')} value={stats?.markets?.main ?? stats?.markets?.total ?? 0} subValue={t('dash_openCount', { n: stats?.markets?.openMain ?? 0 })} />
+                    <StatRow label={t('dash_starlineMarkets')} value={stats?.markets?.starline ?? 0} subValue={t('dash_openCount', { n: stats?.markets?.openStarline ?? 0 })} />
                 </SectionCard>
 
                 {/* Payments */}
-                <SectionCard title="Payments" description="Deposits & Withdrawals" icon={FaCreditCard} linkTo="/payment-management" linkLabel="Manage Payments">
-                    <StatRow label="Deposits (period)" value={formatCurrency(stats?.payments?.totalDeposits)} colorClass="text-green-600" />
-                    <StatRow label="Withdrawals (period)" value={formatCurrency(stats?.payments?.totalWithdrawals)} colorClass="text-red-500" />
-                    <StatRow label="Pending Deposits" value={pendingDeposits} colorClass="text-orange-500" />
-                    <StatRow label="Pending Withdrawals" value={pendingWithdrawals} colorClass="text-orange-500" />
-                    <StatRow label="Total Pending" value={pendingPayments} colorClass="text-orange-500" />
+                <SectionCard title={t('payments')} description={t('dash_depositsWithdrawals')} icon={FaCreditCard} linkTo="/payment-management" linkLabel={t('dash_managePayments')}>
+                    <StatRow label={t('dash_depositsPeriod')} value={formatCurrency(stats?.payments?.totalDeposits)} colorClass="text-green-600" />
+                    <StatRow label={t('dash_withdrawalsPeriod')} value={formatCurrency(stats?.payments?.totalWithdrawals)} colorClass="text-red-500" />
+                    <StatRow label={t('dash_pendingDeposits')} value={pendingDeposits} colorClass="text-orange-500" />
+                    <StatRow label={t('dash_pendingWithdrawals')} value={pendingWithdrawals} colorClass="text-orange-500" />
+                    <StatRow label={t('dash_totalPending')} value={pendingPayments} colorClass="text-orange-500" />
                 </SectionCard>
 
                 {/* Wallet */}
-                <SectionCard title="Wallet Balance" description="All players combined (all-time)" icon={FaWallet} linkTo="/wallet" linkLabel="Wallet">
-                    <StatRow label="Total Balance" value={formatCurrency(stats?.wallet?.totalBalance)} colorClass="text-green-600" />
+                <SectionCard title={t('dash_walletBalance')} description={t('dash_allPlayersCombined')} icon={FaWallet} linkTo="/wallet" linkLabel={t('wallet')}>
+                    <StatRow label={t('dash_totalBalance')} value={formatCurrency(stats?.wallet?.totalBalance)} colorClass="text-green-600" />
                 </SectionCard>
 
                 {/* Bookies (Super Admin only) */}
                 {adminRole === 'super_admin' && (
-                    <SectionCard title="Bookie Accounts" description="All-time" icon={FaUsers} linkTo="/bookie-management" linkLabel="Manage Bookies">
-                        <StatRow label="Total Bookies" value={stats?.bookies?.total ?? 0} />
-                        <StatRow label="Active Bookies" value={stats?.bookies?.active ?? 0} colorClass="text-green-600" />
+                    <SectionCard title={t('dash_bookieAccounts')} description={t('dash_allTime')} icon={FaUsers} linkTo="/bookie-management" linkLabel={t('dash_manageBookies')}>
+                        <StatRow label={t('dash_totalBookies')} value={stats?.bookies?.total ?? 0} />
+                        <StatRow label={t('dash_activeBookies')} value={stats?.bookies?.active ?? 0} colorClass="text-green-600" />
                     </SectionCard>
                 )}
 
                 {/* Help Desk */}
                 {isSuperAdmin && (
-                    <SectionCard title="Help Desk" description="Support tickets" icon={FaLifeRing} linkTo="/help-desk" linkLabel="Help Desk">
-                        <StatRow label="Total Tickets" value={stats?.helpDesk?.total ?? 0} />
-                        <StatRow label="Open" value={stats?.helpDesk?.open ?? 0} colorClass="text-orange-500" />
-                        <StatRow label="In Progress" value={stats?.helpDesk?.inProgress ?? 0} colorClass="text-blue-600" />
+                    <SectionCard title={t('dash_helpDeskSection')} description={t('dash_supportTickets')} icon={FaLifeRing} linkTo="/help-desk" linkLabel={t('helpDeskIssues')}>
+                        <StatRow label={t('dash_totalTickets')} value={stats?.helpDesk?.total ?? 0} />
+                        <StatRow label={t('dash_openTickets')} value={stats?.helpDesk?.open ?? 0} colorClass="text-orange-500" />
+                        <StatRow label={t('dash_inProgress')} value={stats?.helpDesk?.inProgress ?? 0} colorClass="text-blue-600" />
                     </SectionCard>
                 )}
             </div>
@@ -502,20 +511,20 @@ const AdminDashboard = () => {
             <div className="bg-white rounded-xl p-5 border border-gray-200 mb-6">
                 <h3 className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
                     <FaMoneyBillWave className="w-4 h-4 text-orange-500" />
-                    Revenue Summary for Selected Period
+                    {t('dash_revenueSummaryTitle')}
                 </h3>
-                <p className="text-xs text-gray-500 mb-4">Total revenue in the selected date range.</p>
+                <p className="text-xs text-gray-500 mb-4">{t('dash_revenueSummaryHint')}</p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                        <p className="text-gray-500 text-sm mb-1">Total Revenue</p>
+                        <p className="text-gray-500 text-sm mb-1">{t('dash_totalRevenue')}</p>
                         <p className="text-xl font-bold text-green-600 font-mono">{formatCurrency(stats?.revenue?.total)}</p>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                        <p className="text-gray-500 text-sm mb-1">Total Payouts</p>
+                        <p className="text-gray-500 text-sm mb-1">{t('dash_totalPayouts')}</p>
                         <p className="text-xl font-bold text-red-500 font-mono">{formatCurrency(stats?.revenue?.payouts)}</p>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                        <p className="text-gray-500 text-sm mb-1">Net Profit</p>
+                        <p className="text-gray-500 text-sm mb-1">{t('dash_netProfit')}</p>
                         <p className="text-xl font-bold text-blue-600 font-mono">{formatCurrency(stats?.revenue?.netProfit)}</p>
                     </div>
                 </div>
@@ -525,23 +534,23 @@ const AdminDashboard = () => {
                 <div className="bg-white rounded-xl p-5 border border-gray-200 mb-6">
                     <h3 className="text-base font-semibold text-gray-800 mb-2 flex items-center gap-2">
                         <FaChartBar className="w-4 h-4 text-orange-500" />
-                        Market-wise stats (selected period)
+                        {t('dash_marketWiseTitle')}
                     </h3>
                     <p className="text-xs text-gray-500 mb-3">
-                        Bet volume, revenue, and payouts by market. Use the Market filter above to focus summary cards on one market.
+                        {t('dash_marketWiseHint')}
                     </p>
                     {!stats?.marketWise?.length ? (
-                        <p className="text-sm text-gray-500">No bets in this period.</p>
+                        <p className="text-sm text-gray-500">{t('dash_noBetsPeriod')}</p>
                     ) : (
                         <div className="overflow-x-auto -mx-1">
                             <table className="min-w-full text-sm">
                                 <thead>
                                     <tr className="text-left text-gray-500 border-b border-gray-200">
-                                        <th className="py-2 px-1 sm:px-2 font-medium">Market</th>
-                                        <th className="py-2 px-1 sm:px-2 font-medium text-right">Bets</th>
-                                        <th className="py-2 px-1 sm:px-2 font-medium text-right">Revenue</th>
-                                        <th className="py-2 px-1 sm:px-2 font-medium text-right">Payouts</th>
-                                        <th className="py-2 px-1 sm:px-2 font-medium text-right">Net</th>
+                                        <th className="py-2 px-1 sm:px-2 font-medium">{t('markets')}</th>
+                                        <th className="py-2 px-1 sm:px-2 font-medium text-right">{t('dash_colBets')}</th>
+                                        <th className="py-2 px-1 sm:px-2 font-medium text-right">{t('dash_colRevenue')}</th>
+                                        <th className="py-2 px-1 sm:px-2 font-medium text-right">{t('dash_colPayouts')}</th>
+                                        <th className="py-2 px-1 sm:px-2 font-medium text-right">{t('dash_colNet')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -565,24 +574,24 @@ const AdminDashboard = () => {
             <div className="bg-white rounded-xl p-5 border border-gray-200">
                 <h3 className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
                     <FaClipboardList className="w-4 h-4 text-orange-500" />
-                    Quick Links
+                    {t('dash_quickLinks')}
                 </h3>
-                <p className="text-xs text-gray-500 mb-4">Navigate to admin sections directly from here.</p>
+                <p className="text-xs text-gray-500 mb-4">{t('dash_quickLinksHint')}</p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                     <Link to="/add-result" className="px-4 py-3 rounded-lg bg-gray-100 hover:bg-orange-500/20 border border-gray-200 hover:border-orange-300 text-gray-600 hover:text-orange-500 text-sm font-medium transition-all text-center">
-                        Add Result
+                        {t('addResult')}
                     </Link>
                     <Link to="/update-rate" className="px-4 py-3 rounded-lg bg-gray-100 hover:bg-orange-500/20 border border-gray-200 hover:border-orange-300 text-gray-600 hover:text-orange-500 text-sm font-medium transition-all text-center">
-                        Update Rate
+                        {t('updateRate')}
                     </Link>
                     <Link to="/add-user" className="px-4 py-3 rounded-lg bg-gray-100 hover:bg-orange-500/20 border border-gray-200 hover:border-orange-300 text-gray-600 hover:text-orange-500 text-sm font-medium transition-all text-center">
-                        Add Player
+                        {t('title_addPlayer')}
                     </Link>
                     <Link to="/add-market" className="px-4 py-3 rounded-lg bg-gray-100 hover:bg-orange-500/20 border border-gray-200 hover:border-orange-300 text-gray-600 hover:text-orange-500 text-sm font-medium transition-all text-center">
-                        Add Market
+                        {t('title_addMarketPage')}
                     </Link>
                     <Link to="/logs" className="px-4 py-3 rounded-lg bg-gray-100 hover:bg-orange-500/20 border border-gray-200 hover:border-orange-300 text-gray-600 hover:text-orange-500 text-sm font-medium transition-all text-center">
-                        Activity Logs
+                        {t('dash_linkActivityLogs')}
                     </Link>
                 </div>
             </div>

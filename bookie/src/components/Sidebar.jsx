@@ -21,14 +21,13 @@ import {
     FaLink,
 } from 'react-icons/fa';
 import { useLanguage } from '../context/LanguageContext';
-import { LANGUAGE_OPTIONS, applyLanguage, getCurrentLanguage } from './GoogleTranslateWidget';
+import { LANGUAGE_OPTIONS } from '../constants/languages';
 
 const Sidebar = ({ user, onLogout, isOpen = true, onClose }) => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { t } = useLanguage();
+    const { t, language, changeLanguage } = useLanguage();
     const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
-    const [selectedLang, setSelectedLang] = useState(getCurrentLanguage());
 
     const menuItems = [
         { path: '/dashboard', label: t('dashboard'), icon: FaTachometerAlt, key: 'dashboard' },
@@ -136,16 +135,15 @@ const Sidebar = ({ user, onLogout, isOpen = true, onClose }) => {
                                             key={lang.code}
                                             type="button"
                                             onClick={() => {
-                                                setSelectedLang(lang.code);
                                                 setLanguageMenuOpen(false);
-                                                applyLanguage(lang.code);
+                                                changeLanguage(lang.code);
                                             }}
                                             className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
                                                 idx > 0 ? 'border-t border-gray-200' : ''
-                                            } ${selectedLang === lang.code ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'}`}
+                                            } ${language === lang.code ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'}`}
                                         >
                                             <span className="text-sm">{lang.label}</span>
-                                            {selectedLang === lang.code && <span className="ml-auto text-blue-600">✓</span>}
+                                            {language === lang.code && <span className="ml-auto text-blue-600">✓</span>}
                                         </button>
                                     ))}
                                 </div>

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useMarketBetContextTitle } from '../../../hooks/useMarketBetContextTitle';
 import BidLayout from '../BidLayout';
 import BidReviewModal from './BidReviewModal';
 import { placeBet, updateUserBalance } from '../../../api/bets';
@@ -85,7 +86,7 @@ const SingleDigitBulkBid = ({ market, title }) => {
     const bulkTotalPoints = bids.reduce((sum, b) => sum + Number(b.points || 0), 0);
     const todayDate = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-');
     const dateText = new Date().toLocaleDateString('en-GB');
-    const marketTitle = market?.gameName || market?.marketName || title;
+    const marketTitle = useMarketBetContextTitle(market, title);
 
     const walletBefore = useMemo(() => {
         try {

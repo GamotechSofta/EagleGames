@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL, marketsListFetchInit } from '../config/api';
 import { isPastClosingTime } from '../utils/marketTiming';
 import { useRefreshOnMarketReset } from '../hooks/useRefreshOnMarketReset';
+import { useLanguage } from '../context/LanguageContext';
 
 const STARLINE_DASHBOARD_MARKET_IMAGE_URL =
   'https://res.cloudinary.com/dnyp5jknp/image/upload/v1770722975/Untitled_design_16_1_palesh_qef2qd.png';
@@ -20,6 +21,7 @@ const getMarketStatus = (market) => {
 
 const StartlineDashboard = () => {
   const navigate = useNavigate();
+  const { language } = useLanguage();
   const [markets, setMarkets] = useState([]);
   const [starlineGroups, setStarlineGroups] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,7 +40,10 @@ const StartlineDashboard = () => {
   const fetchMarkets = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_BASE_URL}/markets/get-markets`);
+      const res = await fetch(
+        `${API_BASE_URL}/markets/get-markets?lang=${encodeURIComponent(language)}`,
+        marketsListFetchInit(language)
+      );
       const data = await res.json();
       if (data?.success && Array.isArray(data?.data)) {
         const onlyStarline = data.data.filter((m) => {
@@ -51,7 +56,7 @@ const StartlineDashboard = () => {
             const status = getMarketStatus(m);
             return {
               id: m._id,
-              marketName: m.marketName,
+              marketName: m.name || m.marketName,
               startingTime: m.startingTime,
               closingTime: m.closingTime,
               openingNumber: m.openingNumber || null,
@@ -92,7 +97,7 @@ const StartlineDashboard = () => {
   useEffect(() => {
     fetchMarkets();
     fetchStarlineGroups();
-  }, []);
+  }, [language]);
 
   useRefreshOnMarketReset(fetchMarkets);
 

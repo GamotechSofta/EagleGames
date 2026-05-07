@@ -1,4 +1,5 @@
  import React from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 export const SkeletonCard = () => (
     <div className="bg-white rounded-xl p-6 border border-gray-200 animate-pulse">
@@ -46,13 +47,17 @@ export const Spinner = ({ size = 'md', className = '' }) => {
     );
 };
 
-export const LoadingOverlay = ({ message = 'Loading...' }) => (
+export const LoadingOverlay = ({ message }) => {
+    const { t } = useLanguage();
+    const msg = message ?? t('loadingDots');
+    return (
     <div className="flex flex-col items-center justify-center py-20">
         <div className="relative">
             <div className="w-16 h-16 rounded-full border-4 border-gray-200"></div>
             <div className="absolute inset-0 w-16 h-16 rounded-full border-4 border-transparent border-t-orange-500 animate-spin"></div>
         </div>
-        <p className="mt-6 text-gray-600 font-medium">{message}</p>
-        <p className="mt-2 text-sm text-gray-400">This won't take long</p>
+        <p className="mt-6 text-gray-600 font-medium">{msg}</p>
+        <p className="mt-2 text-sm text-gray-400">{t('wontTakeLong')}</p>
     </div>
-);
+    );
+};

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
-import { API_BASE_URL, getMarketDisplayName, fetchWithAuth } from '../utils/api';
+import { API_BASE_URL, getMarketDisplayName, fetchWithAuth, buildGetMarketsUrl } from '../utils/api';
 import { useRefreshOnMarketReset } from '../hooks/useRefreshOnMarketReset';
 import { useLanguage } from '../context/LanguageContext';
 import { getMarketSession, isPastClosingTime } from '../utils/marketTiming';
@@ -29,7 +29,7 @@ const Markets = () => {
     const fetchMarkets = async () => {
         try {
             setLoading(true);
-            const response = await fetchWithAuth(`${API_BASE_URL}/markets/get-markets`);
+            const response = await fetchWithAuth(buildGetMarketsUrl(language));
             if (response.status === 401) return;
             const data = await response.json();
             if (data.success) setMarkets(data.data);
@@ -43,7 +43,7 @@ const Markets = () => {
 
     useEffect(() => {
         fetchMarkets();
-    }, []);
+    }, [language]);
 
     // Update current time every minute to check if markets have closed
     useEffect(() => {

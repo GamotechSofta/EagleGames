@@ -1,7 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL, getAuthHeaders, fetchWithAuth } from '../../config/api';
+import { useLanguage } from '../../context/LanguageContext';
+
+const DATE_LOCALE_BY_LANG = {
+  en: 'en-IN',
+  hi: 'hi-IN',
+  mr: 'mr-IN',
+  te: 'te-IN',
+  ta: 'ta-IN',
+  kn: 'kn-IN',
+  ml: 'ml-IN',
+};
 
 const WithdrawFund = () => {
+    const { t, language } = useLanguage();
+    const dateLocale = DATE_LOCALE_BY_LANG[language] || 'en-IN';
+    const fmtInr = (n) => `₹${Number(n || 0).toLocaleString(dateLocale)}`;
     const [config, setConfig] = useState(null);
     const [bankAccounts, setBankAccounts] = useState([]);
     const [walletBalance, setWalletBalance] = useState(0);
@@ -73,7 +87,7 @@ const WithdrawFund = () => {
         setSuccess('');
 
         if (!user.id) {
-            setError('Please login to withdraw funds');
+            setError(t('withdraw_err_login'));
             return;
         }
 
@@ -82,17 +96,17 @@ const WithdrawFund = () => {
         const maxWithdraw = config?.maxWithdrawal || 25000;
 
         if (!numAmount || numAmount < minWithdraw || numAmount > maxWithdraw) {
-            setError(`Amount must be between ₹${minWithdraw} and ₹${maxWithdraw}`);
+            setError(t('withdraw_err_amountBetween', { min: fmtInr(minWithdraw), max: fmtInr(maxWithdraw) }));
             return;
         }
 
         if (numAmount > walletBalance) {
-            setError('Insufficient wallet balance');
+            setError(t('withdraw_err_insufficient'));
             return;
         }
 
         if (!selectedBankId) {
-            setError('Please select a bank account');
+            setError(t('withdraw_err_selectBank'));
             return;
         }
 
@@ -117,10 +131,10 @@ const WithdrawFund = () => {
                 setUserNote('');
                 fetchWalletBalance();
             } else {
-                setError(data.message || 'Failed to submit request');
+                setError(data.message || t('addfund_err_submit'));
             }
         } catch (err) {
-            setError('Network error. Please try again.');
+            setError(t('withdraw_err_network'));
         } finally {
             setLoading(false);
         }
@@ -137,7 +151,7 @@ const WithdrawFund = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" d="M2 12h20" />
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 2c3.5 3.5 3.5 16.5 0 20" />
                         </svg>
-                        <span className="font-semibold tracking-wide">RATAN 365</span>
+                        <span className="font-semibold tracking-wide">{t('addfund_brand')}</span>
                     </div>
 
                     <div className="bg-gradient-to-r bg-[#1a74e5] px-4 py-3 flex items-center gap-3">
@@ -147,16 +161,16 @@ const WithdrawFund = () => {
                             </div>
                         </div>
                         <div className="min-w-0">
-                            <div className="text-[11px] font-semibold text-white/90 leading-none">Available Balance</div>
+                            <div className="text-[11px] font-semibold text-white/90 leading-none">{t('withdraw_availableBalance')}</div>
                             <div className="text-white font-extrabold text-lg sm:text-xl leading-tight truncate">
-                                ₹ {Number(walletBalance || 0).toLocaleString('en-IN')}
+                                ₹ {Number(walletBalance || 0).toLocaleString(dateLocale)}
                             </div>
                         </div>
                     </div>
 
                     <div className="px-4 py-3 flex items-center justify-between bg-[#1f2937]">
                         <div className="text-sm text-gray-200 truncate">
-                            {user?.username || user?.name || 'User'}
+                            {user?.username || user?.name || t('profile_user')}
                         </div>
                         <div className="flex items-center gap-1.5">
                             <span className="w-3 h-3 rounded-full bg-[#1a74e5] inline-block" />
@@ -166,7 +180,10 @@ const WithdrawFund = () => {
                 </div>
 
                 <div className="mt-3 text-gray-300 text-sm">
-                    Min: ₹{config?.minWithdrawal || 500} | Max: ₹{config?.maxWithdrawal || 25000}
+                    {t('withdraw_minMax', {
+                        min: fmtInr(config?.minWithdrawal || 500),
+                        max: fmtInr(config?.maxWithdrawal || 25000),
+                    })}
                 </div>
             </div>
 
@@ -185,8 +202,8 @@ const WithdrawFund = () => {
             {/* No Bank Account Warning */}
             {bankAccounts.length === 0 && (
                 <div className="p-3 bg-[#1f2937] border border-[#4b5563] rounded-xl text-[#1a74e5] text-xs sm:text-sm">
-                    <p className="font-medium">No bank account added!</p>
-                    <p className="text-[#1a74e5] mt-1 leading-snug">Please add a bank account first from the "Bank Detail" section to withdraw funds.</p>
+                    <p className="font-medium">{t('withdraw_noBankTitle')}</p>
+                    <p className="text-[#1a74e5] mt-1 leading-snug">{t('withdraw_noBankBody')}</p>
                 </div>
             )}
 
@@ -194,12 +211,12 @@ const WithdrawFund = () => {
             <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Amount Input */}
                 <div>
-                    <label className="block text-gray-200 text-sm font-medium mb-2">Amount (₹)</label>
+                    <label className="block text-gray-200 text-sm font-medium mb-2">{t('withdraw_amountLabel')}</label>
                     <input
                         type="number"
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
-                        placeholder="Enter amount"
+                        placeholder={t('withdraw_enterAmount')}
                         className="w-full bg-[#111827] border border-[#374151] rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#1B3150] focus:border-[#1a74e5]"
                         min={config?.minWithdrawal || 500}
                         max={Math.min(config?.maxWithdrawal || 25000, walletBalance)}
@@ -209,13 +226,15 @@ const WithdrawFund = () => {
                         onClick={() => setAmount(Math.min(walletBalance, config?.maxWithdrawal || 25000).toString())}
                         className="mt-2 text-[#1a74e5] text-sm hover:text-[#1a74e5]"
                     >
-                        Withdraw Max (₹{Math.min(walletBalance, config?.maxWithdrawal || 25000).toLocaleString()})
+                        {t('withdraw_maxBtn', {
+                            amt: fmtInr(Math.min(walletBalance, config?.maxWithdrawal || 25000)),
+                        })}
                     </button>
                 </div>
 
                 {/* Bank Account Selection */}
                 <div>
-                    <label className="block text-gray-200 text-sm font-medium mb-2">Select Bank Account</label>
+                    <label className="block text-gray-200 text-sm font-medium mb-2">{t('withdraw_selectBank')}</label>
                     <div className="space-y-2">
                         {bankAccounts.map((acc) => (
                             <label
@@ -242,12 +261,12 @@ const WithdrawFund = () => {
                                         </p>
                                     )}
                                     {acc.upiId && (
-                                        <p className="text-gray-300 text-sm">UPI: {acc.upiId}</p>
+                                        <p className="text-gray-300 text-sm">{t('bank_upiPrefix')} {acc.upiId}</p>
                                     )}
                                 </div>
                                 {acc.isDefault && (
                                     <span className="px-2 py-1 bg-[#374151] text-[#1a74e5] text-xs rounded-full border border-[#4b5563]">
-                                        Default
+                                        {t('withdraw_default')}
                                     </span>
                                 )}
                                 <div className={`w-5 h-5 rounded-full border-2 ml-3 flex items-center justify-center ${
@@ -265,12 +284,12 @@ const WithdrawFund = () => {
                 {/* Note */}
                 <div>
                     <label className="block text-gray-200 text-sm font-medium mb-2">
-                        Note <span className="text-gray-500">(Optional)</span>
+                        {t('withdraw_noteOptional')}
                     </label>
                     <textarea
                         value={userNote}
                         onChange={(e) => setUserNote(e.target.value)}
-                        placeholder="Any special instructions..."
+                        placeholder={t('withdraw_notePlaceholder')}
                         className="w-full bg-[#111827] border border-[#374151] rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#1B3150] focus:border-[#1a74e5] resize-none"
                         rows={2}
                     />
@@ -282,18 +301,18 @@ const WithdrawFund = () => {
                     disabled={loading || bankAccounts.length === 0}
                     className="w-full py-4 bg-gradient-to-r from-[#1a74e5] to-[#1a74e5] hover:from-[#1a74e5] hover:bg-[#155fc2] text-white font-bold rounded-xl transition-all disabled:opacity-50 shadow-md hover:shadow-lg"
                 >
-                    {loading ? 'Submitting...' : 'Submit Withdrawal Request'}
+                    {loading ? t('withdraw_submitting') : t('withdraw_submitBtn')}
                 </button>
             </form>
 
             {/* Info */}
             <div className="bg-[#1f2937] rounded-xl p-4 border border-[#374151]">
-                <h4 className="text-[#1a74e5] font-semibold mb-2">Withdrawal Info:</h4>
+                <h4 className="text-[#1a74e5] font-semibold mb-2">{t('withdraw_infoTitle')}</h4>
                 <ul className="text-gray-200 text-sm space-y-1">
-                    <li>• Withdrawals are processed within 24 hours</li>
-                    <li>• Ensure your bank details are correct</li>
-                    <li>• Minimum withdrawal: ₹{config?.minWithdrawal || 500}</li>
-                    <li>• Maximum withdrawal: ₹{config?.maxWithdrawal || 25000}</li>
+                    <li>• {t('withdraw_info_1')}</li>
+                    <li>• {t('withdraw_info_2')}</li>
+                    <li>• {t('withdraw_info_3', { amt: fmtInr(config?.minWithdrawal || 500) })}</li>
+                    <li>• {t('withdraw_info_4', { amt: fmtInr(config?.maxWithdrawal || 25000) })}</li>
                 </ul>
             </div>
 
@@ -308,16 +327,15 @@ const WithdrawFund = () => {
                             </svg>
                         </div>
 
-                        <h3 className="text-xl font-bold text-white mb-2">Withdrawal Request Submitted!</h3>
+                        <h3 className="text-xl font-bold text-white mb-2">{t('withdraw_successTitle')}</h3>
                         
                         <div className="bg-[#1f2937] rounded-xl p-4 mb-4 border border-[#374151]">
-                            <p className="text-gray-300 text-sm">Amount</p>
-                            <p className="text-2xl font-bold text-[#1a74e5]">₹{submittedAmount.toLocaleString()}</p>
+                            <p className="text-gray-300 text-sm">{t('addfund_amount')}</p>
+                            <p className="text-2xl font-bold text-[#1a74e5]">{fmtInr(submittedAmount)}</p>
                         </div>
 
                         <p className="text-gray-300 text-sm mb-6">
-                            Your withdrawal request has been submitted successfully. 
-                            Amount will be transferred to your bank account after admin approval within 24 hours.
+                            {t('withdraw_successBody')}
                         </p>
 
                         <div className="space-y-3">
@@ -325,7 +343,7 @@ const WithdrawFund = () => {
                                 onClick={() => setShowSuccessModal(false)}
                                 className="w-full py-3 bg-[#1a74e5] hover:bg-[#1a74e5] text-white font-semibold rounded-xl transition-colors shadow-md"
                             >
-                                Done
+                                {t('addfund_done')}
                             </button>
                             <button
                                 onClick={() => {
@@ -334,7 +352,7 @@ const WithdrawFund = () => {
                                 }}
                                 className="w-full py-3 bg-[#111827] border border-[#4b5563] hover:bg-[#1f2937] text-[#1a74e5] font-medium rounded-xl transition-colors"
                             >
-                                View History
+                                {t('addfund_viewHistory')}
                             </button>
                         </div>
                     </div>

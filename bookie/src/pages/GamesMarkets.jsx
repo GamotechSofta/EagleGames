@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
-import { API_BASE_URL, getMarketDisplayName, fetchWithAuth } from '../utils/api';
+import { API_BASE_URL, getMarketDisplayName, fetchWithAuth, buildGetMarketsUrl } from '../utils/api';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useRefreshOnMarketReset } from '../hooks/useRefreshOnMarketReset';
@@ -35,7 +35,7 @@ const GamesMarkets = () => {
     const fetchMarkets = async () => {
         try {
             setLoading(true);
-            const response = await fetchWithAuth(`${API_BASE_URL}/markets/get-markets`);
+            const response = await fetchWithAuth(buildGetMarketsUrl(language));
             if (response.status === 401) return;
             const data = await response.json();
             if (data.success) setMarkets(data.data || []);
@@ -49,7 +49,7 @@ const GamesMarkets = () => {
 
     useEffect(() => {
         fetchMarkets();
-    }, []);
+    }, [language]);
 
     // Update current time every second for real-time updates
     useEffect(() => {

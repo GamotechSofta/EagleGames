@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
 import { AddFund, WithdrawFund, BankDetail, AddFundHistory, WithdrawFundHistory } from './funds/index';
 
 const Funds = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   
   // Mobile only: prevent page scrolling (as requested)
@@ -43,16 +45,16 @@ const Funds = () => {
   const items = useMemo(() => ([
     {
       key: 'add-fund',
-      title: 'Add Fund',
-      subtitle: 'You can add fund to your wallet',
+      title: t('profile_addFund'),
+      subtitle: t('funds_sub_addFund'),
       color: '#1B3150',
       icon: <span className="text-3xl font-extrabold text-white leading-none">₹</span>,
       component: AddFund,
     },
     {
       key: 'withdraw-fund',
-      title: 'Withdraw Fund',
-      subtitle: 'You can withdraw winnings',
+      title: t('funds_title_withdrawFund'),
+      subtitle: t('funds_sub_withdrawFund'),
       color: '#ef4444',
       icon: (
         <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
@@ -63,8 +65,8 @@ const Funds = () => {
     },
     {
       key: 'bank-detail',
-      title: 'Bank Detail',
-      subtitle: 'Add your bank detail for withdrawals',
+      title: t('funds_title_bankDetail'),
+      subtitle: t('funds_sub_bankDetail'),
       color: '#3b82f6',
       icon: (
         <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
@@ -75,8 +77,8 @@ const Funds = () => {
     },
     {
       key: 'add-fund-history',
-      title: 'Add Fund History',
-      subtitle: 'You can check your add point history',
+      title: t('funds_title_addFundHistory'),
+      subtitle: t('funds_sub_addFundHistory'),
       color: '#1e3a8a',
       icon: (
         <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
@@ -88,8 +90,8 @@ const Funds = () => {
     },
     {
       key: 'withdraw-fund-history',
-      title: 'Withdraw Fund History',
-      subtitle: 'You can check your Withdraw point history',
+      title: t('funds_title_withdrawFundHistory'),
+      subtitle: t('funds_sub_withdrawFundHistory'),
       color: '#f59e0b',
       icon: (
         <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
@@ -99,7 +101,7 @@ const Funds = () => {
       ),
       component: WithdrawFundHistory,
     },
-  ]), []);
+  ]), [t]);
 
   // Get active tab from URL or default to first
   const tabParam = searchParams.get('tab');
@@ -136,14 +138,14 @@ const Funds = () => {
               type="button"
               onClick={() => mobileView ? handleMobileBack() : navigate(-1)}
               className="min-w-[44px] min-h-[44px] rounded-full bg-[#111827] border border-[#374151] flex items-center justify-center text-gray-300 hover:bg-[#2563eb] hover:border-[#1a74e5] hover:text-white active:scale-95 transition touch-manipulation"
-              aria-label="Back"
+              aria-label={t('bidopt_backAria')}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
               </svg>
             </button>
             <h1 className="text-xl sm:text-2xl font-bold text-white">
-              {mobileView ? items.find(i => i.key === mobileView)?.title : 'Funds'}
+              {mobileView ? items.find(i => i.key === mobileView)?.title : t('nav_funds')}
             </h1>
           </div>
 

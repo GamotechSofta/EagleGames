@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { useMarketBetContextTitle } from '../../../hooks/useMarketBetContextTitle';
 import BidLayout from '../BidLayout';
 import BidReviewModal from './BidReviewModal';
 import { useBettingWindow } from '../BettingWindowContext';
@@ -247,7 +248,7 @@ const SpDpMotorBid = ({ market, title }) => {
   };
 
   const dateText = new Date().toLocaleDateString('en-GB');
-  const marketTitle = market?.gameName || market?.marketName || title;
+  const marketTitle = useMarketBetContextTitle(market, title);
   const { allowed: bettingAllowed } = useBettingWindow();
   const walletBefore = useMemo(() => {
     try {

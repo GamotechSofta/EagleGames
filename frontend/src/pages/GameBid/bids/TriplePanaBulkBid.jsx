@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useMarketBetContextTitle } from '../../../hooks/useMarketBetContextTitle';
 import BidLayout from '../BidLayout';
 import BidReviewModal from './BidReviewModal';
 import { placeBet, updateUserBalance } from '../../../api/bets';
@@ -183,7 +184,7 @@ const TriplePanaBulkBid = ({ market, title }) => {
     }, [bids, totalPoints, inputNumber, inputPoints]);
     const isPanaInvalid = !!inputNumber && inputNumber.length === 3 && !isValidTriplePana(inputNumber);
     const dateText = new Date().toLocaleDateString('en-GB');
-    const marketTitle = market?.gameName || market?.marketName || title;
+    const marketTitle = useMarketBetContextTitle(market, title);
 
     const submitBtnClass = (enabled) =>
         enabled

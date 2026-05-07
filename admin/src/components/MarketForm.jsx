@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchWithAuth } from '../lib/auth';
 import useModalBackHandler from '../hooks/useModalBackHandler';
+import { useLanguage } from '../context/LanguageContext';
 
 // Parse "HH:MM" or "H:MM" (24h) to { hour12, minute, ampm }
 const from24Hour = (timeStr) => {
@@ -37,9 +38,15 @@ const HOURS_12 = ['12', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']
 const MINUTES = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
 
 const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, apiBaseUrl, getAuthHeaders }) => {
+    const { t } = useLanguage();
     const [formData, setFormData] = useState({
         marketName: '',
         marketNameHi: '',
+        marketNameMr: '',
+        marketNameTe: '',
+        marketNameTa: '',
+        marketNameKn: '',
+        marketNameMl: '',
         startingTime: '00:00',
         closingTime: '12:00',
         betClosureTime: '',
@@ -66,6 +73,11 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                 ...prev,
                 marketName: market.marketName || '',
                 marketNameHi: market.marketNameHi || '',
+                marketNameMr: market.marketNameMr || '',
+                marketNameTe: market.marketNameTe || '',
+                marketNameTa: market.marketNameTa || '',
+                marketNameKn: market.marketNameKn || '',
+                marketNameMl: market.marketNameMl || '',
                 startingTime: market.startingTime || '',
                 closingTime: closing24 || market.closingTime || '',
                 betClosureTime: market.betClosureTime ?? '',
@@ -134,10 +146,10 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
             if (data.success) {
                 onSuccess();
             } else {
-                setError(data.message || 'Operation failed');
+                setError(data.message || t('operationFailed'));
             }
         } catch (err) {
-            setError('Network error. Please check if the server is running.');
+            setError(t('login_network_error'));
         } finally {
             setLoading(false);
         }
@@ -149,7 +161,7 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                 <div className="p-3.5 sm:p-4">
                     <div className="flex justify-between items-center mb-3.5 sm:mb-4">
                         <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
-                            {market ? 'Edit Market' : 'Create New Market'}
+                            {market ? t('mf_editMarket') : t('mf_createMarket')}
                         </h2>
                         <button
                             onClick={closeModal}
@@ -170,10 +182,10 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                         {market && market.marketType === 'startline' ? (
                             <>
                                 <div className="rounded-lg bg-orange-50 border border-orange-200 px-3 py-2 text-sm text-orange-700">
-                                    Fixed Startline market – only <strong>Closing Time</strong> and result (Declare Result page) can be changed.
+                                    {t('mf_startlineFixedHint')}
                                 </div>
                                 <div>
-                                    <label className="block text-gray-500 text-sm font-medium mb-1">Market Name (fixed)</label>
+                                    <label className="block text-gray-500 text-sm font-medium mb-1">{t('mf_marketNameFixed')}</label>
                                     <p className="px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 font-medium">
                                         {formData.marketName}
                                     </p>
@@ -183,7 +195,7 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                             <>
                                 <div>
                                     <label className="block text-gray-600 text-sm font-medium mb-1.5">
-                                        Market Name
+                                        {t('mf_marketName')}
                                     </label>
                                     <input
                                         type="text"
@@ -191,13 +203,13 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                                         value={formData.marketName}
                                         onChange={handleChange}
                                         className="w-full px-3 sm:px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm sm:text-base"
-                                        placeholder="e.g., Rudraksh Morning"
+                                        placeholder={t('mf_placeholderMarket')}
                                         required
                                     />
                                 </div>
                                 <div>
                                     <label className="block text-gray-600 text-sm font-medium mb-1.5">
-                                        Market Name (Hindi)
+                                        {t('mf_marketNameHi')}
                                     </label>
                                     <input
                                         type="text"
@@ -207,7 +219,76 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                                         className="w-full px-3 sm:px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm sm:text-base"
                                         placeholder="e.g., नाइट मार्केट"
                                     />
-                                    <p className="text-xs text-gray-500 mt-0.5">Optional. Shown when bookie language is Hindi.</p>
+                                    <p className="text-xs text-gray-500 mt-0.5">{t('mf_optionalHi')}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-gray-600 text-sm font-medium mb-1.5">
+                                        {t('mf_marketNameMr')}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="marketNameMr"
+                                        value={formData.marketNameMr}
+                                        onChange={handleChange}
+                                        className="w-full px-3 sm:px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm sm:text-base"
+                                        placeholder="उदा. रात्री बाजार"
+                                    />
+                                    <p className="text-xs text-gray-500 mt-0.5">{t('mf_optionalMr')}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-gray-600 text-sm font-medium mb-1.5">
+                                        {t('mf_marketNameTe')}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="marketNameTe"
+                                        value={formData.marketNameTe}
+                                        onChange={handleChange}
+                                        className="w-full px-3 sm:px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm sm:text-base"
+                                        placeholder={t('mf_placeholderTe')}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-gray-600 text-sm font-medium mb-1.5">
+                                        {t('mf_marketNameTa')}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="marketNameTa"
+                                        value={formData.marketNameTa}
+                                        onChange={handleChange}
+                                        className="w-full px-3 sm:px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm sm:text-base"
+                                        placeholder={t('mf_placeholderTa')}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-gray-600 text-sm font-medium mb-1.5">
+                                        {t('mf_marketNameKn')}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="marketNameKn"
+                                        value={formData.marketNameKn}
+                                        onChange={handleChange}
+                                        className="w-full px-3 sm:px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm sm:text-base"
+                                        placeholder={t('mf_placeholderKn')}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-gray-600 text-sm font-medium mb-1.5">
+                                        {t('mf_marketNameMl')}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="marketNameMl"
+                                        value={formData.marketNameMl}
+                                        onChange={handleChange}
+                                        className="w-full px-3 sm:px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm sm:text-base"
+                                        placeholder={t('mf_placeholderMl')}
+                                    />
+                                    <p className="text-xs text-gray-500 mt-0.5">
+                                        {t('mf_optionalSouthHint')}
+                                    </p>
                                 </div>
                             </>
                         )}
@@ -215,7 +296,7 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                         {formData.marketType !== 'startline' && (
                             <div>
                                 <label className="block text-gray-600 text-sm font-medium mb-1.5">
-                                    Starting Time
+                                    {t('mf_startingTime')}
                                 </label>
                                 <div className="grid grid-cols-[1fr_auto_1fr_auto_auto] gap-1 sm:gap-2 items-center">
                                     <select
@@ -252,13 +333,16 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
 
                         {formData.marketType === 'startline' && (
                             <p className="text-xs text-orange-700 bg-orange-50 border border-orange-200 rounded-lg px-3 py-1.5">
-                                Startline has no opening time. Only <strong>Closing Time</strong> (bet cutoff) can be updated below.
+                                {t('mf_startlineNoOpen')}
                             </p>
                         )}
 
                         <div>
                             <label className="block text-gray-600 text-sm font-medium mb-1.5">
-                                Closing Time {formData.marketType === 'startline' && <span className="text-orange-500">(bet cutoff)</span>}
+                                {t('mf_closingTime')}{' '}
+                                {formData.marketType === 'startline' && (
+                                    <span className="text-orange-500">{t('mf_betCutoffTag')}</span>
+                                )}
                             </label>
                             <div className="grid grid-cols-[1fr_auto_1fr_auto_auto] gap-1 sm:gap-2 items-center">
                                 <select
@@ -294,7 +378,7 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
 
                         <div>
                             <label className="block text-gray-600 text-sm font-medium mb-1.5">
-                                Bet Closure Time
+                                {t('mf_betClosureTime')}
                             </label>
                             <div className="flex flex-wrap gap-0 rounded-lg overflow-hidden border border-gray-300">
                                 <input
@@ -304,12 +388,12 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                                     onChange={handleChange}
                                     min="0"
                                     step="1"
-                                    placeholder="e.g. 300"
+                                    placeholder={t('mf_placeholderBetClosure')}
                                     inputMode="numeric"
                                     className="flex-1 min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-2 bg-gray-50 text-gray-800 placeholder-gray-400 text-sm sm:text-base border-0 focus:ring-2 focus:ring-orange-500 focus:ring-inset"
                                 />
                                 <span className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-gray-100 text-gray-500 text-xs sm:text-sm font-medium whitespace-nowrap">
-                                    Seconds
+                                    {t('mf_seconds')}
                                 </span>
                             </div>
                         </div>
@@ -320,14 +404,14 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                                 onClick={closeModal}
                                 className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 sm:py-2 px-4 rounded-lg transition-colors"
                             >
-                                Cancel
+                                {t('cancel')}
                             </button>
                             <button
                                 type="submit"
                                 disabled={loading}
                                 className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 sm:py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
                             >
-                                {loading ? 'Saving...' : market ? 'Update' : 'Create'}
+                                {loading ? t('mf_saving') : market ? t('mf_update') : t('btn_create')}
                             </button>
                         </div>
                     </form>

@@ -1,10 +1,12 @@
 import React, { startTransition, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL, marketsListFetchInit } from '../config/api';
 import { getRatesCurrent, getBetHistory } from '../api/bets';
 import ResultDatePicker from '../components/ResultDatePicker';
 import BetHistoryCard from '../components/BetHistoryCard';
 import { useRefreshOnMarketReset } from '../hooks/useRefreshOnMarketReset';
+import { useLanguage } from '../context/LanguageContext';
+import { getMarketDisplayName } from '../utils/marketDisplayName';
 
 const safeParse = (raw, fallback) => {
   try {
@@ -176,6 +178,7 @@ const evaluateBet = ({ market, betNumberRaw, amount, session, ratesMap }) => {
 };
 
 const Bids = () => {
+  const { language } = useLanguage();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -340,7 +343,10 @@ const Bids = () => {
 
   const fetchMarkets = async (background = false) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/markets/get-markets`);
+      const res = await fetch(
+        `${API_BASE_URL}/markets/get-markets?lang=${encodeURIComponent(language)}`,
+        marketsListFetchInit(language)
+      );
       const data = await res.json();
       const apply = () => {
         if (data?.success && Array.isArray(data?.data)) setMarkets(data.data);
@@ -413,7 +419,7 @@ const Bids = () => {
       alive = false;
       clearInterval(id);
     };
-  }, []);
+  }, [language]);
 
   const marketByName = useMemo(() => {
     const map = new Map();
@@ -448,6 +454,7 @@ const Bids = () => {
       const market = (b?.marketId?.marketName || '').toString().trim() || 'MARKET';
       const marketKey = normalizeMarketName(market);
       const fromList = marketByName.get(marketKey);
+      const marketDisplay = fromList ? getMarketDisplayName(fromList, language) : market;
       const fromBet = typeof b?.marketId === 'object' && b.marketId ? b.marketId : null;
       const mergedMarket = {
         openingNumber: fromList?.openingNumber ?? fromBet?.openingNumber,
@@ -480,12 +487,13 @@ const Bids = () => {
         points,
         session,
         market,
+        marketDisplay,
         marketKey,
         verdict,
         statusLabel,
       };
     });
-  }, [apiBets, marketByName, ratesMap]);
+  }, [apiBets, marketByName, ratesMap, language]);
 
   const marketOptions = useMemo(() => {
     const fromApi = (markets || [])
@@ -502,8 +510,13 @@ const Bids = () => {
             : uniqAll.filter((name) => !isStarlineMarketName(name)))
         : uniqAll;
     uniq.sort((a, b) => a.localeCompare(b));
-    return uniq.map((label) => ({ label, key: normalizeMarketName(label) }));
-  }, [markets, desktopRows, isAnyHistoryPanel, historyScope]);
+    return uniq.map((englishLabel) => {
+      const key = normalizeMarketName(englishLabel);
+      const m = marketByName.get(key);
+      const label = m ? getMarketDisplayName(m, language) : englishLabel;
+      return { label, key };
+    });
+  }, [markets, desktopRows, isAnyHistoryPanel, historyScope, marketByName, language]);
 
   const filteredDesktopRows = useMemo(() => {
     const effectiveSelectedMarkets = isAnyHistoryPanel
@@ -763,13 +776,13 @@ const Bids = () => {
                   ) : (
                     <div className="rounded-2xl bg-[#1f2937] border-2 border-[#374151] p-3 sm:p-4">
                       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3">
-                        {filteredDesktopRows.map(({ x, r, idx, betValue, gameType, points, session, market, verdict, statusLabel }, i) => (
+                        {filteredDesktopRows.map(({ x, r, idx, betValue, gameType, points, session, market, marketDisplay, verdict, statusLabel }, i) => (
                           <BetHistoryCard
                             key={`${x.id}-${r?.id ?? idx}`}
                             index={i + 1}
                             betId={r?.id ?? x.id}
                             session={session}
-                            marketTitle={market.toUpperCase()}
+                            marketTitle={marketDisplay}
                             gameLabel={shortGameLabel(gameType)}
                             betValue={betValue}
                             betAmount={points}
@@ -886,7 +899,7 @@ const Bids = () => {
                         onChange={() => toggleDraft(draftMarkets, name.key, setDraftMarkets)}
                       />
                       <span className="text-sm sm:text-base font-semibold tracking-wide text-white">
-                        {name.label.toUpperCase()}
+                        {name.label}
                       </span>
                     </label>
                   ))}

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useMarketBetContextTitle } from '../../../hooks/useMarketBetContextTitle';
 import BidLayout from '../BidLayout';
 import BidReviewModal from './BidReviewModal';
 import { placeBet, updateUserBalance } from '../../../api/bets';
@@ -148,7 +149,7 @@ const TriplePanaBid = ({ market, title }) => {
         .toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })
         .replace(/\//g, '-');
     const dateText = new Date().toLocaleDateString('en-GB');
-    const marketTitle = market?.gameName || market?.marketName || title;
+    const marketTitle = useMarketBetContextTitle(market, title);
     const isRunning = market?.status === 'running'; // "CLOSED IS RUNNING"
 
     useEffect(() => {

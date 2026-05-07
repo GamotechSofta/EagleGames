@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
-import { API_BASE_URL, getBookieAuthHeaders } from '../utils/api';
+import { API_BASE_URL, getBookieAuthHeaders, buildGetMarketsUrl } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -126,7 +126,7 @@ const SkeletonCard = () => (
 );
 
 const Dashboard = () => {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const { updateBookie } = useAuth();
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -171,15 +171,9 @@ const Dashboard = () => {
         }
     };
 
-    useEffect(() => {
-        fetchDashboardStats();
-        refreshBookieProfile();
-        fetchMarkets();
-    }, []);
-
     const fetchMarkets = async () => {
         try {
-            const res = await fetch(`${API_BASE_URL}/markets/get-markets?marketType=main`, {
+            const res = await fetch(buildGetMarketsUrl(language, { marketType: 'main' }), {
                 headers: getBookieAuthHeaders(),
             });
             const data = await res.json();
@@ -188,6 +182,15 @@ const Dashboard = () => {
             setMarkets([]);
         }
     };
+
+    useEffect(() => {
+        fetchDashboardStats();
+        refreshBookieProfile();
+    }, []);
+
+    useEffect(() => {
+        fetchMarkets();
+    }, [language]);
 
     const fetchMarketReport = async (rangeOverride, marketIdOverride) => {
         try {

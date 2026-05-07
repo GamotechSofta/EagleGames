@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useMarketBetContextTitle } from '../../../hooks/useMarketBetContextTitle';
 import BidLayout from '../BidLayout';
 import BidReviewModal from './BidReviewModal';
 import { placeBet, updateUserBalance } from '../../../api/bets';
@@ -200,7 +201,7 @@ const JodiBulkBid = ({ market, title }) => {
         }
     }, []);
 
-    const marketTitle = market?.gameName || market?.marketName || title;
+    const marketTitle = useMarketBetContextTitle(market, title);
     const dateText = new Date().toLocaleDateString('en-GB'); // dd/mm/yyyy
 
     const rows = useMemo(() => {

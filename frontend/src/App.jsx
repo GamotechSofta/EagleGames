@@ -1,13 +1,12 @@
 import React from 'react'
 import AppRoutes from './routes/AppRoutes'
-import GoogleTranslateWidget from './components/GoogleTranslateWidget'
+import { LanguageProvider } from './context/LanguageContext'
 
 const App = () => {
   return (
-    <>
+    <LanguageProvider>
       <AppRoutes />
-      <GoogleTranslateWidget />
-    </>
+    </LanguageProvider>
   )
 }
 

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../components/AdminLayout';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3010/api/v1';
 import { getAuthHeaders, clearAdminSession, fetchWithAuth } from '../lib/auth';
 
 const Wallet = () => {
     const navigate = useNavigate();
+    const { t } = useLanguage();
     const [wallets, setWallets] = useState([]);
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -74,8 +76,8 @@ const Wallet = () => {
     };
 
     return (
-        <AdminLayout onLogout={handleLogout} title="Wallet">
-                    <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Wallet Management</h1>
+        <AdminLayout onLogout={handleLogout} title={t('wallet')}>
+                    <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">{t('wal_title')}</h1>
 
                     {/* Tabs */}
                     <div className="flex gap-2 sm:gap-4 mb-4 sm:mb-6 border-b border-gray-200 overflow-x-auto">
@@ -85,7 +87,7 @@ const Wallet = () => {
                                 activeTab === 'wallets' ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-400'
                             }`}
                         >
-                            Player Wallets
+                            {t('wal_tabWallets')}
                         </button>
                         <button
                             onClick={() => setActiveTab('transactions')}
@@ -93,13 +95,13 @@ const Wallet = () => {
                                 activeTab === 'transactions' ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-400'
                             }`}
                         >
-                            Transactions
+                            {t('wal_tabTransactions')}
                         </button>
                     </div>
 
                     {loading ? (
                         <div className="text-center py-12">
-                            <p className="text-gray-400">Loading...</p>
+                            <p className="text-gray-400">{t('loadingDots')}</p>
                         </div>
                     ) : activeTab === 'wallets' ? (
                         <div className="overflow-x-auto -mx-4 sm:mx-0">
@@ -107,16 +109,16 @@ const Wallet = () => {
                                 <table className="w-full text-sm sm:text-base">
                                 <thead className="bg-gray-100">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Player</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Balance</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Actions</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">{t('player')}</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">{t('balance')}</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">{t('actions')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-700">
                                     {wallets.length === 0 ? (
                                         <tr>
                                             <td colSpan="3" className="px-6 py-4 text-center text-gray-400">
-                                                No wallets found
+                                                {t('wal_noWallets')}
                                             </td>
                                         </tr>
                                     ) : (
@@ -128,21 +130,21 @@ const Wallet = () => {
                                                     <div className="flex gap-2">
                                                         <button
                                                             onClick={() => {
-                                                                const amount = prompt('Enter amount to add:');
+                                                                const amount = prompt(t('wal_promptAdd'));
                                                                 if (amount) handleAdjustBalance(wallet.userId._id || wallet.userId, parseFloat(amount), 'credit');
                                                             }}
                                                             className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-xs"
                                                         >
-                                                            Add
+                                                            {t('wal_add')}
                                                         </button>
                                                         <button
                                                             onClick={() => {
-                                                                const amount = prompt('Enter amount to deduct:');
+                                                                const amount = prompt(t('wal_promptDeduct'));
                                                                 if (amount) handleAdjustBalance(wallet.userId._id || wallet.userId, parseFloat(amount), 'debit');
                                                             }}
                                                             className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-xs"
                                                         >
-                                                            Deduct
+                                                            {t('wal_deduct')}
                                                         </button>
                                                     </div>
                                                 </td>
@@ -159,17 +161,17 @@ const Wallet = () => {
                                 <table className="w-full text-sm sm:text-base">
                                 <thead className="bg-gray-100">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Player</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Type</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Amount</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Date</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">{t('player')}</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">{t('type')}</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">{t('amount')}</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">{t('date')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-700">
                                     {transactions.length === 0 ? (
                                         <tr>
                                             <td colSpan="4" className="px-6 py-4 text-center text-gray-400">
-                                                No transactions found
+                                                {t('wal_noTransactions')}
                                             </td>
                                         </tr>
                                     ) : (

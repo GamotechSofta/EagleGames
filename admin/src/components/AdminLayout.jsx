@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import { FaBars, FaSignOutAlt } from 'react-icons/fa';
+import { useLanguage } from '../context/LanguageContext';
 
 const AdminLayout = ({ children, onLogout, title }) => {
+    const { t } = useLanguage();
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
@@ -13,16 +15,16 @@ const AdminLayout = ({ children, onLogout, title }) => {
                     type="button"
                     onClick={() => setSidebarOpen(true)}
                     className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                    aria-label="Open menu"
+                    aria-label={t('aria_openMenu')}
                 >
                     <FaBars className="w-6 h-6 text-orange-500" />
                 </button>
-                <h1 className="text-lg font-bold text-orange-600 truncate mx-2">{title || 'Admin'}</h1>
+                <h1 className="text-lg font-bold text-orange-600 truncate mx-2">{title || t('adminDefaultTitle')}</h1>
                 <button
                     type="button"
                     onClick={onLogout}
                     className="p-2 rounded-lg hover:bg-red-50 transition-colors"
-                    aria-label="Logout"
+                    aria-label={t('aria_logoutBtn')}
                 >
                     <FaSignOutAlt className="w-5 h-5 text-red-500" />
                 </button>

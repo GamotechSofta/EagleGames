@@ -1,9 +1,11 @@
 import React, { startTransition, useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE_URL, fetchWithAuth, getAuthHeaders } from '../config/api';
+import { API_BASE_URL, fetchWithAuth, getAuthHeaders, marketsListFetchInit } from '../config/api';
 import { getRatesCurrent } from '../api/bets';
 import { useRefreshOnMarketReset } from '../hooks/useRefreshOnMarketReset';
 import BetHistoryCard from '../components/BetHistoryCard';
+import { useLanguage } from '../context/LanguageContext';
+import { getMarketDisplayName } from '../utils/marketDisplayName';
 
 const safeParse = (raw, fallback) => {
   try {
@@ -165,6 +167,7 @@ const evaluateBet = ({ market, betNumberRaw, amount, session, ratesMap }) => {
 };
 
 const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
+  const { language } = useLanguage();
   const navigate = useNavigate();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedSessions, setSelectedSessions] = useState([]); // ['OPEN','CLOSE']
@@ -196,7 +199,10 @@ const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
 
   const fetchMarketsOnce = useCallback(async (background = false) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/markets/get-markets`);
+      const res = await fetch(
+        `${API_BASE_URL}/markets/get-markets?lang=${encodeURIComponent(language)}`,
+        marketsListFetchInit(language)
+      );
       const data = await res.json();
       const apply = () => {
         if (data?.success && Array.isArray(data?.data)) setMarkets(data.data);
@@ -206,7 +212,7 @@ const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
     } catch {
       // ignore
     }
-  }, []);
+  }, [language]);
 
   const fetchMyBetsOnce = useCallback(async (background = false) => {
     try {
@@ -318,8 +324,13 @@ const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
       .filter(Boolean);
     const uniq = Array.from(new Set([...fromApi, ...fromHistory])).filter((name) => inScope(name));
     uniq.sort((a, b) => a.localeCompare(b));
-    return uniq.map((label) => ({ label, key: normalizeMarketName(label) }));
-  }, [markets, bets]);
+    return uniq.map((englishLabel) => {
+      const key = normalizeMarketName(englishLabel);
+      const m = marketByName.get(key);
+      const label = m ? getMarketDisplayName(m, language) : englishLabel;
+      return { label, key };
+    });
+  }, [markets, bets, language, marketByName, scope]);
 
   const enriched = useMemo(() => {
     return flat.map(({ x, r, idx }) => {
@@ -328,6 +339,7 @@ const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
       const marketTitle = (x?.marketTitle || '').toString().trim() || 'MARKET';
       const key = normalizeMarketName(marketTitle);
       const fromList = marketByName.get(key);
+      const marketDisplayTitle = fromList ? getMarketDisplayName(fromList, language) : marketTitle;
       const fromBet = x?.marketFromBet;
       const mergedMarket = {
         openingNumber: fromList?.openingNumber ?? fromBet?.openingNumber,
@@ -348,9 +360,9 @@ const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
           ? { ...computed, state: storedState, payout: storedPayout }
           : computed;
 
-      return { x, r, idx, points, session, marketTitle, computedVerdict: computed, verdict: finalVerdict };
+      return { x, r, idx, points, session, marketTitle, marketDisplayTitle, computedVerdict: computed, verdict: finalVerdict };
     });
-  }, [flat, marketByName, ratesMap]);
+  }, [flat, marketByName, ratesMap, language]);
 
   const filtered = useMemo(() => {
     return (enriched || []).filter((row) => {
@@ -475,7 +487,7 @@ const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
               {userId ? 'No bets found.' : 'Please login to see your bet history.'}
             </div>
           ) : (
-            sortedFiltered.map(({ x, r, idx, points, session, marketTitle, verdict }, i) => {
+            sortedFiltered.map(({ x, r, idx, points, session, marketTitle, marketDisplayTitle, verdict }, i) => {
               const betValue = r?.number != null ? renderBetNumber(r.number) : '-';
               const statusLabel =
                 verdict.state === 'won' ? 'Win' : verdict.state === 'lost' ? 'Lost' : 'Pending';
@@ -487,7 +499,7 @@ const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
                   index={i + 1}
                   betId={betId}
                   session={session}
-                  marketTitle={marketTitle.toUpperCase()}
+                  marketTitle={marketDisplayTitle}
                   gameLabel={shortGameLabel(x?.labelKey)}
                   betValue={betValue}
                   betAmount={points}
@@ -573,7 +585,7 @@ const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
                         onChange={() => toggleDraft(draftMarkets, name.key, setDraftMarkets)}
                       />
                       <span className="text-sm sm:text-base font-semibold tracking-wide text-white">
-                        {name.label.toUpperCase()}
+                        {name.label}
                       </span>
                     </label>
                   ))}
