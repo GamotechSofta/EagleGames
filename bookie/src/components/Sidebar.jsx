@@ -62,7 +62,7 @@ const Sidebar = ({ user, onLogout, isOpen = true, onClose }) => {
 
     return (
         <aside
-            className={`fixed left-0 top-0 h-screen w-64 sm:w-72 bg-white border-r border-gray-200 flex flex-col z-50 overflow-y-auto shadow-lg
+            className={`fixed left-0 top-0 h-screen w-64 sm:w-72 bg-white border-r border-gray-200 flex flex-col z-50 overflow-hidden shadow-lg
                 transform transition-transform duration-200 ease-in-out
                 lg:translate-x-0
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
@@ -89,8 +89,8 @@ const Sidebar = ({ user, onLogout, isOpen = true, onClose }) => {
                 </button>
             </div>
 
-            {/* Menu Items */}
-            <nav className="flex-1 p-3 sm:p-4 space-y-1 overflow-y-auto">
+            {/* Menu Items — only this block scrolls; footer stays pinned (mobile + desktop) */}
+            <nav className="flex-1 min-h-0 p-3 sm:p-4 space-y-1 overflow-y-auto overscroll-contain">
                 {menuItems.map((item) => (
                     <button
                         key={item.path}
@@ -107,8 +107,8 @@ const Sidebar = ({ user, onLogout, isOpen = true, onClose }) => {
                 ))}
             </nav>
 
-            {/* Language Selector & Logout */}
-            <div className="p-3 sm:p-4 border-t border-gray-200 shrink-0">
+            {/* Language + logout: fixed to bottom of sidebar on mobile (flex shrink-0 + nav scroll) */}
+            <div className="shrink-0 border-t border-gray-200 bg-white p-3 sm:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-6px_16px_rgba(0,0,0,0.06)] lg:shadow-none lg:pb-4">
                 <div className="flex items-center gap-2">
                     {/* Language Selector */}
                     <div className="relative flex-1">
