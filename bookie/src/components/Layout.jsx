@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Sidebar from './Sidebar';
-import { FaBars } from 'react-icons/fa';
+import { FaBars, FaSignOutAlt } from 'react-icons/fa';
 import { API_BASE_URL, getBookieAuthHeaders } from '../utils/api';
+import { useLanguage } from '../context/LanguageContext';
 
 const Layout = ({ children, title }) => {
     const navigate = useNavigate();
@@ -11,6 +12,7 @@ const Layout = ({ children, title }) => {
     const { bookie, logout, updateBookie } = useAuth();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const lastProfileFetch = useRef(0);
+    const { t } = useLanguage();
 
     const handleLogout = () => {
         logout();
@@ -113,10 +115,17 @@ const Layout = ({ children, title }) => {
                 >
                     <FaBars className="w-6 h-6 text-[#1B3150]" />
                 </button>
-                <h1 className="text-lg font-bold text-[#1B3150] truncate mx-2">
+                <h1 className="text-lg font-bold text-[#1B3150] truncate mx-2 flex-1 text-center min-w-0">
                     {title || 'Bookie Panel'}
                 </h1>
-                <div className="w-10" />
+                <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="p-2 rounded-lg hover:bg-red-50 transition-colors shrink-0"
+                    aria-label={t('logout')}
+                >
+                    <FaSignOutAlt className="w-5 h-5 text-red-500" />
+                </button>
             </header>
 
             {/* Sidebar */}
