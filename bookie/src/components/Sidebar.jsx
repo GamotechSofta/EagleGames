@@ -62,7 +62,7 @@ const Sidebar = ({ user, onLogout, isOpen = true, onClose }) => {
 
     return (
         <aside
-            className={`fixed left-0 top-0 h-screen w-64 sm:w-72 bg-white border-r border-gray-200 flex flex-col z-50 overflow-hidden shadow-lg
+            className={`fixed left-0 top-0 bottom-0 w-64 sm:w-72 bg-white border-r border-gray-200 flex flex-col z-50 overflow-hidden shadow-lg
                 transform transition-transform duration-200 ease-in-out
                 lg:translate-x-0
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
@@ -108,7 +108,9 @@ const Sidebar = ({ user, onLogout, isOpen = true, onClose }) => {
             </nav>
 
             {/* Language + logout: fixed to bottom of sidebar on mobile (flex shrink-0 + nav scroll) */}
-            <div className="shrink-0 border-t border-gray-200 bg-white p-3 sm:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-6px_16px_rgba(0,0,0,0.06)] lg:shadow-none lg:pb-4">
+            <div
+                className="bookie-sidebar-footer-safe shrink-0 border-t border-gray-200 bg-white px-3 pt-3 sm:px-4 sm:pt-4 shadow-[0_-6px_16px_rgba(0,0,0,0.06)] lg:shadow-none"
+            >
                 <div className="flex items-center gap-2">
                     {/* Language Selector */}
                     <div className="relative flex-1">

@@ -5,6 +5,20 @@ body {
   background: #f8f9fb;
 }
 
+/*
+ * Bookie sidebar footer: clear home indicator (iOS) + gesture bar (Android).
+ * legacy iOS: constant(); modern: env(). Below lg, extra min gutter when env() is 0 on some Android WebViews.
+ */
+.bookie-sidebar-footer-safe {
+  padding-bottom: calc(1rem + constant(safe-area-inset-bottom));
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+}
+@media (max-width: 1023px) {
+  .bookie-sidebar-footer-safe {
+    padding-bottom: calc(1rem + max(env(safe-area-inset-bottom, 0px), 24px));
+  }
+}
+
 /* Hide number input spinners globally across all browsers */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
