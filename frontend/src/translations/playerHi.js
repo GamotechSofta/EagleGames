@@ -1,10 +1,12 @@
 export default {
   nav_myBets: 'मेरी बेट्स',
   nav_bank: 'बैंक',
+  nav_games: 'गेम्स',
   nav_home: 'होम',
   nav_funds: 'फंड्स',
   nav_support: 'सहायता',
   menu_myBets: 'मेरी बेट्स',
+  menu_games: 'गेम्स',
   menu_bank: 'बैंक',
   menu_funds: 'फंड्स',
   menu_downloadApp: 'ऐप डाउनलोड',

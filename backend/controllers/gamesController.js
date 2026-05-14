@@ -3,7 +3,55 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const GAME_LAUNCH_URL = process.env.GAME_LAUNCH_URL;
+/** CraftDigital partner session launch (override with GAME_LAUNCH_URL in .env). */
+const DEFAULT_GAME_LAUNCH_URL = 'https://gamotechdashboardapi.craftdigital.in/api/partner/session/launch';
+
+const resolveGameLaunchUrl = () => {
+    const fromEnv = process.env.GAME_LAUNCH_URL && String(process.env.GAME_LAUNCH_URL).trim();
+    return fromEnv || DEFAULT_GAME_LAUNCH_URL;
+};
+
+/** Replace placeholders in catalog `launchUrl` (in-house static games). */
+const resolveCatalogLaunchUrl = (template, externalPlayerId) => {
+    const id = encodeURIComponent(String(externalPlayerId || '').trim());
+    return String(template || '')
+        .replace(/\{playerId\}/gi, id)
+        .replace(/\{externalPlayerId\}/gi, id)
+        .replace(/\{player\}/gi, id);
+};
+
+/**
+ * Bundled static HTML under `GET /games-static/*` (see `backend/index.js`).
+ * Keys must match Mongo `gameCode` for those rows. If you rename Fun Timer in DB (e.g. `FUN_TIMER`),
+ * either add that key here or set `launchUrl` on the game document — the catalog’s `gameCode` is authoritative.
+ */
+const INHOUSE_STATIC_PATH = {
+    ROULETTE: '/games-static/roulette/index.html?player={playerId}',
+    FUNTIMER: '/games-static/funtimer/index.html?player={playerId}',
+};
+
+const apiOriginFromRequest = (req) => {
+    try {
+        const host = (req.get('x-forwarded-host') || req.get('host') || '').trim();
+        if (!host) return '';
+        const rawProto = (req.get('x-forwarded-proto') || req.protocol || 'https').split(',')[0].trim();
+        const proto = rawProto.replace(/:$/, '');
+        return `${proto}://${host}`;
+    } catch {
+        return '';
+    }
+};
+
+/** When Mongo `launchUrl` is empty, use bundled static only if `gameCode` matches `INHOUSE_STATIC_PATH`. */
+const inhouseCatalogTemplateForCode = (gameCode, req) => {
+    const rel = INHOUSE_STATIC_PATH[gameCode];
+    if (!rel) return '';
+    const fromEnv = (process.env.PUBLIC_GAME_BASE_URL || '').trim().replace(/\/$/, '');
+    const base = fromEnv || apiOriginFromRequest(req);
+    if (base) return `${base}${rel}`;
+    const port = Number(process.env.PORT) || 3010;
+    return `http://127.0.0.1:${port}${rel}`;
+};
 
 const toBoolean = (value) => {
     if (typeof value === 'boolean') return value;
@@ -178,13 +226,22 @@ export const launchGame = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Game not found or inactive' });
         }
 
-        const launchEndpoint = GAME_LAUNCH_URL && String(GAME_LAUNCH_URL).trim();
-        if (!launchEndpoint) {
-            return res.status(500).json({
-                success: false,
-                message: 'GAME_LAUNCH_URL is not configured',
+        let catalogTemplate = game.launchUrl && String(game.launchUrl).trim();
+        if (!catalogTemplate) {
+            catalogTemplate = inhouseCatalogTemplateForCode(gameCode, req);
+        }
+        if (catalogTemplate) {
+            const launchUrl = resolveCatalogLaunchUrl(catalogTemplate, externalPlayerId);
+            return res.status(200).json({
+                success: true,
+                gameCode,
+                launchUrl,
+                embedAllowed: game.embedAllowed !== false,
+                data: { source: 'catalog' },
             });
         }
+
+        const launchEndpoint = resolveGameLaunchUrl();
 
         const partnerToken = process.env.PARTNER_TOKEN;
         const apiKey = process.env.API_KEY;
@@ -196,8 +253,10 @@ export const launchGame = async (req, res) => {
             });
         }
 
+        const partnerGameCode = String(game.partnerCode || '').trim().toUpperCase() || gameCode;
+
         const payload = {
-            gameCode,
+            gameCode: partnerGameCode,
             externalPlayerId,
             currency: String(req.body?.currency || process.env.CURRENCY || 'INR'),
             locale: String(req.body?.locale || 'en'),
@@ -206,26 +265,38 @@ export const launchGame = async (req, res) => {
                 : String(process.env.GAME_RETURN_URL || 'https://singlepana.in'),
         };
 
+        const headers = {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            'x-api-secret': apiSecret,
+        };
+        if (String(process.env.GAME_LAUNCH_BEARER || '').trim() === '1') {
+            headers.Authorization = `Bearer ${String(partnerToken).trim()}`;
+        }
+
         const response = await axios.post(
             launchEndpoint,
             payload,
             {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': apiKey,
-                    'x-api-secret': apiSecret,
-                },
+                headers,
                 timeout: 15000,
             }
         );
 
-        const launchUrl = response?.data?.launchUrl
-            || response?.data?.data?.launchUrl
-            || response?.data?.result?.launchUrl
-            || response?.data?.url
-            || response?.data?.gameUrl
-            || response?.data?.sessionUrl
-            || response?.data?.redirectUrl
+        const d = response?.data;
+        const nested = d && typeof d === 'object' ? d.data : null;
+        const launchUrl =
+            (d && d.launchUrl)
+            || (nested && nested.launchUrl)
+            || (d && d.result && d.result.launchUrl)
+            || (d && d.url)
+            || (d && d.gameUrl)
+            || (d && d.sessionUrl)
+            || (d && d.redirectUrl)
+            || (d && d.link)
+            || (nested && nested.url)
+            || (nested && nested.sessionUrl)
+            || (nested && nested.gameUrl)
             || null;
 
         return res.status(200).json({

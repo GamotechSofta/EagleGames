@@ -18,9 +18,20 @@ router.post('/create-game', verifySuperAdmin, createGame);
 router.patch('/update-game/:id', verifySuperAdmin, updateGame);
 router.delete('/delete-game/:id', verifySuperAdmin, deleteGame);
 
-router.post('/launch/:gameCode', verifyUser, launchGame);
-
+/**
+ * Player catalog (mounted at app `/api/v1/games`).
+ *
+ * Full list:     GET  /api/v1/games
+ * One by code:   GET  /api/v1/games/:gameCode   — use the exact `gameCode` from the list (Mongo), not a hardcoded UI constant.
+ * Launch session: POST /api/v1/games/launch/:gameCode (auth)
+ *
+ * Third-party partner catalogs / Vercel-hosted game UIs are outside this repo; they are whatever `GAME_LAUNCH_URL`
+ * and each game’s stored `launchUrl` point to.
+ *
+ * Route order: register `GET /` before `GET /:gameCode` so the list handler runs for the catalog root.
+ */
 router.get('/', getGames);
 router.get('/:gameCode', getGameByCode);
+router.post('/launch/:gameCode', verifyUser, launchGame);
 
 export default router;

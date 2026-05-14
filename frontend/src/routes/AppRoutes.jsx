@@ -20,6 +20,8 @@ import BetHistory from '../pages/BetHistory';
 import MarketResultHistory from '../pages/MarketResultHistory';
 import TopWinners from '../pages/TopWinners';
 import GameRate from '../pages/GameRate';
+import GameLaunchEmbed from '../pages/GameLaunchEmbed';
+import GamesHub from '../pages/GamesHub';
 
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -122,6 +124,8 @@ const Layout = ({ children }) => {
 
   const isBidPage = location.pathname.includes('game-bid') || location.pathname === '/bidoptions';
   const isGameBidPage = location.pathname.includes('game-bid');
+  const isGamePlayPage = location.pathname.startsWith('/games/play');
+  const isFullBleedGame = isGameBidPage || isGamePlayPage;
   const isSupportPage =
     location.pathname === '/support' ||
     location.pathname === '/support/new' ||
@@ -132,13 +136,13 @@ const Layout = ({ children }) => {
     location.pathname === '/bet-history' || location.pathname === '/market-result-history';
 
   return (
-    <div className={`min-h-screen min-h-ios-screen ${isGameBidPage ? 'pb-0' : 'pb-[calc(4rem+env(safe-area-inset-bottom,0px))]'} md:pb-0 w-full max-w-full overflow-x-hidden text-white ${isBidPage ? 'bg-[#111827]' : 'bg-[#1f2937]'}`}>
-      {!isGameBidPage && <AppHeader />}
+    <div className={`min-h-screen min-h-ios-screen ${isFullBleedGame ? 'pb-0' : 'pb-[calc(4rem+env(safe-area-inset-bottom,0px))]'} md:pb-0 w-full max-w-full overflow-x-hidden text-white ${isBidPage ? 'bg-[#111827]' : 'bg-[#1f2937]'}`}>
+      {!isFullBleedGame && <AppHeader />}
       {/* Reduce mobile top-gap under fixed header */}
       {/* Desktop: ensure no overlap under fixed header */}
       <div
         className={
-          isGameBidPage
+          isFullBleedGame
             ? 'pt-0'
             : isBidPage
             ? 'pt-[calc(44px+env(safe-area-inset-top,0px))] sm:pt-[calc(50px+env(safe-area-inset-top,0px))] md:pt-[calc(56px+env(safe-area-inset-top,0px))]'
@@ -147,7 +151,7 @@ const Layout = ({ children }) => {
       >
         {children}
       </div>
-      {!isGameBidPage && <BottomNavbar />}
+      {!isFullBleedGame && <BottomNavbar />}
     </div>
   );
 };
@@ -176,6 +180,8 @@ const AppRoutes = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/top-winners" element={<TopWinners />} />
           <Route path="/game-rate" element={<GameRate />} />
+          <Route path="/games" element={<GamesHub />} />
+          <Route path="/games/play/:gameCode" element={<GameLaunchEmbed />} />
         </Routes>
       </Layout>
     </Router>

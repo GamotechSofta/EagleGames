@@ -1,10 +1,12 @@
 export default {
   nav_myBets: 'எனது பந்தயங்கள்',
   nav_bank: 'வங்கி',
+  nav_games: 'விளையாட்டுகள்',
   nav_home: 'முகப்பு',
   nav_funds: 'நிதிகள்',
   nav_support: 'ஆதரவு',
   menu_myBets: 'எனது பந்தயங்கள்',
+  menu_games: 'விளையாட்டுகள்',
   menu_bank: 'வங்கி',
   menu_funds: 'நிதிகள்',
   menu_downloadApp: 'பயன்பாட்டை பதிவிறக்கு',

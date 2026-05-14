@@ -1,17 +1,28 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useLanguage } from '../context/LanguageContext';
 import { API_BASE_URL, fetchWithAuth } from '../config/api';
+import { useLanguage } from '../context/LanguageContext';
+import {
+  GAME_LAUNCH_URL_KEY_PREFIX,
+  GAME_LAUNCH_NAME_KEY_PREFIX,
+} from '../constants/gamesLaunchStorage';
 
 const hideScrollbarStyle = {
   msOverflowStyle: 'none',
   scrollbarWidth: 'none',
 };
 
-export const GAME_LAUNCH_URL_KEY_PREFIX = 'eagle_game_launch_url_';
-export const GAME_LAUNCH_NAME_KEY_PREFIX = 'eagle_game_launch_name_';
-/** '1' = iframe OK, '0' = open new tab only */
-export const GAME_LAUNCH_EMBED_KEY_PREFIX = 'eagle_game_embed_';
+/** Re-export for GameLaunchEmbed (same keys as offlineGame2). */
+export { GAME_LAUNCH_URL_KEY_PREFIX, GAME_LAUNCH_NAME_KEY_PREFIX };
+
+const getPlayerId = () => {
+  try {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    return String(user?._id || user?.id || '').trim();
+  } catch {
+    return '';
+  }
+};
 
 const GamesSection = () => {
   const { t } = useLanguage();
@@ -48,41 +59,59 @@ const GamesSection = () => {
 
   const handlePlay = useCallback(
     async (game) => {
-      const gameCode = game?.gameCode;
-      if (!gameCode) return;
-      const canLaunch = !!(game.launchUrl && String(game.launchUrl).trim());
-      if (!canLaunch) return;
+      const rawCode = game?.gameCode;
+      if (!rawCode) return;
+
+      const gameCode = String(rawCode).trim().toUpperCase();
+      const externalPlayerId = getPlayerId();
+      if (!externalPlayerId) {
+        setError(t('games_err_loginPlayer'));
+        return;
+      }
+
       setLaunchingCode(gameCode);
       setError('');
       try {
+        const payload = {
+          gameCode,
+          externalPlayerId,
+          currency: 'INR',
+          locale: 'en',
+          returnUrl: '',
+        };
+
         const res = await fetchWithAuth(
           `${API_BASE_URL}/games/launch/${encodeURIComponent(gameCode)}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({}),
+            body: JSON.stringify(payload),
           }
         );
         const json = await res.json().catch(() => ({}));
-        const embedAllowed = json.embedAllowed !== false;
-        if (!res.ok || !json.success || !json.launchUrl) {
+        const launchUrl =
+          json?.launchUrl ||
+          json?.data?.launchUrl ||
+          json?.data?.data?.launchUrl ||
+          json?.data?.url ||
+          json?.data?.gameUrl ||
+          json?.data?.sessionUrl ||
+          json?.data?.redirectUrl ||
+          '';
+
+        if (!res.ok || !json.success || !launchUrl) {
           setError(json.message || t('games_launchError'));
           return;
         }
-        const launchUrl = json.launchUrl;
-        if (!embedAllowed) {
-          window.open(launchUrl, '_blank', 'noopener,noreferrer');
-          return;
-        }
+
         const codeForRoute = encodeURIComponent(gameCode);
         const gameName = String(game?.name || gameCode);
         try {
           sessionStorage.setItem(`${GAME_LAUNCH_URL_KEY_PREFIX}${gameCode}`, launchUrl);
           sessionStorage.setItem(`${GAME_LAUNCH_NAME_KEY_PREFIX}${gameCode}`, gameName);
-          sessionStorage.setItem(`${GAME_LAUNCH_EMBED_KEY_PREFIX}${gameCode}`, '1');
         } catch (_) {}
         navigate(`/games/play/${codeForRoute}`, {
-          state: { launchUrl, gameName, embedAllowed: true },
+          state: { launchUrl, gameName },
         });
       } catch {
         setError(t('games_launchError'));
@@ -125,19 +154,16 @@ const GamesSection = () => {
           style={hideScrollbarStyle}
         >
           {games.map((game) => {
-            const code = game.gameCode;
+            const code = String(game.gameCode || '').trim().toUpperCase();
             const busy = launchingCode === code;
-            const canLaunch = !!(game.launchUrl && String(game.launchUrl).trim());
             return (
               <button
                 key={game._id || code}
                 type="button"
-                disabled={busy || !canLaunch}
+                disabled={busy}
                 onClick={() => handlePlay(game)}
-                aria-label={`${canLaunch ? t('games_play') : t('games_soon')} ${game.name}`}
-                className={`group relative w-[150px] sm:w-[180px] md:w-[220px] aspect-[4/3] rounded-xl overflow-hidden shrink-0 snap-start ring-1 ring-white/10 text-left transition-transform duration-200 ${
-                  canLaunch ? 'hover:-translate-y-0.5' : 'opacity-75 cursor-not-allowed'
-                } disabled:opacity-60`}
+                aria-label={`${t('games_play')} ${game.name}`}
+                className="group relative w-[150px] sm:w-[180px] md:w-[220px] aspect-[4/3] rounded-xl overflow-hidden shrink-0 snap-start ring-1 ring-white/10 text-left transition-transform duration-200 hover:-translate-y-0.5 disabled:opacity-60"
               >
                 <img
                   src={game.image}
@@ -147,7 +173,7 @@ const GamesSection = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent pointer-events-none" />
                 <span className="absolute top-2 right-2 text-[10px] md:text-xs font-semibold text-white bg-[#1a74e5] px-2 py-0.5 rounded-full shadow-md pointer-events-none">
-                  {busy ? t('loading') : canLaunch ? t('games_play') : t('games_soon')}
+                  {busy ? t('loading') : t('games_play')}
                 </span>
                 <div className="absolute left-3 bottom-2.5 pointer-events-none">
                   <p className="text-[10px] md:text-xs text-white/65 leading-none">

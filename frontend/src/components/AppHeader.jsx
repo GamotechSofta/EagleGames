@@ -15,6 +15,7 @@ const AppHeader = () => {
   const menuItems = useMemo(
     () => [
       { id: 'myBets', labelKey: 'menu_myBets', path: '/bids' },
+      { id: 'games', labelKey: 'menu_games', path: '/games' },
       { id: 'bank', labelKey: 'menu_bank', path: '/funds?tab=bank-detail' },
       { id: 'funds', labelKey: 'menu_funds', path: '/funds' },
       { id: 'download', labelKey: 'menu_downloadApp', path: null, isDownload: true },

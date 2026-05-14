@@ -50,6 +50,28 @@ const BottomNavbar = () => {
         ),
       },
       {
+        id: 'games',
+        labelKey: 'nav_games',
+        path: '/games',
+        icon: (
+          <svg
+            className="w-6 h-6 text-gray-200"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            viewBox="0 0 24 24"
+            aria-hidden
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5.25 7.5h13.5A2.25 2.25 0 0121 9.75v4.5A2.25 2.25 0 0118.75 16.5H5.25A2.25 2.25 0 013 14.25v-4.5A2.25 2.25 0 015.25 7.5z"
+            />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 10.5v3M6.75 12h3M15.75 11.25h.008v.008h-.008v-.008zM17.25 12.75h.008v.008h-.008v-.008z" />
+          </svg>
+        ),
+      },
+      {
         id: 'home',
         labelKey: 'nav_home',
         path: '/',
