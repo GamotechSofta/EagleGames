@@ -7,8 +7,8 @@ const Home = () => {
   return (
     <div className="min-h-screen min-h-ios-screen bg-transparent w-full max-w-full overflow-x-hidden">
       <HeroSection />
-      <Section1 />
       <GamesSection />
+      <Section1 />
     </div>
   );
 };

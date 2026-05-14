@@ -1,5 +1,6 @@
 /**
- * One-shot: upsert ROULETTE + FUNTIMER with in-house static launch URLs.
+ * One-shot: upsert ROULETTE + FUNTIMER catalog rows (tiles / metadata only).
+ * Game launch uses the partner session API (`gamesController.launchGame`).
  * Run from repo root: node backend/scripts/seedRouletteFuntimer.js
  * Or from backend:   node scripts/seedRouletteFuntimer.js
  */
@@ -13,8 +14,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 const MONGODB_URI = process.env.MONGODB_URI || process.env.MONGO_URI;
-const PORT = Number(process.env.PORT) || 3010;
-const BASE = (process.env.PUBLIC_GAME_BASE_URL || `http://localhost:${PORT}`).replace(/\/$/, '');
 
 const ROULETTE_IMG =
     'https://res.cloudinary.com/dzd47mpdo/image/upload/v1776326983/FUN_TIMER_5_xn87ir.png';
@@ -36,7 +35,6 @@ async function main() {
             image: ROULETTE_IMG,
             category: 'casino',
             provider: 'in-house',
-            launchUrl: `${BASE}/games-static/roulette/index.html?player={playerId}`,
             isActive: true,
             order: 10,
         },
@@ -46,7 +44,6 @@ async function main() {
             image: FUNTIMER_IMG,
             category: 'arcade',
             provider: 'in-house',
-            launchUrl: `${BASE}/games-static/funtimer/index.html?player={playerId}`,
             isActive: true,
             order: 11,
         },
@@ -67,7 +64,6 @@ async function main() {
     }
 
     console.log(`Done. Upserts — inserted: ${inserted}, updated: ${updated}`);
-    console.log(`Launch base used: ${BASE}`);
     await mongoose.disconnect();
 }
 

@@ -52,6 +52,10 @@ export default {
   games_tapPlay: 'Tap & play',
   games_back: 'Back',
   games_backHub: 'Back to games',
+  games_openNewTab: 'Open in new tab',
+  games_playInBrowser: 'Play in browser',
+  games_iframeBlockedHint:
+    'This game cannot load inside the app frame. Use the button below to open it in a new tab.',
   ok: 'OK',
   loading: 'Loading...',
 

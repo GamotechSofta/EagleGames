@@ -1,16 +1,18 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import {
-  GAME_LAUNCH_URL_KEY_PREFIX,
-  GAME_LAUNCH_NAME_KEY_PREFIX,
-} from '../constants/gamesLaunchStorage';
 import { API_BASE_URL, fetchWithAuth } from '../config/api';
 import { useLanguage } from '../context/LanguageContext';
+import { partnerRequiresTopLevelNavigation } from '../utils/partnerGameEmbed';
 
-const storageKeyForCode = (code) =>
-  `${GAME_LAUNCH_URL_KEY_PREFIX}${String(code || '').trim().toUpperCase()}`;
-const nameKeyForCode = (code) =>
-  `${GAME_LAUNCH_NAME_KEY_PREFIX}${String(code || '').trim().toUpperCase()}`;
+/** Session keys for handoff from `POST /api/v1/games/launch/:gameCode` to `/games/play/:gameCode`. */
+function gameLaunchSessionKeys(gameCode) {
+  const c = String(gameCode || '').trim().toUpperCase();
+  return {
+    url: `eagleGames:v1:gameLaunch:url:${c}`,
+    name: `eagleGames:v1:gameLaunch:name:${c}`,
+    embed: `eagleGames:v1:gameLaunch:embed:${c}`,
+  };
+}
 
 const isHttpUrl = (value) => typeof value === 'string' && /^https?:\/\//i.test(value.trim());
 
@@ -39,11 +41,16 @@ const GameLaunchEmbed = () => {
   const [launchUrl, setLaunchUrl] = useState('');
   const [gameName, setGameName] = useState('Game');
   const [phase, setPhase] = useState('loading'); // loading | ready | error
+  /** When false, partner URL must open at top level (not iframe); we redirect with location.assign. */
+  const [useIframe, setUseIframe] = useState(true);
+  const topLevelRedirectRef = useRef(false);
 
   const clearStoredLaunch = () => {
     try {
-      sessionStorage.removeItem(storageKeyForCode(gameCode));
-      sessionStorage.removeItem(nameKeyForCode(gameCode));
+      const k = gameLaunchSessionKeys(gameCode);
+      sessionStorage.removeItem(k.url);
+      sessionStorage.removeItem(k.name);
+      sessionStorage.removeItem(k.embed);
     } catch (_) {}
   };
 
@@ -52,37 +59,70 @@ const GameLaunchEmbed = () => {
     navigate('/games', { replace: true });
   };
 
+  const openGameInNewTab = () => {
+    if (!launchUrl) return;
+    window.open(launchUrl.trim(), '_blank', 'noopener,noreferrer');
+  };
+
+  const applyLaunchPayload = (url, name, embedAllowedFromApi, cancelled) => {
+    if (cancelled || !isHttpUrl(url)) return;
+    const trimmed = url.trim();
+    setLaunchUrl(trimmed);
+    if (typeof name === 'string' && name.trim()) setGameName(name.trim());
+
+    let partnerAllowsEmbed = true;
+    if (typeof embedAllowedFromApi === 'boolean') {
+      partnerAllowsEmbed = embedAllowedFromApi;
+    } else {
+      try {
+        const st = sessionStorage.getItem(gameLaunchSessionKeys(gameCode).embed);
+        if (st === '0') partnerAllowsEmbed = false;
+      } catch (_) {}
+    }
+
+    const needsTopLevel = partnerRequiresTopLevelNavigation(trimmed, gameCode, partnerAllowsEmbed);
+    const iframe = !needsTopLevel;
+    setUseIframe(iframe);
+
+    try {
+      const k = gameLaunchSessionKeys(gameCode);
+      sessionStorage.setItem(k.url, trimmed);
+      if (typeof name === 'string' && name.trim()) {
+        sessionStorage.setItem(k.name, name.trim());
+      }
+      sessionStorage.setItem(k.embed, iframe ? '1' : '0');
+    } catch (_) {}
+  };
+
   useEffect(() => {
     let cancelled = false;
 
     const resolveOnce = async () => {
       let resolvedUrl = '';
       let resolvedName = '';
+      let resolvedEmbedAllowed;
 
       const stateUrl = location.state?.launchUrl;
       const stateName = location.state?.gameName;
+      const stateEmb = location.state?.embedAllowed;
       if (isHttpUrl(stateUrl)) resolvedUrl = stateUrl.trim();
       if (typeof stateName === 'string' && stateName.trim()) resolvedName = stateName.trim();
+      if (typeof stateEmb === 'boolean') resolvedEmbedAllowed = stateEmb;
 
       try {
         if (!resolvedUrl) {
-          const stored = sessionStorage.getItem(storageKeyForCode(gameCode));
+          const stored = sessionStorage.getItem(gameLaunchSessionKeys(gameCode).url);
           if (isHttpUrl(stored)) resolvedUrl = stored.trim();
         }
         if (!resolvedName) {
-          const storedName = sessionStorage.getItem(nameKeyForCode(gameCode));
+          const storedName = sessionStorage.getItem(gameLaunchSessionKeys(gameCode).name);
           if (typeof storedName === 'string' && storedName.trim()) resolvedName = storedName.trim();
         }
       } catch (_) {}
 
       if (resolvedUrl && gameCode) {
         if (cancelled) return;
-        setLaunchUrl(resolvedUrl);
-        if (resolvedName) setGameName(resolvedName);
-        try {
-          sessionStorage.setItem(storageKeyForCode(gameCode), resolvedUrl);
-          if (resolvedName) sessionStorage.setItem(nameKeyForCode(gameCode), resolvedName);
-        } catch (_) {}
+        applyLaunchPayload(resolvedUrl, resolvedName, resolvedEmbedAllowed, cancelled);
         if (location.state) {
           try {
             window.history.replaceState({}, '', `/games/play/${encodeURIComponent(gameCode)}`);
@@ -131,13 +171,8 @@ const GameLaunchEmbed = () => {
           data?.data?.redirectUrl ||
           '';
         if (res.ok && isHttpUrl(url) && data?.success !== false) {
-          setLaunchUrl(url.trim());
-          const n = typeof data?.gameName === 'string' ? data.gameName : resolvedName || gameCode;
-          setGameName(n);
-          try {
-            sessionStorage.setItem(storageKeyForCode(gameCode), url.trim());
-            sessionStorage.setItem(nameKeyForCode(gameCode), String(n));
-          } catch (_) {}
+          const emb = data?.embedAllowed !== false;
+          applyLaunchPayload(url, data?.gameName || resolvedName || gameCode, emb, cancelled);
           try {
             window.history.replaceState({}, '', `/games/play/${encodeURIComponent(gameCode)}`);
           } catch (_) {}
@@ -156,13 +191,20 @@ const GameLaunchEmbed = () => {
     };
   }, [gameCode, location.state, navigate]);
 
+  /** Roulette and some partners block iframes; same launch URL works as a full-page navigation. */
+  useEffect(() => {
+    if (phase !== 'ready' || !launchUrl || useIframe) return;
+    if (topLevelRedirectRef.current) return;
+    topLevelRedirectRef.current = true;
+    window.location.assign(launchUrl.trim());
+  }, [phase, launchUrl, useIframe]);
+
   const iframeProps = useMemo(
     () => ({
       title: gameName || 'Game',
       src: launchUrl,
       className: 'min-h-0 w-full flex-1 border-0 bg-black',
       allow: 'fullscreen; autoplay; camera; microphone; payment; clipboard-write',
-      referrerPolicy: 'no-referrer',
     }),
     [launchUrl, gameName]
   );
@@ -190,6 +232,15 @@ const GameLaunchEmbed = () => {
     );
   }
 
+  if (!useIframe && launchUrl) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3 bg-slate-950 px-4 text-center text-sm text-white/80">
+        <p>{t('games_loading')}</p>
+        <p className="max-w-md text-xs text-[#AAB3C5]">{t('games_iframeBlockedHint')}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-[100] flex flex-col bg-black">
       <div className="flex h-12 shrink-0 items-center gap-2 border-b border-white/10 bg-[#111827] px-2">
@@ -201,6 +252,13 @@ const GameLaunchEmbed = () => {
           ← {t('games_back')}
         </button>
         <div className="ml-2 truncate text-sm font-semibold text-white">{gameName}</div>
+        <button
+          type="button"
+          onClick={openGameInNewTab}
+          className="ml-auto shrink-0 rounded-lg border border-[#1a74e5]/60 bg-[#1a74e5]/20 px-3 py-1.5 text-xs font-semibold text-[#cbe0ff] hover:bg-[#1a74e5]/30"
+        >
+          {t('games_openNewTab')}
+        </button>
       </div>
       <iframe {...iframeProps} />
     </div>

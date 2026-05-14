@@ -106,9 +106,6 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Serve downloadable files (APK, etc.) – works in production with path.join
 app.use('/downloads', express.static(path.join(__dirname, 'public')));
 
-/** In-house HTML games (see seedRouletteFuntimer.js launchUrl paths). */
-app.use('/games-static', express.static(path.join(__dirname, 'public', 'games')));
-
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });

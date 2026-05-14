@@ -2,18 +2,21 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL, fetchWithAuth } from '../config/api';
 import { useLanguage } from '../context/LanguageContext';
-import {
-  GAME_LAUNCH_URL_KEY_PREFIX,
-  GAME_LAUNCH_NAME_KEY_PREFIX,
-} from '../constants/gamesLaunchStorage';
+import { partnerRequiresTopLevelNavigation } from '../utils/partnerGameEmbed';
+
+function gameLaunchSessionKeys(gameCode) {
+  const c = String(gameCode || '').trim().toUpperCase();
+  return {
+    url: `eagleGames:v1:gameLaunch:url:${c}`,
+    name: `eagleGames:v1:gameLaunch:name:${c}`,
+    embed: `eagleGames:v1:gameLaunch:embed:${c}`,
+  };
+}
 
 const hideScrollbarStyle = {
   msOverflowStyle: 'none',
   scrollbarWidth: 'none',
 };
-
-/** Re-export for GameLaunchEmbed (same keys as offlineGame2). */
-export { GAME_LAUNCH_URL_KEY_PREFIX, GAME_LAUNCH_NAME_KEY_PREFIX };
 
 const getPlayerId = () => {
   try {
@@ -106,12 +109,19 @@ const GamesSection = () => {
 
         const codeForRoute = encodeURIComponent(gameCode);
         const gameName = String(game?.name || gameCode);
+        const embedAllowed = json?.embedAllowed !== false;
+        if (partnerRequiresTopLevelNavigation(launchUrl, gameCode, embedAllowed)) {
+          window.location.assign(String(launchUrl).trim());
+          return;
+        }
         try {
-          sessionStorage.setItem(`${GAME_LAUNCH_URL_KEY_PREFIX}${gameCode}`, launchUrl);
-          sessionStorage.setItem(`${GAME_LAUNCH_NAME_KEY_PREFIX}${gameCode}`, gameName);
+          const k = gameLaunchSessionKeys(gameCode);
+          sessionStorage.setItem(k.url, launchUrl);
+          sessionStorage.setItem(k.name, gameName);
+          sessionStorage.setItem(k.embed, embedAllowed ? '1' : '0');
         } catch (_) {}
         navigate(`/games/play/${codeForRoute}`, {
-          state: { launchUrl, gameName },
+          state: { launchUrl, gameName, embedAllowed },
         });
       } catch {
         setError(t('games_launchError'));

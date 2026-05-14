@@ -23,10 +23,8 @@ router.delete('/delete-game/:id', verifySuperAdmin, deleteGame);
  *
  * Full list:     GET  /api/v1/games
  * One by code:   GET  /api/v1/games/:gameCode   — use the exact `gameCode` from the list (Mongo), not a hardcoded UI constant.
- * Launch session: POST /api/v1/games/launch/:gameCode (auth)
- *
- * Third-party partner catalogs / Vercel-hosted game UIs are outside this repo; they are whatever `GAME_LAUNCH_URL`
- * and each game’s stored `launchUrl` point to.
+ * Launch: POST /api/v1/games/launch/:gameCode (auth) → CraftDigital session API
+ * (`GAME_LAUNCH_URL`, `GAME_LAUNCH_API_KEY` / `GAME_LAUNCH_API_SECRET`).
  *
  * Route order: register `GET /` before `GET /:gameCode` so the list handler runs for the catalog root.
  */

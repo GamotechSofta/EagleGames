@@ -1,5 +1,26 @@
 import Game from '../models/games/games.js';
-import { AVIATOR_LAUNCH_DEFAULT, resolveEffectiveLaunchTemplate } from './gameLaunchUrl.js';
+
+/** Fields removed from `games` schema; strip from existing documents (idempotent). */
+export async function unsetLegacyGameSchemaFields() {
+    try {
+        const res = await Game.collection.updateMany(
+            {
+                $or: [
+                    { launchUrl: { $exists: true } },
+                    { partnerCode: { $exists: true } },
+                    { embedAllowed: { $exists: true } },
+                    { launchMode: { $exists: true } },
+                ],
+            },
+            { $unset: { launchUrl: '', partnerCode: '', embedAllowed: '', launchMode: '' } }
+        );
+        if (res.modifiedCount > 0) {
+            console.log(`[games] Removed legacy fields from ${res.modifiedCount} document(s).`);
+        }
+    } catch (err) {
+        console.error('[games] Legacy field $unset failed:', err.message);
+    }
+}
 
 /** Fun Timer tile (square promo art). */
 const FUNTIMER_TILE_IMAGE =
@@ -11,7 +32,7 @@ const LEGACY_FUNTIMER_TILE_IMAGE =
 const ROULETTE_TILE_IMAGE =
     'https://res.cloudinary.com/dzd47mpdo/image/upload/v1776326983/FUN_TIMER_5_xn87ir.png';
 const LEGACY_ROULETTE_TILE_IMAGE =
-    'https://res.cloudinary.com/dwwt5xdsz/image/upload/v1775804007/roulletGame_a719um.jpg';
+    'https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775804007/roulletGame_a719um.jpg';
 
 const DEFAULT_GAMES = [
     {
@@ -20,7 +41,6 @@ const DEFAULT_GAMES = [
         image: 'https://res.cloudinary.com/dwwt5xdsz/image/upload/v1775804006/aviatorGame_qfug5k.jpg',
         category: 'instant',
         provider: 'partner',
-        launchUrl: AVIATOR_LAUNCH_DEFAULT,
         isActive: true,
         order: 1,
     },
@@ -30,7 +50,6 @@ const DEFAULT_GAMES = [
         image: FUNTIMER_TILE_IMAGE,
         category: 'instant',
         provider: 'partner',
-        launchUrl: '',
         isActive: true,
         order: 2,
     },
@@ -40,18 +59,10 @@ const DEFAULT_GAMES = [
         image: ROULETTE_TILE_IMAGE,
         category: 'instant',
         provider: 'partner',
-        launchUrl: '',
         isActive: true,
         order: 3,
     },
 ];
-
-function buildDocsWithEnv() {
-    return DEFAULT_GAMES.map((g) => ({
-        ...g,
-        launchUrl: resolveEffectiveLaunchTemplate(g.gameCode, g.launchUrl),
-    }));
-}
 
 /** Migrate legacy Fun Timer thumbnail (dice placeholder) to branded tile. */
 async function migrateFunTimerTileImageIfLegacy() {
@@ -75,39 +86,19 @@ async function migrateRouletteTileImageIfLegacy() {
     }
 }
 
-async function syncLaunchUrlsFromEnv() {
-    const aviatorUrl = process.env.AVIATOR_LAUNCH_URL?.trim();
-    if (aviatorUrl) {
-        await Game.updateOne({ gameCode: 'AVIATOR' }, { $set: { launchUrl: aviatorUrl } });
-    }
-    const rouletteUrl =
-        process.env.ROULETTE_LAUNCH_URL?.trim() || process.env.GAMEZOP_ROULETTE_LAUNCH_URL?.trim();
-    if (rouletteUrl) {
-        await Game.updateOne({ gameCode: 'ROULETTE' }, { $set: { launchUrl: rouletteUrl } });
-    }
-    const funtimerUrl = process.env.FUNTIMER_LAUNCH_URL?.trim();
-    if (funtimerUrl) {
-        await Game.updateOne({ gameCode: 'FUNTIMER' }, { $set: { launchUrl: funtimerUrl } });
-    }
-}
-
 /**
  * Ensures each default row exists (by gameCode). Inserts only missing games.
- * Set DISABLE_GAME_SEED=true to skip ensure + sync.
+ * Set DISABLE_GAME_SEED=true to skip ensure.
  *
- * Env (Roulette same pattern as Aviator — app merges these even if Mongo launchUrl is empty):
- *   AVIATOR_LAUNCH_URL=...
- *   ROULETTE_LAUNCH_URL=https://www.gamezop.com/g/<ID>?uid={playerId}
- *   FUNTIMER_LAUNCH_URL=https://www.gamezop.com/g/<ID>?uid={playerId}
+ * All launches use the CraftDigital session API (`gamesController.launchGame`).
  */
 export async function ensureDefaultGames() {
     if (process.env.DISABLE_GAME_SEED === 'true') {
         return;
     }
     try {
-        const docs = buildDocsWithEnv();
         let added = 0;
-        for (const doc of docs) {
+        for (const doc of DEFAULT_GAMES) {
             const exists = await Game.exists({ gameCode: doc.gameCode });
             if (!exists) {
                 await Game.create(doc);
@@ -117,7 +108,6 @@ export async function ensureDefaultGames() {
         if (added > 0) {
             console.log(`[games] Inserted ${added} missing default game(s) (by gameCode).`);
         }
-        await syncLaunchUrlsFromEnv();
         await migrateRouletteTileImageIfLegacy();
         await migrateFunTimerTileImageIfLegacy();
 

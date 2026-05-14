@@ -1,9 +1,10 @@
 import Game from '../models/games/games.js';
 import axios from 'axios';
 import dotenv from 'dotenv';
+
 dotenv.config();
 
-/** CraftDigital partner session launch (override with GAME_LAUNCH_URL in .env). */
+/** CraftDigital partner session launch; override with `GAME_LAUNCH_URL` in `.env`. */
 const DEFAULT_GAME_LAUNCH_URL = 'https://gamotechdashboardapi.craftdigital.in/api/partner/session/launch';
 
 const resolveGameLaunchUrl = () => {
@@ -11,46 +12,75 @@ const resolveGameLaunchUrl = () => {
     return fromEnv || DEFAULT_GAME_LAUNCH_URL;
 };
 
-/** Replace placeholders in catalog `launchUrl` (in-house static games). */
-const resolveCatalogLaunchUrl = (template, externalPlayerId) => {
-    const id = encodeURIComponent(String(externalPlayerId || '').trim());
-    return String(template || '')
-        .replace(/\{playerId\}/gi, id)
-        .replace(/\{externalPlayerId\}/gi, id)
-        .replace(/\{player\}/gi, id);
+/** Prefer `GAME_LAUNCH_API_*` so `API_KEY` is not confused with Cloudinary etc. */
+const getLaunchApiCredentials = () => {
+    const apiKey = String(
+        process.env.GAME_LAUNCH_API_KEY || process.env.GAME_API_KEY || process.env.API_KEY || ''
+    ).trim();
+    const apiSecret = String(
+        process.env.GAME_LAUNCH_API_SECRET || process.env.GAME_API_SECRET || process.env.API_SECRET || ''
+    ).trim();
+    return { apiKey, apiSecret };
+};
+
+const extractLaunchUrl = (d) => {
+    if (!d || typeof d !== 'object') return null;
+    const nested = d.data;
+    const deep = nested && typeof nested === 'object' ? nested.data : null;
+    return (
+        d.launchUrl
+        || (nested && nested.launchUrl)
+        || (deep && deep.launchUrl)
+        || (d.result && d.result.launchUrl)
+        || d.url
+        || d.gameUrl
+        || d.sessionUrl
+        || d.redirectUrl
+        || d.link
+        || (nested && nested.url)
+        || (nested && nested.sessionUrl)
+        || (nested && nested.gameUrl)
+        || (deep && deep.url)
+        || null
+    );
+};
+
+/** Partner may forbid embedding (X-Frame-Options / CSP); respect explicit flags when present. */
+const deriveEmbedAllowed = (partnerBody) => {
+    if (!partnerBody || typeof partnerBody !== 'object') return true;
+    const d = partnerBody.data;
+    const candidates = [
+        partnerBody.embedAllowed,
+        partnerBody.iframeAllowed,
+        partnerBody.allowIframe,
+        d && d.embedAllowed,
+        d && d.iframeAllowed,
+        partnerBody.game && partnerBody.game.embedAllowed,
+    ];
+    for (const v of candidates) {
+        if (v === false || v === 'false' || v === 0 || v === '0') return false;
+        if (v === true || v === 'true' || v === 1 || v === '1') return true;
+    }
+    return true;
 };
 
 /**
- * Bundled static HTML under `GET /games-static/*` (see `backend/index.js`).
- * Keys must match Mongo `gameCode` for those rows. If you rename Fun Timer in DB (e.g. `FUN_TIMER`),
- * either add that key here or set `launchUrl` on the game document — the catalog’s `gameCode` is authoritative.
+ * Maps your catalog `gameCode` → code CraftDigital expects in the session launch body.
+ * Set in `.env` as JSON, e.g. GAME_PARTNER_CODE_MAP={"FUNTIMER":"FUN_TIMER","ROULETTE":"EURO_ROULETTE"}
+ * (use exact strings from the Gamotech / CraftDigital dashboard for your tenant.)
  */
-const INHOUSE_STATIC_PATH = {
-    ROULETTE: '/games-static/roulette/index.html?player={playerId}',
-    FUNTIMER: '/games-static/funtimer/index.html?player={playerId}',
-};
-
-const apiOriginFromRequest = (req) => {
+const getPartnerGameCodeFromEnvMap = (catalogCode) => {
+    const raw = process.env.GAME_PARTNER_CODE_MAP;
+    if (!raw || !String(raw).trim()) return '';
     try {
-        const host = (req.get('x-forwarded-host') || req.get('host') || '').trim();
-        if (!host) return '';
-        const rawProto = (req.get('x-forwarded-proto') || req.protocol || 'https').split(',')[0].trim();
-        const proto = rawProto.replace(/:$/, '');
-        return `${proto}://${host}`;
+        const obj = JSON.parse(String(raw).trim());
+        if (!obj || typeof obj !== 'object') return '';
+        const k = String(catalogCode || '').trim().toUpperCase();
+        const v = obj[k];
+        return v != null && String(v).trim() ? String(v).trim() : '';
     } catch {
         return '';
     }
-};
-
-/** When Mongo `launchUrl` is empty, use bundled static only if `gameCode` matches `INHOUSE_STATIC_PATH`. */
-const inhouseCatalogTemplateForCode = (gameCode, req) => {
-    const rel = INHOUSE_STATIC_PATH[gameCode];
-    if (!rel) return '';
-    const fromEnv = (process.env.PUBLIC_GAME_BASE_URL || '').trim().replace(/\/$/, '');
-    const base = fromEnv || apiOriginFromRequest(req);
-    if (base) return `${base}${rel}`;
-    const port = Number(process.env.PORT) || 3010;
-    return `http://127.0.0.1:${port}${rel}`;
 };
 
 const toBoolean = (value) => {
@@ -71,6 +101,10 @@ const pickGamePayload = (body = {}) => {
     if (body.image !== undefined) payload.image = String(body.image).trim();
     if (body.category !== undefined) payload.category = String(body.category).trim();
     if (body.provider !== undefined) payload.provider = String(body.provider).trim();
+    if (body.partnerGameCode !== undefined) {
+        const v = String(body.partnerGameCode).trim().toUpperCase();
+        payload.partnerGameCode = v;
+    }
     if (body.isActive !== undefined) payload.isActive = toBoolean(body.isActive);
     if (body.order !== undefined) payload.order = Number(body.order);
 
@@ -98,7 +132,6 @@ export const getGames = async (req, res) => {
     try {
         const query = {};
         if ((req.query.includeInactive || '').toString() !== 'true') {
-            // Include docs created via manual DB insert where isActive may be missing.
             query.isActive = { $ne: false };
         }
 
@@ -211,8 +244,25 @@ export const deleteGame = async (req, res) => {
 
 export const launchGame = async (req, res) => {
     try {
-        const gameCode = String(req.params.gameCode || req.body?.gameCode || '').trim().toUpperCase();
-        const externalPlayerId = String(req.body?.externalPlayerId || req.body?.playerId || req.userId || '').trim();
+        /**
+         * Single launch path for every catalog game: POST CraftDigital session launch
+         * (`GAME_LAUNCH_URL` / default). Only `gameCode` in the partner body changes
+         * (via `partnerGameCode` / `GAME_PARTNER_CODE_MAP`). Response mirrors partner:
+         * `data` is the raw partner JSON; `launchUrl` is duplicated at top level for the iframe.
+         */
+        const fromParams = String(req.params.gameCode || '').trim().toUpperCase();
+        const fromBody =
+            req.body?.gameCode != null ? String(req.body.gameCode).trim().toUpperCase() : '';
+        if (fromBody && fromParams && fromBody !== fromParams) {
+            return res.status(400).json({
+                success: false,
+                message: 'gameCode in the request body must match the gameCode in the URL',
+            });
+        }
+        const gameCode = fromParams || fromBody;
+        const externalPlayerId = String(
+            req.userId || req.body?.externalPlayerId || req.body?.playerId || ''
+        ).trim();
 
         if (!gameCode) {
             return res.status(400).json({ success: false, message: 'gameCode is required' });
@@ -226,85 +276,83 @@ export const launchGame = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Game not found or inactive' });
         }
 
-        let catalogTemplate = game.launchUrl && String(game.launchUrl).trim();
-        if (!catalogTemplate) {
-            catalogTemplate = inhouseCatalogTemplateForCode(gameCode, req);
-        }
-        if (catalogTemplate) {
-            const launchUrl = resolveCatalogLaunchUrl(catalogTemplate, externalPlayerId);
-            return res.status(200).json({
-                success: true,
-                gameCode,
-                launchUrl,
-                embedAllowed: game.embedAllowed !== false,
-                data: { source: 'catalog' },
-            });
-        }
-
-        const launchEndpoint = resolveGameLaunchUrl();
-
-        const partnerToken = process.env.PARTNER_TOKEN;
-        const apiKey = process.env.API_KEY;
-        const apiSecret = process.env.API_SECRET;
-        if (!partnerToken || !apiKey || !apiSecret) {
+        const { apiKey, apiSecret } = getLaunchApiCredentials();
+        if (!apiKey || !apiSecret) {
             return res.status(500).json({
                 success: false,
                 message: 'Game launch credentials are not configured',
             });
         }
 
-        const partnerGameCode = String(game.partnerCode || '').trim().toUpperCase() || gameCode;
+        /** Code sent in partner payload: env map → Mongo `partnerGameCode` → catalog `gameCode`. */
+        const partnerGameCode =
+            getPartnerGameCodeFromEnvMap(gameCode)
+            || String(game.partnerGameCode || '').trim().toUpperCase()
+            || gameCode;
+        const currency = String(req.body?.currency ?? process.env.CURRENCY ?? 'INR');
+        const locale = String(req.body?.locale ?? 'en');
+        const returnUrl =
+            req.body && Object.prototype.hasOwnProperty.call(req.body, 'returnUrl')
+                ? String(req.body.returnUrl)
+                : (process.env.GAME_RETURN_URL !== undefined
+                    ? String(process.env.GAME_RETURN_URL)
+                    : '');
 
         const payload = {
             gameCode: partnerGameCode,
             externalPlayerId,
-            currency: String(req.body?.currency || process.env.CURRENCY || 'INR'),
-            locale: String(req.body?.locale || 'en'),
-            returnUrl: req.body?.returnUrl != null
-                ? String(req.body.returnUrl)
-                : String(process.env.GAME_RETURN_URL || 'https://singlepana.in'),
+            currency,
+            locale,
+            returnUrl,
         };
 
+        const launchUrlResolved = resolveGameLaunchUrl();
         const headers = {
             'Content-Type': 'application/json',
             'x-api-key': apiKey,
             'x-api-secret': apiSecret,
         };
         if (String(process.env.GAME_LAUNCH_BEARER || '').trim() === '1') {
-            headers.Authorization = `Bearer ${String(partnerToken).trim()}`;
+            const partnerToken = String(process.env.PARTNER_TOKEN || '').trim();
+            if (partnerToken) headers.Authorization = `Bearer ${partnerToken}`;
         }
 
-        const response = await axios.post(
-            launchEndpoint,
-            payload,
-            {
-                headers,
-                timeout: 15000,
-            }
-        );
+        const response = await axios.post(launchUrlResolved, payload, {
+            headers,
+            timeout: 15000,
+        });
 
-        const d = response?.data;
-        const nested = d && typeof d === 'object' ? d.data : null;
-        const launchUrl =
-            (d && d.launchUrl)
-            || (nested && nested.launchUrl)
-            || (d && d.result && d.result.launchUrl)
-            || (d && d.url)
-            || (d && d.gameUrl)
-            || (d && d.sessionUrl)
-            || (d && d.redirectUrl)
-            || (d && d.link)
-            || (nested && nested.url)
-            || (nested && nested.sessionUrl)
-            || (nested && nested.gameUrl)
-            || null;
+        const partnerBody = response?.data;
+        if (partnerBody && partnerBody.success === false) {
+            return res.status(400).json({
+                success: false,
+                message: partnerBody.message || 'Partner rejected session launch',
+                catalogGameCode: gameCode,
+                partnerGameCodeSent: partnerGameCode,
+                data: partnerBody,
+            });
+        }
+
+        const launchUrl = extractLaunchUrl(partnerBody);
+        if (!launchUrl) {
+            return res.status(502).json({
+                success: false,
+                message:
+                    'Partner API did not return a playable launch URL. '
+                    + 'FUNTIMER / ROULETTE often use different codes than your Mongo `gameCode`. '
+                    + 'Set `partnerGameCode` on each Game in admin, or `GAME_PARTNER_CODE_MAP` in .env (JSON catalogKey → partner code).',
+                catalogGameCode: gameCode,
+                partnerGameCodeSent: partnerGameCode,
+                data: partnerBody,
+            });
+        }
 
         return res.status(200).json({
             success: true,
             gameCode,
             launchUrl,
-            embedAllowed: game.embedAllowed !== false,
-            data: response.data,
+            embedAllowed: deriveEmbedAllowed(partnerBody),
+            data: partnerBody,
         });
     } catch (error) {
         const partnerError = error?.response?.data;
@@ -316,4 +364,3 @@ export const launchGame = async (req, res) => {
         });
     }
 };
-
