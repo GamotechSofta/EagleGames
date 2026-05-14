@@ -18,6 +18,7 @@ import bankDetailRoutes from './routes/bankDetail/bankDetailRoutes.js';
 import rouletteRoutes from './routes/roulette/rouletteRoutes.js';
 import gamesRoutes from './routes/games/gamesRoutes.js';
 import genericWalletRoutes from './routes/generics/genericWalletRoutes.js';
+import genericRouter from './routes/generics/genericRouter.js';
 import mockWalletRoutes from './routes/generics/mockWalletRoutes.js';
 import { getClientIp } from './utils/activityLogger.js';
 import { startMidnightResetScheduler } from './utils/midnightReset.js';
@@ -134,6 +135,8 @@ app.use('/api/v1/daily-commission', dailyCommissionRoutes);
 app.use('/api/v1/bank-details', bankDetailRoutes);
 app.use('/api/v1/roulette', rouletteRoutes);
 app.use('/api/v1/games', gamesRoutes);
+/** Same contract as offlineGame2: POST …/wallet/balance|debit|credit (+ optional :playerId in path) */
+app.use('/api/v1/generics', genericRouter);
 app.use('/api/v1/partner/wallet', genericWalletRoutes);
 /** Partner mock wallet contract: POST /wallet/balance|debit|credit (Bearer PARTNER_TOKEN, default partner-token) */
 app.use('/wallet', mockWalletRoutes);

@@ -14,7 +14,8 @@ const isAutoCreateUsersEnabled = () => {
     return ['1', 'true', 'yes', 'y', 'on'].includes(raw);
 };
 
-const getPartnerToken = () => String(process.env.PARTNER_TOKEN || DEFAULT_PARTNER_TOKEN);
+const getPartnerToken = () =>
+    String(process.env.PARTNER_TOKEN || DEFAULT_PARTNER_TOKEN).trim();
 
 const parseBearerToken = (authorizationHeader) => {
     if (!authorizationHeader || !authorizationHeader.startsWith('Bearer ')) {
@@ -78,12 +79,15 @@ const ensureWalletForPlayer = async (playerId, { autoCreate = isAutoCreateUsersE
 };
 
 export const verifyGenericPartnerAuth = (req, res, next) => {
+    const expected = getPartnerToken();
     const token = parseBearerToken(req.headers.authorization);
-    if (!token || token !== getPartnerToken()) {
-        return res.status(401).json({
-            success: false,
-            error: 'Unauthorized',
-        });
+    if (!token || token !== expected) {
+        const body = { success: false, error: 'Unauthorized' };
+        if (process.env.NODE_ENV !== 'production') {
+            body.hint =
+                'Send header: Authorization: Bearer <exact PARTNER_TOKEN from backend .env>. Browser address bar cannot send this header.';
+        }
+        return res.status(401).json(body);
     }
     next();
 };
