@@ -14,16 +14,16 @@ const featuredGames = [
       'https://res.cloudinary.com/dwwt5xdsz/image/upload/v1775804006/aviatorGame_qfug5k.jpg',
   },
   {
-    id: 'chicken-road',
-    title: 'Chicken Road',
+    id: 'funtimer',
+    title: 'Fun Timer',
     image:
-      'https://res.cloudinary.com/dwwt5xdsz/image/upload/v1775804006/chickenRoadMap_vsvc1a.jpg',
+      'https://res.cloudinary.com/dzd47mpdo/image/upload/v1776326982/FUN_TIMER_6_irmgjz.png',
   },
   {
     id: 'roulette',
     title: 'Roulette',
     image:
-      'https://res.cloudinary.com/dwwt5xdsz/image/upload/v1775804007/roulletGame_a719um.jpg',
+      'https://res.cloudinary.com/dzd47mpdo/image/upload/v1776326983/FUN_TIMER_5_xn87ir.png',
   },
 ];
 
@@ -60,7 +60,7 @@ const HeroSection = () => {
           className="w-full h-auto object-contain"
         />
       </section>
-      <section className="w-full `max-w-full px-4 md:px-6 pb-3 md:pb-5">
+      <section className="w-full max-w-full px-4 md:px-6 pb-3 md:pb-5">
         <div className="mb-3 flex items-start justify-between gap-3">
           <div>
             <h2 className="text-white text-lg md:text-xl font-semibold leading-tight">

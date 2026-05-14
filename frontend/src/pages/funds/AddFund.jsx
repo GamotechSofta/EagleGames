@@ -34,7 +34,6 @@ const AddFund = () => {
     const dateLocale = DATE_LOCALE_BY_LANG[language] || 'en-IN';
     const [config, setConfig] = useState(null);
     const [amount, setAmount] = useState('');
-    const [upiTransactionId, setUpiTransactionId] = useState('');
     const [screenshot, setScreenshot] = useState(null);
     const [screenshotPreview, setScreenshotPreview] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -102,16 +101,6 @@ const AddFund = () => {
             return;
         }
 
-        const utr = String(upiTransactionId || '').trim();
-        if (!utr) {
-            setError(t('addfund_err_utrRequired'));
-            return;
-        }
-        if (!/^\d{12}$/.test(utr)) {
-            setError(t('addfund_err_utr12'));
-            return;
-        }
-
         if (!screenshot) {
             setError(t('addfund_err_screenshot'));
             return;
@@ -122,7 +111,6 @@ const AddFund = () => {
         try {
             const formData = new FormData();
             formData.append('amount', numAmount);
-            formData.append('upiTransactionId', utr);
             formData.append('screenshot', screenshot);
 
             const res = await fetchWithAuth(`${API_BASE_URL}/payments/deposit`, {
@@ -136,7 +124,6 @@ const AddFund = () => {
                 setSubmittedAmount(numAmount);
                 setShowSuccessModal(true);
                 setAmount('');
-                setUpiTransactionId('');
                 setScreenshot(null);
                 setScreenshotPreview(null);
                 setStep(1);
@@ -476,20 +463,6 @@ const AddFund = () => {
                         <p className="text-[11px] text-gray-500 -mt-2 leading-snug">
                             {t('addfund_proofHint')}
                         </p>
-                        <div>
-                            <label className="block text-gray-300 text-xs font-medium mb-1">
-                                {t('addfund_utr')} <span className="text-red-400">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                value={upiTransactionId}
-                                onChange={(e) => setUpiTransactionId(e.target.value)}
-                                placeholder={t('addfund_utrPlaceholder')}
-                                inputMode="numeric"
-                                className="w-full bg-[#1f2937] border border-[#374151] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#1a74e5]"
-                                required
-                            />
-                        </div>
                         <div>
                             <label className="block text-gray-300 text-xs font-medium mb-1">
                                 {t('addfund_screenshot')} <span className="text-red-400">*</span>{' '}

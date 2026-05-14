@@ -17,9 +17,9 @@ const PORT = Number(process.env.PORT) || 3010;
 const BASE = (process.env.PUBLIC_GAME_BASE_URL || `http://localhost:${PORT}`).replace(/\/$/, '');
 
 const ROULETTE_IMG =
-    'https://images.unsplash.com/photo-1596838132736-92f855223faa?w=400&q=80&auto=format&fit=crop';
+    'https://res.cloudinary.com/dzd47mpdo/image/upload/v1776326983/FUN_TIMER_5_xn87ir.png';
 const FUNTIMER_IMG =
-    'https://images.unsplash.com/photo-1618005188914-d08668fc9fae?w=400&q=80&auto=format&fit=crop';
+    'https://res.cloudinary.com/dzd47mpdo/image/upload/v1776326982/FUN_TIMER_6_irmgjz.png';
 
 async function main() {
     if (!MONGODB_URI) {
