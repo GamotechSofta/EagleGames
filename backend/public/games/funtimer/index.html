@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <title>Fun Timer</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --accent: #38bdf8;
+      --gold: #eab308;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      padding: 12px;
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: var(--panel);
+      border-radius: 12px;
+      margin-bottom: 16px;
+      font-size: 13px;
+    }
+    .player-id {
+      word-break: break-all;
+      color: var(--muted);
+      font-size: 11px;
+      max-width: 58vw;
+      text-align: right;
+    }
+    a.back { color: var(--gold); font-weight: 700; text-decoration: none; }
+    .card {
+      width: 100%;
+      max-width: 400px;
+      background: var(--panel);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+    }
+    h1 { margin: 0 0 8px; font-size: 1.25rem; }
+    .target {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin: 16px 0;
+    }
+    .timer {
+      font-size: 3rem;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      margin: 12px 0;
+      min-height: 3.5rem;
+    }
+    .btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .btn-start {
+      background: linear-gradient(180deg, #22c55e, #15803d);
+      color: #fff;
+    }
+    .btn-stop {
+      background: linear-gradient(180deg, #f97316, #c2410c);
+      color: #fff;
+    }
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .score {
+      margin-top: 16px;
+      font-size: 15px;
+      color: var(--muted);
+    }
+    .score strong { color: var(--gold); font-size: 1.1rem; }
+    .rules {
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="back" href="javascript:history.back()">← Back</a>
+    <span class="player-id" id="playerLabel">Player: —</span>
+  </header>
+  <div class="card">
+    <h1>Stop the timer</h1>
+    <p style="margin:0;color:var(--muted);font-size:14px">Stop as close as possible to the target (seconds).</p>
+    <div class="target" id="targetDisplay">—</div>
+    <div class="timer" id="timerDisplay">0.000</div>
+    <button type="button" class="btn btn-start" id="startBtn">Start round</button>
+    <button type="button" class="btn btn-stop" id="stopBtn" disabled>STOP!</button>
+    <div class="score" id="scoreLine">Best score (lower is better): <strong id="bestScore">—</strong></div>
+    <p class="rules">Timer runs from 0s. Your error = |your stop time − target|. Running…</p>
+  </div>
+  <script>
+(function () {
+  const params = new URLSearchParams(location.search);
+  const player = params.get('player') || 'guest';
+  document.getElementById('playerLabel').textContent = 'Player: ' + player;
+
+  let targetSec = 5;
+  let running = false;
+  let startTs = 0;
+  let raf = 0;
+  let best = null;
+
+  const targetDisplay = document.getElementById('targetDisplay');
+  const timerDisplay = document.getElementById('timerDisplay');
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const bestScore = document.getElementById('bestScore');
+
+  function newTarget() {
+    targetSec = Math.round((3 + Math.random() * 4) * 1000) / 1000;
+    targetDisplay.textContent = targetSec.toFixed(3) + 's';
+  }
+
+  function tick(now) {
+    if (!running) return;
+    const elapsed = (now - startTs) / 1000;
+    timerDisplay.textContent = elapsed.toFixed(3);
+    raf = requestAnimationFrame(tick);
+  }
+
+  startBtn.onclick = () => {
+    if (running) return;
+    newTarget();
+    timerDisplay.textContent = '0.000';
+    running = true;
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
+    startTs = performance.now();
+    raf = requestAnimationFrame(tick);
+  };
+
+  stopBtn.onclick = () => {
+    if (!running) return;
+    running = false;
+    cancelAnimationFrame(raf);
+    const elapsed = (performance.now() - startTs) / 1000;
+    timerDisplay.textContent = elapsed.toFixed(3);
+    const err = Math.abs(elapsed - targetSec);
+    if (best === null || err < best) best = err;
+    bestScore.textContent = best.toFixed(3) + 's off';
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+  };
+
+  newTarget();
+})();
+  </script>
+</body>
+</html>
