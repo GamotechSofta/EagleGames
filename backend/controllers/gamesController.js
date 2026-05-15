@@ -1,6 +1,7 @@
 import Game from '../models/games/games.js';
 import axios from 'axios';
 import dotenv from 'dotenv';
+import { getPlayerGameBetHistory, getAdminGameBetHistory } from '../services/gameBetHistoryService.js';
 
 dotenv.config();
 
@@ -364,3 +365,36 @@ export const launchGame = async (req, res) => {
         });
     }
 };
+
+/**
+ * GET /games/my-bet-history?limit=100 — logged-in player's game bets (partner + roulette).
+ */
+export async function getMyGameBetHistory(req, res) {
+    try {
+        const userId = req.userId;
+        if (!userId) {
+            return res.status(401).json({ success: false, message: 'Authentication required' });
+        }
+        const limit = Math.min(Number(req.query?.limit) || 100, 500);
+        const gameCode = String(req.query?.gameCode || req.query?.game || '').trim();
+        const data = await getPlayerGameBetHistory(userId, { limit, gameCode });
+        return res.status(200).json({ success: true, data });
+    } catch (err) {
+        return res.status(500).json({ success: false, message: err.message || 'Failed to load game bet history' });
+    }
+}
+
+/**
+ * GET /games/admin-bet-history?userId=&limit=&page= — all players' game bets (admin).
+ */
+export async function getAdminGameBetHistoryHandler(req, res) {
+    try {
+        const limit = Number(req.query?.limit) || 50;
+        const page = Number(req.query?.page) || 1;
+        const userId = req.query?.userId ? String(req.query.userId).trim() : '';
+        const result = await getAdminGameBetHistory({ userId: userId || undefined, limit, page });
+        return res.status(200).json({ success: true, ...result });
+    } catch (err) {
+        return res.status(500).json({ success: false, message: err.message || 'Failed to load admin game bet history' });
+    }
+}

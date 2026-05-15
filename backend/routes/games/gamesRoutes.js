@@ -7,6 +7,8 @@ import {
     createGame,
     updateGame,
     deleteGame,
+    getMyGameBetHistory,
+    getAdminGameBetHistoryHandler,
 } from '../../controllers/gamesController.js';
 import { verifyUser } from '../../middleware/userAuth.js';
 import { verifyAdmin, verifySuperAdmin } from '../../middleware/adminAuth.js';
@@ -14,6 +16,8 @@ import { verifyAdmin, verifySuperAdmin } from '../../middleware/adminAuth.js';
 const router = express.Router();
 
 router.get('/admin/all', verifyAdmin, getAllGamesForAdmin);
+router.get('/admin-bet-history', verifyAdmin, getAdminGameBetHistoryHandler);
+router.get('/my-bet-history', verifyUser, getMyGameBetHistory);
 router.post('/create-game', verifySuperAdmin, createGame);
 router.patch('/update-game/:id', verifySuperAdmin, updateGame);
 router.delete('/delete-game/:id', verifySuperAdmin, deleteGame);

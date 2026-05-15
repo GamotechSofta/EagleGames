@@ -19,6 +19,7 @@ import {
     FaDice,
     FaQrcode,
     FaGlobe,
+    FaGamepad,
 } from 'react-icons/fa';
 import { useLanguage } from '../context/LanguageContext';
 import { LANGUAGE_OPTIONS } from '../constants/languages';
@@ -52,6 +53,7 @@ const Sidebar = ({ onLogout, isOpen = true, onClose }) => {
         { path: '/payment-management', labelKey: 'payments', icon: FaCreditCard },
         { path: '/wallet', labelKey: 'wallet', icon: FaWallet },
         { path: '/roulette', labelKey: 'roulette', icon: FaDice },
+        { path: '/game-history', label: 'Game History', icon: FaGamepad },
         { path: '/logs', labelKey: 'logs', icon: FaClipboardList },
         { path: '/settings', labelKey: 'settings', icon: FaCog },
     ];
@@ -126,7 +128,7 @@ const Sidebar = ({ onLogout, isOpen = true, onClose }) => {
                             }`}
                     >
                         <item.icon className="w-5 h-5 sm:text-xl shrink-0" />
-                        <span className="truncate">{t(item.labelKey)}</span>
+                        <span className="truncate">{item.label || t(item.labelKey)}</span>
                     </button>
                 ))}
             </nav>

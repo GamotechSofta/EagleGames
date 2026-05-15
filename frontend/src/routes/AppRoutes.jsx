@@ -22,6 +22,7 @@ import TopWinners from '../pages/TopWinners';
 import GameRate from '../pages/GameRate';
 import GameLaunchEmbed from '../pages/GameLaunchEmbed';
 import GamesHub from '../pages/GamesHub';
+import GameBetHistory from '../pages/GameBetHistory';
 
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -133,7 +134,9 @@ const Layout = ({ children }) => {
   // All pages now use white background with navy/white theme
   const isBetsPage = location.pathname === '/bids';
   const isHistoryPage =
-    location.pathname === '/bet-history' || location.pathname === '/market-result-history';
+    location.pathname === '/bet-history' ||
+    location.pathname === '/market-result-history' ||
+    location.pathname === '/game-bet-history' || location.pathname.startsWith('/game-bet-history/');
 
   return (
     <div className={`min-h-screen min-h-ios-screen ${isFullBleedGame ? 'pb-0' : 'pb-[calc(4rem+env(safe-area-inset-bottom,0px))]'} md:pb-0 w-full max-w-full overflow-x-hidden text-white ${isBidPage ? 'bg-[#111827]' : 'bg-[#1f2937]'}`}>
@@ -182,6 +185,8 @@ const AppRoutes = () => {
           <Route path="/game-rate" element={<GameRate />} />
           <Route path="/games" element={<GamesHub />} />
           <Route path="/games/play/:gameCode" element={<GameLaunchEmbed />} />
+          <Route path="/game-bet-history" element={<GameBetHistory />} />
+          <Route path="/game-bet-history/:gameCode" element={<GameBetHistory />} />
         </Routes>
       </Layout>
     </Router>

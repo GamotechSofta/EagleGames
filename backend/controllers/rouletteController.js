@@ -110,6 +110,32 @@ export async function getGlobalStats(req, res) {
 }
 
 /**
+ * GET /roulette/admin-history?userId=&limit=50&page=1 - all users' roulette history (admin)
+ */
+export async function getAdminRouletteHistory(req, res) {
+    try {
+        const limit = Math.min(Number(req.query?.limit) || 50, 200);
+        const page = Math.max(Number(req.query?.page) || 1, 1);
+        const skip = (page - 1) * limit;
+        const query = {};
+        if (req.query?.userId) query.user = req.query.userId;
+        const [list, total] = await Promise.all([
+            RouletteGame.find(query)
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .populate('user', 'username phone email')
+                .select('spinId winningNumber totalBet payout profit createdAt user bets')
+                .lean(),
+            RouletteGame.countDocuments(query),
+        ]);
+        return res.status(200).json({ success: true, data: list, total, page, limit });
+    } catch (err) {
+        return res.status(500).json({ success: false, message: err.message || 'Failed to get admin roulette history' });
+    }
+}
+
+/**
  * GET /roulette/proof/:spinId - provably fair proof for a spin (if stored)
  */
 export async function getProof(req, res) {

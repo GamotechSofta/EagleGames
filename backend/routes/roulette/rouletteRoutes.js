@@ -8,6 +8,7 @@ import {
     spinRoulette,
     getRouletteStats,
     getRouletteHistory,
+    getAdminRouletteHistory,
     getRouletteConfig,
     getGlobalStats,
     getProof,
@@ -29,6 +30,7 @@ router.get('/global-stats', getGlobalStats);
 router.get('/proof/:spinId', getProof);
 router.get('/rtp', getRTP);
 router.get('/rtp-check', verifyAdmin, getRTPCheck);
+router.get('/admin-history', verifyAdmin, getAdminRouletteHistory);
 router.get('/exposure-status', verifyAdmin, getExposureStatus);
 router.get('/system-health', verifyAdmin, getSystemHealth);
 router.post('/monte-carlo', verifyAdmin, runMonteCarloRoute);

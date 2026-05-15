@@ -26,6 +26,7 @@ import MarketDetail from './pages/MarketDetail';
 import Settings from './pages/Settings';
 import TopWinners from './pages/TopWinners';
 import Roulette from './pages/Roulette';
+import GameHistory from './pages/GameHistory';
 import PlatformPlayerDeposit from './pages/PlatformPlayerDeposit';
 
 // Scroll to top on route change
@@ -262,6 +263,14 @@ const App = () => {
                     element={
                         <PrivateRoute>
                             <Roulette />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/game-history"
+                    element={
+                        <PrivateRoute>
+                            <GameHistory />
                         </PrivateRoute>
                     }
                 />

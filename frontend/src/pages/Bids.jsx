@@ -1,9 +1,11 @@
-import React, { startTransition, useEffect, useMemo, useState } from 'react';
+﻿import React, { startTransition, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { API_BASE_URL, marketsListFetchInit } from '../config/api';
+import { API_BASE_URL, fetchWithAuth, getAuthHeaders, marketsListFetchInit } from '../config/api';
 import { getRatesCurrent, getBetHistory } from '../api/bets';
 import ResultDatePicker from '../components/ResultDatePicker';
 import BetHistoryCard from '../components/BetHistoryCard';
+import GameBetHistoryPicker from '../components/GameBetHistoryPicker';
+import GameBetHistoryList from '../components/GameBetHistoryList';
 import { useRefreshOnMarketReset } from '../hooks/useRefreshOnMarketReset';
 import { useLanguage } from '../context/LanguageContext';
 import { getMarketDisplayName } from '../utils/marketDisplayName';
@@ -99,7 +101,7 @@ const shortGameLabel = (label) => {
   return s;
 };
 
-// Backend defaults (must match backend/models/rate/rate.js) – used when API rates not loaded
+// Backend defaults (must match backend/models/rate/rate.js) â€“ used when API rates not loaded
 const DEFAULT_RATES = { single: 10, jodi: 100, singlePatti: 150, doublePatti: 300, triplePatti: 1000, halfSangam: 5000, fullSangam: 10000 };
 
 const rateNum = (val, def) => (Number.isFinite(Number(val)) && Number(val) >= 0 ? Number(val) : def);
@@ -248,15 +250,22 @@ const Bids = () => {
       color: '#25d366',
       iconUrl: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1769799295/result_ekwn16.png'
     },
+    {
+      title: 'Game Bet History',
+      subtitle: 'You can view your game bet history',
+      color: '#1a74e5',
+    },
   ]), []);
 
   const TAB_TO_TITLE = useMemo(() => ({
     'bet-history': 'Bet History',
     'game-results': 'Game Results',
+    'game-bet-history': 'Game Bet History',
   }), []);
   const TITLE_TO_TAB = useMemo(() => ({
     'Bet History': 'bet-history',
     'Game Results': 'game-results',
+    'Game Bet History': 'game-bet-history',
   }), []);
 
   const tabParam = (searchParams.get('tab') || '').toString();
@@ -265,7 +274,7 @@ const Bids = () => {
   const activeItem = items.find((i) => i.title === activeTitle) || items[0];
   const isBetHistoryPanel = activeTitle === 'Bet History';
   const isGameResultsPanel = activeTitle === 'Game Results';
-  const rightPanelTitle = activeTitle === 'Game Results' ? 'Market Result History' : activeTitle;
+  const isGameBetHistoryPanel = activeTitle === 'Game Bet History';
   const historyScope = 'main';
   const isAnyHistoryPanel = isBetHistoryPanel;
 
@@ -304,12 +313,17 @@ const Bids = () => {
       navigate('/market-result-history');
       return;
     }
+    if (item?.title === 'Game Bet History') {
+      navigate('/game-bet-history');
+      return;
+    }
     // keep current behavior for other items
     setActiveTitle(item.title);
   };
 
   const handleDesktopItemClick = (item) => {
     // Desktop: show content on right panel (no navigation)
+    if (item?.title === 'Game Bet History') setSelectedGameBetCode('');
     setActiveTitle(item.title);
   };
 
@@ -340,6 +354,14 @@ const Bids = () => {
 
   const [resultsDate, setResultsDate] = useState(() => new Date());
   const [resultsRows, setResultsRows] = useState([]);
+
+  // Game bet history for desktop panel (partner games + roulette)
+  const [gameBetEntries, setGameBetEntries] = useState([]);
+  const [gameBetLoading, setGameBetLoading] = useState(false);
+  const [gameBetStatusFilter, setGameBetStatusFilter] = useState('all');
+  const [catalogGames, setCatalogGames] = useState([]);
+  const [catalogGamesLoading, setCatalogGamesLoading] = useState(false);
+  const [selectedGameBetCode, setSelectedGameBetCode] = useState('');
 
   const fetchMarkets = async (background = false) => {
     try {
@@ -446,6 +468,75 @@ const Bids = () => {
       clearInterval(id);
     };
   }, [resultsDate, todayKey]);
+
+  useEffect(() => {
+    if (!isGameBetHistoryPanel) {
+      setSelectedGameBetCode('');
+      return;
+    }
+    let alive = true;
+    (async () => {
+      setCatalogGamesLoading(true);
+      try {
+        const res = await fetch(`${API_BASE_URL}/games`, { cache: 'no-store' });
+        const data = await res.json();
+        if (alive && data?.success && Array.isArray(data?.data)) setCatalogGames(data.data);
+        else if (alive) setCatalogGames([]);
+      } catch {
+        if (alive) setCatalogGames([]);
+      } finally {
+        if (alive) setCatalogGamesLoading(false);
+      }
+    })();
+    return () => { alive = false; };
+  }, [isGameBetHistoryPanel]);
+
+  useEffect(() => {
+    if (!isGameBetHistoryPanel || !selectedGameBetCode) return;
+    let alive = true;
+    const fetchGameBets = async () => {
+      setGameBetLoading(true);
+      try {
+        const qs = new URLSearchParams({ limit: '100', gameCode: selectedGameBetCode });
+        const res = await fetchWithAuth(`${API_BASE_URL}/games/my-bet-history?${qs}`, { headers: getAuthHeaders() });
+        if (!alive) return;
+        if (res.status === 401) { setGameBetLoading(false); return; }
+        const data = await res.json();
+        if (alive) setGameBetEntries(data?.success && Array.isArray(data?.data) ? data.data : []);
+      } catch {
+        if (alive) setGameBetEntries([]);
+      } finally {
+        if (alive) setGameBetLoading(false);
+      }
+    };
+    fetchGameBets();
+    const id = setInterval(fetchGameBets, 30000);
+    return () => { alive = false; clearInterval(id); };
+  }, [isGameBetHistoryPanel, selectedGameBetCode]);
+
+  const desktopGameBetUsername = useMemo(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem('user') || '{}');
+      return u?.username || u?.name || u?.phone || '';
+    } catch {
+      return '';
+    }
+  }, []);
+
+  const selectedDesktopGame = useMemo(
+    () => catalogGames.find((g) => String(g.gameCode || '').toUpperCase() === selectedGameBetCode),
+    [catalogGames, selectedGameBetCode]
+  );
+
+  const rightPanelTitle = useMemo(() => {
+    if (activeTitle === 'Game Results') return 'Market Result History';
+    if (activeTitle === 'Game Bet History' && selectedGameBetCode) {
+      return selectedDesktopGame?.name || selectedGameBetCode;
+    }
+    return activeTitle;
+  }, [activeTitle, selectedGameBetCode, selectedDesktopGame]);
+
+  const hideMyBetsSidebar = isGameBetHistoryPanel && !!selectedGameBetCode;
 
   const desktopRows = useMemo(() => {
     return (apiBets || []).map((b, idx) => {
@@ -577,7 +668,7 @@ const Bids = () => {
         }
       `}</style>
       <div className="w-full max-w-lg md:max-w-none mx-auto md:mx-0">
-        <div className="mb-6 md:grid md:grid-cols-[360px_1fr] md:gap-6 md:items-center">
+        <div className={`mb-6 md:grid ${hideMyBetsSidebar ? 'md:grid-cols-1' : 'md:grid-cols-[360px_1fr]'} md:gap-6 md:items-center`}>
           <div className="flex items-center gap-3">
             <button
               onClick={handleBack}
@@ -604,7 +695,7 @@ const Bids = () => {
                     buttonClassName="px-4 py-2 rounded-full bg-[#111827] border border-[#374151] text-white font-bold text-sm shadow-sm hover:border-[#4b5563] transition-colors"
                   />
                 </div>
-              ) : isAnyHistoryPanel ? (
+              ) : isGameBetHistoryPanel ? null : isAnyHistoryPanel ? (
                 <button
                   type="button"
                   onClick={() => setIsDesktopFilterOpen(true)}
@@ -643,6 +734,28 @@ const Bids = () => {
                     </button>
                   );
                 })}
+              </div>
+            ) : hideMyBetsSidebar ? (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 mr-1">Result</span>
+                {[
+                  { key: 'all', label: 'All' },
+                  { key: 'win', label: 'Win' },
+                  { key: 'lost', label: 'Lost' },
+                ].map(({ key, label }) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setGameBetStatusFilter(key)}
+                    className={`min-h-[40px] px-4 rounded-xl text-sm font-bold border-2 transition-colors ${
+                      gameBetStatusFilter === key
+                        ? 'bg-[#1a74e5] border-[#1a74e5] text-white shadow-sm'
+                        : 'bg-[#111827] border-[#374151] text-[#1a74e5] hover:border-[#1a74e5]/40 hover:bg-[#1f2937]'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
             ) : null}
           </div>
@@ -685,7 +798,8 @@ const Bids = () => {
         </div>
 
         {/* Desktop: sidebar-style list */}
-        <div className="hidden md:grid md:grid-cols-[360px_1fr] md:gap-6 md:items-start">
+        <div className={`hidden md:grid ${hideMyBetsSidebar ? 'md:grid-cols-1' : 'md:grid-cols-[360px_1fr]'} md:gap-6 md:items-start`}>
+          {!hideMyBetsSidebar && (
           <aside className="md:sticky md:top-[96px] space-y-3 md:space-y-5">
             {items.map((item) => {
               const active = item.title === activeTitle;
@@ -728,15 +842,16 @@ const Bids = () => {
               );
             })}
           </aside>
+          )}
 
           <main
             className={
-              (isAnyHistoryPanel || isGameResultsPanel)
+              (isAnyHistoryPanel || isGameResultsPanel || isGameBetHistoryPanel)
                 ? 'bg-transparent border-0 shadow-none p-0'
                 : 'rounded-2xl bg-[#111827] border border-[#374151] shadow-md p-6'
             }
           >
-            {(isAnyHistoryPanel || isGameResultsPanel) ? null : (
+            {(isAnyHistoryPanel || isGameResultsPanel || isGameBetHistoryPanel) ? null : (
               <div className="flex items-center justify-center gap-4">
                 <div
                   className="w-14 h-14 rounded-full flex items-center justify-center text-[#111827] shadow-[0_10px_20px_rgba(0,0,0,0.35)]"
@@ -818,9 +933,45 @@ const Bids = () => {
                   )}
                 </div>
               </div>
+            ) : isGameBetHistoryPanel ? (
+              <div className="mt-0 max-h-[calc(100vh-240px)] overflow-y-auto hide-scrollbar">
+                {!selectedGameBetCode ? (
+                  <>
+                    <p className="text-sm text-gray-400 mb-3">Select a game to view bet history</p>
+                    <GameBetHistoryPicker
+                      games={catalogGames}
+                      loading={catalogGamesLoading}
+                      compact
+                      onSelect={(game) => {
+                        const code = String(game?.gameCode || '').trim().toUpperCase();
+                        if (code) setSelectedGameBetCode(code);
+                      }}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedGameBetCode('')}
+                      className="mb-3 text-sm font-semibold text-[#1a74e5] hover:underline"
+                    >
+                      Back to all games
+                    </button>
+                    <GameBetHistoryList
+                      entries={gameBetEntries}
+                      loading={gameBetLoading}
+                      username={desktopGameBetUsername}
+                      selectedStatus={gameBetStatusFilter}
+                      onStatusChange={setGameBetStatusFilter}
+                      gameName={selectedDesktopGame?.name || selectedGameBetCode}
+                      hideFilters={hideMyBetsSidebar}
+                    />
+                  </>
+                )}
+              </div>
             ) : (
               <div className="mt-6 text-gray-300 text-sm">
-                Select an item from the left menu. We will add the actual pages/content here next.
+                Select an item from the left menu.
               </div>
             )}
           </main>
