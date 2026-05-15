@@ -17,6 +17,7 @@ import { runExposureChecks } from '../engine/exposure.js';
 import { getOperationalPolicyState } from '../engine/operationalPolicy.js';
 import { getWinningNumberFromSeeds } from '../engine/provablyFair.js';
 import { recordSpinForUser } from '../middleware/rouletteAntiAbuse.js';
+import { recordRouletteSpin } from './gameBetHistoryRecordService.js';
 
 const SPIN_COOLDOWN_MS = 2000;
 const lastSpinByUser = new Map();
@@ -227,6 +228,18 @@ export async function executeSpin(body) {
             rtpSnapshot: rtpSnapshot != null ? Math.round(rtpSnapshot * 1e6) / 1e6 : undefined,
             rngEntropyRef: serverSeedHash ? 'provably_fair' : 'crypto',
         }], { session });
+
+        await recordRouletteSpin(
+            {
+                userId,
+                spinId,
+                betAmount: totalBet,
+                payout,
+                winningNumber,
+                bets,
+            },
+            session
+        );
 
         lastSpinByUser.set(userId, now);
         recordSpinForUser(userId.toString());

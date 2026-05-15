@@ -2,6 +2,10 @@ import User from '../../models/user/user.js';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import { Wallet, WalletTransaction } from '../../models/wallet/wallet.js';
+import {
+    recordPartnerGameDebit,
+    recordPartnerGameCredit,
+} from '../../services/gameBetHistoryRecordService.js';
 
 dotenv.config();
 
@@ -190,6 +194,15 @@ export const genericWalletDebit = async (req, res) => {
             description: `Generic debit | roundId=${roundId || ''} | game=${game || ''} | betNumber=${betNumber || ''}`,
         });
 
+        await recordPartnerGameDebit({
+            userId: user._id,
+            roundId: roundId || normalizedTransactionId,
+            gameCode: game,
+            betNumber,
+            betAmount: validAmount,
+            debitTransactionId: normalizedTransactionId,
+        });
+
         return res.status(200).json({
             success: true,
             data: {
@@ -256,6 +269,13 @@ export const genericWalletCredit = async (req, res) => {
             amount: validAmount,
             referenceId: normalizedTransactionId,
             description: `Generic credit | roundId=${roundId || ''}`,
+        });
+
+        await recordPartnerGameCredit({
+            userId: user._id,
+            roundId,
+            payout: validAmount,
+            creditTransactionId: normalizedTransactionId,
         });
 
         return res.status(200).json({

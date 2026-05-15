@@ -1,6 +1,8 @@
 import { WalletTransaction } from '../models/wallet/wallet.js';
 import RouletteGame from '../models/rouletteGame/rouletteGame.js';
 import Game from '../models/games/games.js';
+import GameBetHistory from '../models/gameBetHistory/gameBetHistory.js';
+import { toApiEntry } from './gameBetHistoryRecordService.js';
 
 const parsePipeKv = (description) => {
     const out = {};
@@ -35,7 +37,7 @@ const resolveGameName = (gameCode, nameMap) => {
     return prettifyGameCode(code) || 'Game';
 };
 
-/** Partner wallet debits/credits (Aviator, Fun Timer, external Roulette, etc.) */
+/** Partner wallet debits/credits (legacy reconstruction). */
 const historyFromWalletTransactions = (transactions, nameMap) => {
     const debits = [];
     const creditsByRound = new Map();
@@ -69,7 +71,6 @@ const historyFromWalletTransactions = (transactions, nameMap) => {
         const status = payout > 0 ? 'won' : 'lost';
         const gameCode = d.game.toUpperCase();
         return {
-            id: `partner-${d.debitId}`,
             betId: d.roundKey,
             source: 'partner',
             gameCode: gameCode || 'GAME',
@@ -80,18 +81,19 @@ const historyFromWalletTransactions = (transactions, nameMap) => {
             betNumber: d.betNumber || null,
             roundId: d.roundKey,
             createdAt: d.createdAt,
+            debitTransactionId: d.debitId,
         };
     });
 };
 
-/** In-house roulette spins */
+/** In-house roulette spins (legacy reconstruction). */
 const historyFromRouletteGames = (spins, nameMap) =>
     (spins || []).map((spin) => {
         const betAmount = Number(spin.totalBet) || 0;
         const payout = Number(spin.payout) || 0;
+        const spinId = spin.spinId || spin._id?.toString();
         return {
-            id: spin._id?.toString() || spin.spinId || `roulette-${spin.createdAt}`,
-            betId: spin.spinId || spin._id?.toString(),
+            betId: spinId,
             source: 'roulette',
             gameCode: 'ROULETTE',
             gameName: resolveGameName('ROULETTE', nameMap),
@@ -100,21 +102,13 @@ const historyFromRouletteGames = (spins, nameMap) =>
             status: payout > 0 ? 'won' : 'lost',
             winningNumber: spin.winningNumber,
             bets: spin.bets,
-            roundId: spin.spinId || null,
+            roundId: spinId,
             createdAt: spin.createdAt,
         };
     });
 
-const mergeAndSort = (entries) =>
-    [...entries].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-/**
- * Player game bet history: partner wallet rounds + in-house roulette.
- */
-export async function getPlayerGameBetHistory(userId, { limit = 100, gameCode = '' } = {}) {
-    const cap = Math.min(Math.max(Number(limit) || 100, 1), 500);
+const buildLegacyEntries = async (userId) => {
     const nameMap = await buildGameNameMap();
-
     const [walletTxns, rouletteSpins] = await Promise.all([
         WalletTransaction.find({ userId })
             .select('type amount description referenceId createdAt')
@@ -123,7 +117,7 @@ export async function getPlayerGameBetHistory(userId, { limit = 100, gameCode = 
             .lean(),
         RouletteGame.find({ user: userId })
             .sort({ createdAt: -1 })
-            .limit(cap)
+            .limit(500)
             .select('spinId winningNumber totalBet payout bets createdAt')
             .lean(),
     ]);
@@ -135,79 +129,97 @@ export async function getPlayerGameBetHistory(userId, { limit = 100, gameCode = 
 
     const partnerEntries = historyFromWalletTransactions(gameTxns, nameMap);
     const rouletteEntries = historyFromRouletteGames(rouletteSpins, nameMap);
-    let merged = mergeAndSort([...partnerEntries, ...rouletteEntries]);
-    const codeFilter = String(gameCode || '').trim().toUpperCase();
-    if (codeFilter) {
-        merged = merged.filter((e) => String(e.gameCode || '').toUpperCase() === codeFilter);
+    return [...partnerEntries, ...rouletteEntries];
+};
+
+/** Sync older wallet/roulette rows into GameBetHistory (upsert, no overwrite of newer DB rows). */
+const backfillUserHistory = async (userId) => {
+    const legacy = await buildLegacyEntries(userId);
+    if (!legacy.length) return;
+
+    const ops = legacy.map((entry) => ({
+        updateOne: {
+            filter: {
+                user: userId,
+                source: entry.source,
+                betId: entry.betId,
+            },
+            update: {
+                $setOnInsert: {
+                    user: userId,
+                    source: entry.source,
+                    gameCode: entry.gameCode,
+                    gameName: entry.gameName,
+                    betId: entry.betId,
+                    roundId: entry.roundId,
+                    betAmount: entry.betAmount,
+                    payout: entry.payout,
+                    status: entry.status,
+                    betNumber: entry.betNumber,
+                    winningNumber: entry.winningNumber,
+                    bets: entry.bets,
+                    debitTransactionId: entry.debitTransactionId,
+                    createdAt: entry.createdAt,
+                },
+            },
+            upsert: true,
+        },
+    }));
+
+    try {
+        await GameBetHistory.bulkWrite(ops, { ordered: false });
+    } catch {
+        // ignore duplicate key races
     }
-    return merged.slice(0, cap);
+};
+
+/**
+ * Player game bet history from GameBetHistory collection (DB).
+ * Backfills legacy wallet/roulette data once per user if collection is empty.
+ */
+export async function getPlayerGameBetHistory(userId, { limit = 100, gameCode = '' } = {}) {
+    const cap = Math.min(Math.max(Number(limit) || 100, 1), 500);
+    await backfillUserHistory(userId);
+
+    const query = { user: userId };
+    const codeFilter = String(gameCode || '').trim().toUpperCase();
+    if (codeFilter) query.gameCode = codeFilter;
+
+    const docs = await GameBetHistory.find(query)
+        .sort({ createdAt: -1 })
+        .limit(cap)
+        .lean();
+
+    return docs.map((d) => toApiEntry(d));
 }
 
 /**
- * Admin game bet history with optional user filter and pagination.
+ * Admin game bet history from GameBetHistory collection (DB).
  */
 export async function getAdminGameBetHistory({ userId, limit = 50, page = 1 } = {}) {
     const cap = Math.min(Math.max(Number(limit) || 50, 1), 200);
     const pg = Math.max(Number(page) || 1, 1);
     const skip = (pg - 1) * cap;
-    const nameMap = await buildGameNameMap();
 
-    const walletQuery = {};
-    const rouletteQuery = {};
-    if (userId) {
-        walletQuery.userId = userId;
-        rouletteQuery.user = userId;
-    }
+    if (userId) await backfillUserHistory(userId);
 
-    const [walletTxns, rouletteSpins, walletCount, rouletteCount] = await Promise.all([
-        WalletTransaction.find(walletQuery)
-            .select('type amount description referenceId createdAt userId')
+    const query = {};
+    if (userId) query.user = userId;
+
+    const [docs, total] = await Promise.all([
+        GameBetHistory.find(query)
             .sort({ createdAt: -1 })
-            .limit(userId ? 2000 : 5000)
-            .populate('userId', 'username phone email')
-            .lean(),
-        RouletteGame.find(rouletteQuery)
-            .sort({ createdAt: -1 })
-            .limit(userId ? 500 : 1000)
+            .skip(skip)
+            .limit(cap)
             .populate('user', 'username phone email')
-            .select('spinId winningNumber totalBet payout bets createdAt user')
             .lean(),
-        WalletTransaction.countDocuments({
-            ...walletQuery,
-            description: /^Generic debit/,
-        }),
-        RouletteGame.countDocuments(rouletteQuery),
+        GameBetHistory.countDocuments(query),
     ]);
 
-    const gameTxns = (walletTxns || []).filter((t) => {
-        const d = String(t?.description || '').toLowerCase();
-        return d.startsWith('generic debit') || d.startsWith('generic credit');
-    });
-
-    const partnerByUser = new Map();
-    for (const tx of gameTxns) {
-        const uid = String(tx.userId?._id || tx.userId || '');
-        if (!uid) continue;
-        if (!partnerByUser.has(uid)) partnerByUser.set(uid, []);
-        partnerByUser.get(uid).push(tx);
-    }
-
-    let partnerEntries = [];
-    for (const [, txns] of partnerByUser) {
-        partnerEntries = partnerEntries.concat(historyFromWalletTransactions(txns, nameMap));
-    }
-
-    const rouletteEntries = (rouletteSpins || []).map((spin) => {
-        const base = historyFromRouletteGames([spin], nameMap)[0];
-        return {
-            ...base,
-            user: spin.user,
-        };
-    });
-
-    const all = mergeAndSort([...partnerEntries, ...rouletteEntries]);
-    const total = walletCount + rouletteCount;
-    const data = all.slice(skip, skip + cap);
-
-    return { data, total, page: pg, limit: cap };
+    return {
+        data: docs.map((d) => toApiEntry(d)),
+        total,
+        page: pg,
+        limit: cap,
+    };
 }
