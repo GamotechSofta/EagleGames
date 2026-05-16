@@ -78,7 +78,6 @@ export async function recordPartnerGameDebit({
                 user: userId,
                 source: 'partner',
                 betId: roundKey,
-                roundId: roundKey,
                 payout: 0,
                 status: 'pending',
             },
