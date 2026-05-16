@@ -76,6 +76,11 @@ const paymentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'BankDetail',
     },
+    /** True when wallet was debited at request time (refund on reject; no second debit on approve). */
+    balanceHeldAtRequest: {
+        type: Boolean,
+        default: false,
+    },
     // Legacy notes field
     notes: {
         type: String,

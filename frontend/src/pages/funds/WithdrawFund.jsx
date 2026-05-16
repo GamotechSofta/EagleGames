@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL, getAuthHeaders, fetchWithAuth } from '../../config/api';
+import { updateUserBalance } from '../../api/bets';
 import { useLanguage } from '../../context/LanguageContext';
 
 const DATE_LOCALE_BY_LANG = {
@@ -129,7 +130,13 @@ const WithdrawFund = () => {
                 setShowSuccessModal(true);
                 setAmount('');
                 setUserNote('');
-                fetchWalletBalance();
+                const newBal = data.data?.walletBalance;
+                if (newBal != null) {
+                    setWalletBalance(newBal);
+                    updateUserBalance(newBal);
+                } else {
+                    fetchWalletBalance();
+                }
             } else {
                 setError(data.message || t('addfund_err_submit'));
             }

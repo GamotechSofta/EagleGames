@@ -206,7 +206,7 @@ export default {
   withdraw_info_4: 'Maximum withdrawal: {{amt}}',
   withdraw_successTitle: 'Withdrawal Request Submitted!',
   withdraw_successBody:
-    'Your withdrawal request has been submitted successfully. Amount will be transferred to your bank account after admin approval within 24 hours.',
+    'Your withdrawal request has been submitted. The amount has been deducted from your wallet and will be transferred to your bank after admin approval. If rejected, it will be refunded to your wallet.',
 
   bank_accountsTitle: 'Bank Accounts',
   bank_accountsCount: '{{count}}/5 accounts added',

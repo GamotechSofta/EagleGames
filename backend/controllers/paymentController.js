@@ -1,6 +1,7 @@
+import mongoose from 'mongoose';
 import Payment from '../models/payment/payment.js';
 import BankDetail from '../models/bankDetail/bankDetail.js';
-import { Wallet } from '../models/wallet/wallet.js';
+import { Wallet, WalletTransaction } from '../models/wallet/wallet.js';
 import Admin from '../models/admin/admin.js';
 import User from '../models/user/user.js';
 import bcrypt from 'bcryptjs';
@@ -8,6 +9,56 @@ import { getBookieUserIds } from '../utils/bookieFilter.js';
 import { logActivity, getClientIp } from '../utils/activityLogger.js';
 import { uploadToCloudinary } from '../config/cloudinary.js';
 import { getPlatformPlayerDepositResolved } from '../utils/platformPlayerDepositConfig.js';
+
+const holdWithdrawalBalance = async (userId, amount, paymentId, session) => {
+    let wallet = await Wallet.findOne({ userId }).session(session);
+    if (!wallet) {
+        wallet = new Wallet({ userId, balance: 0 });
+        await wallet.save({ session });
+    }
+    if (wallet.balance < amount) {
+        const err = new Error('Insufficient wallet balance');
+        err.status = 400;
+        throw err;
+    }
+    wallet.balance -= amount;
+    await wallet.save({ session });
+    await WalletTransaction.create(
+        [
+            {
+                userId,
+                type: 'debit',
+                amount,
+                description: `Withdrawal request ₹${amount} (pending approval)`,
+                referenceId: String(paymentId),
+            },
+        ],
+        { session }
+    );
+    return wallet.balance;
+};
+
+const refundWithdrawalBalance = async (userId, amount, paymentId, session) => {
+    let wallet = await Wallet.findOne({ userId }).session(session);
+    if (!wallet) {
+        wallet = new Wallet({ userId, balance: 0 });
+    }
+    wallet.balance += amount;
+    await wallet.save({ session });
+    await WalletTransaction.create(
+        [
+            {
+                userId,
+                type: 'credit',
+                amount,
+                description: `Withdrawal rejected – refund ₹${amount}`,
+                referenceId: String(paymentId),
+            },
+        ],
+        { session }
+    );
+    return wallet.balance;
+};
 
 // ============ CONFIG API ============
 
@@ -214,37 +265,33 @@ export const createDepositRequest = async (req, res) => {
  * User: Create withdrawal request
  */
 export const createWithdrawalRequest = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
         const userId = req.userId;
         const { amount, bankDetailId, userNote } = req.body;
 
         if (!userId) {
+            await session.abortTransaction();
             return res.status(401).json({ success: false, message: 'Authentication required' });
         }
 
-        const minWithdrawal = parseInt(process.env.MIN_WITHDRAWAL) || 500;
-        const maxWithdrawal = parseInt(process.env.MAX_WITHDRAWAL) || 25000;
+        const minWithdrawal = parseInt(process.env.MIN_WITHDRAWAL, 10) || 500;
+        const maxWithdrawal = parseInt(process.env.MAX_WITHDRAWAL, 10) || 25000;
+        const numAmount = parseFloat(amount);
 
-        if (!amount || amount < minWithdrawal || amount > maxWithdrawal) {
+        if (!Number.isFinite(numAmount) || numAmount < minWithdrawal || numAmount > maxWithdrawal) {
+            await session.abortTransaction();
             return res.status(400).json({
                 success: false,
                 message: `Amount must be between ₹${minWithdrawal} and ₹${maxWithdrawal}`,
             });
         }
 
-        // Check wallet balance
-        const wallet = await Wallet.findOne({ userId });
-        if (!wallet || wallet.balance < amount) {
-            return res.status(400).json({
-                success: false,
-                message: 'Insufficient wallet balance',
-            });
-        }
-
-        // Validate bank detail if provided
         if (bankDetailId) {
-            const bankDetail = await BankDetail.findOne({ _id: bankDetailId, userId, isActive: true });
+            const bankDetail = await BankDetail.findOne({ _id: bankDetailId, userId, isActive: true }).session(session);
             if (!bankDetail) {
+                await session.abortTransaction();
                 return res.status(400).json({
                     success: false,
                     message: 'Invalid bank account selected',
@@ -252,29 +299,39 @@ export const createWithdrawalRequest = async (req, res) => {
             }
         }
 
-        // Check for pending withdrawal
         const pendingWithdrawal = await Payment.findOne({
             userId,
             type: 'withdrawal',
             status: 'pending',
-        });
+        }).session(session);
 
         if (pendingWithdrawal) {
+            await session.abortTransaction();
             return res.status(400).json({
                 success: false,
                 message: 'You already have a pending withdrawal request. Please wait for it to be processed.',
             });
         }
 
-        const payment = await Payment.create({
-            userId,
-            type: 'withdrawal',
-            amount,
-            method: 'bank_transfer',
-            status: 'pending',
-            bankDetailId: bankDetailId || null,
-            userNote: userNote || '',
-        });
+        const [payment] = await Payment.create(
+            [
+                {
+                    userId,
+                    type: 'withdrawal',
+                    amount: numAmount,
+                    method: 'bank_transfer',
+                    status: 'pending',
+                    bankDetailId: bankDetailId || null,
+                    userNote: userNote || '',
+                    balanceHeldAtRequest: true,
+                },
+            ],
+            { session }
+        );
+
+        const newBalance = await holdWithdrawalBalance(userId, numAmount, payment._id, session);
+
+        await session.commitTransaction();
 
         await logActivity({
             action: 'withdrawal_request_created',
@@ -282,17 +339,22 @@ export const createWithdrawalRequest = async (req, res) => {
             performedByType: 'user',
             targetType: 'payment',
             targetId: payment._id.toString(),
-            details: `Withdrawal request ₹${amount} created`,
+            details: `Withdrawal request ₹${numAmount} created (balance held)`,
             ip: getClientIp(req),
         });
 
         res.status(201).json({
             success: true,
-            message: 'Withdrawal request submitted successfully. Please wait for admin approval.',
-            data: payment,
+            message:
+                'Withdrawal request submitted. The amount has been deducted from your wallet and will be processed after admin approval.',
+            data: { ...payment.toObject(), walletBalance: newBalance },
         });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        await session.abortTransaction();
+        const status = error.status || 500;
+        res.status(status).json({ success: false, message: error.message });
+    } finally {
+        session.endSession();
     }
 };
 
@@ -551,8 +613,10 @@ export const approvePayment = async (req, res) => {
             }
         }
 
-        // For withdrawals, check balance again
-        if (payment.type === 'withdrawal') {
+        const withdrawalAlreadyHeld =
+            payment.type === 'withdrawal' && payment.balanceHeldAtRequest === true;
+
+        if (payment.type === 'withdrawal' && !withdrawalAlreadyHeld) {
             const wallet = await Wallet.findOne({ userId: payment.userId._id });
             if (!wallet || wallet.balance < payment.amount) {
                 return res.status(400).json({
@@ -562,14 +626,12 @@ export const approvePayment = async (req, res) => {
             }
         }
 
-        // Update payment status
         payment.status = 'approved';
         payment.adminRemarks = adminRemarks || 'Approved';
         payment.processedBy = req.admin._id;
         payment.processedAt = new Date();
         await payment.save();
 
-        // Update wallet
         let wallet = await Wallet.findOne({ userId: payment.userId._id });
         if (!wallet) {
             wallet = new Wallet({ userId: payment.userId._id, balance: 0 });
@@ -577,10 +639,18 @@ export const approvePayment = async (req, res) => {
 
         if (payment.type === 'deposit') {
             wallet.balance += payment.amount;
-        } else if (payment.type === 'withdrawal') {
+            await wallet.save();
+        } else if (payment.type === 'withdrawal' && !withdrawalAlreadyHeld) {
             wallet.balance -= payment.amount;
+            await wallet.save();
+            await WalletTransaction.create({
+                userId: payment.userId._id,
+                type: 'debit',
+                amount: payment.amount,
+                description: `Withdrawal approved ₹${payment.amount}`,
+                referenceId: String(payment._id),
+            });
         }
-        await wallet.save();
 
         await logActivity({
             action: `payment_${payment.type}_approved`,
@@ -615,15 +685,17 @@ export const approvePayment = async (req, res) => {
  * Access: Super admin always allowed, bookie allowed if canManagePayments is true
  */
 export const rejectPayment = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
-        // Check if admin has permission to manage payments
         const admin = await Admin.findById(req.admin._id);
         if (!admin) {
+            await session.abortTransaction();
             return res.status(403).json({ success: false, message: 'Admin not found' });
         }
 
-        // Super admin always has permission, bookie needs canManagePayments
         if (admin.role === 'bookie' && !admin.canManagePayments) {
+            await session.abortTransaction();
             return res.status(403).json({
                 success: false,
                 message: 'You do not have permission to manage payments. Please contact super admin.',
@@ -633,12 +705,14 @@ export const rejectPayment = async (req, res) => {
         const { id } = req.params;
         const { adminRemarks } = req.body;
 
-        const payment = await Payment.findById(id).populate('userId');
+        const payment = await Payment.findById(id).populate('userId').session(session);
         if (!payment) {
+            await session.abortTransaction();
             return res.status(404).json({ success: false, message: 'Payment not found' });
         }
 
         if (payment.status !== 'pending') {
+            await session.abortTransaction();
             return res.status(400).json({ success: false, message: 'Payment is not pending' });
         }
 
@@ -646,6 +720,7 @@ export const rejectPayment = async (req, res) => {
             admin.role === 'bookie' &&
             String(payment.userId?.referredBy || '') !== String(admin._id)
         ) {
+            await session.abortTransaction();
             return res.status(403).json({
                 success: false,
                 message: 'You can only process payments for your own players',
@@ -656,7 +731,13 @@ export const rejectPayment = async (req, res) => {
         payment.adminRemarks = adminRemarks || 'Rejected';
         payment.processedBy = req.admin._id;
         payment.processedAt = new Date();
-        await payment.save();
+        await payment.save({ session });
+
+        if (payment.type === 'withdrawal' && payment.balanceHeldAtRequest) {
+            await refundWithdrawalBalance(payment.userId._id, payment.amount, payment._id, session);
+        }
+
+        await session.commitTransaction();
 
         await logActivity({
             action: `payment_${payment.type}_rejected`,
@@ -675,7 +756,10 @@ export const rejectPayment = async (req, res) => {
             data: payment,
         });
     } catch (error) {
+        await session.abortTransaction();
         res.status(500).json({ success: false, message: error.message });
+    } finally {
+        session.endSession();
     }
 };
 
