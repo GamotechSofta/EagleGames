@@ -38,18 +38,6 @@ const BottomNavbar = () => {
         ),
       },
       {
-        id: 'bank',
-        labelKey: 'nav_bank',
-        path: '/bank',
-        icon: (
-          <img
-            src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1769777283/bank_il6uwi.png"
-            alt=""
-            className="w-6 h-6 object-contain [image-rendering:-webkit-optimize-contrast]"
-          />
-        ),
-      },
-      {
         id: 'games',
         labelKey: 'nav_games',
         path: '/games',
