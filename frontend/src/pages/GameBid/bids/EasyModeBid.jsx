@@ -171,6 +171,17 @@ const EasyModeBid = ({
 
     const handleDeleteBid = (id) => setBids((prev) => prev.filter((b) => b.id !== id));
 
+    const applyJodiSpecialQuickToNumber = (num) => {
+        const p = Number(jodiSpecialQuickSelected);
+        if (!p || p <= 0) return;
+        const pointStr = String(p);
+        setSpecialInputs((prev) => {
+            const current = String(prev[num] || '');
+            const nextValue = current === pointStr ? '' : pointStr;
+            return { ...prev, [num]: nextValue };
+        });
+    };
+
     const handleAddSpecialToList = () => {
         if (specialModeType !== 'jodi' && specialModeType !== 'doublePana' && specialModeType !== 'singlePana') return;
         const toAdd = Object.entries(specialInputs)
@@ -420,6 +431,8 @@ const EasyModeBid = ({
         setInputPoints(String(pts));
     };
 
+    const isJodiSpecialActive = specialModeType === 'jodi' && activeTab === 'special';
+
     const modeHeader = showModeTabs ? (
         <div className="space-y-2 md:space-y-3">
             <div className="grid grid-cols-2 gap-2 md:gap-3">
@@ -446,7 +459,7 @@ const EasyModeBid = ({
                     SPECIAL MODE
                 </button>
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className={`grid grid-cols-2 gap-2 ${isJodiSpecialActive ? 'md:hidden' : ''}`}>
                 <div className="rounded-xl border border-[#374151] bg-[#111827] px-3 py-2 text-center">
                     <div className="text-[11px] text-gray-300 font-medium">Count</div>
                     <div className="text-base font-bold text-white leading-tight">{specialLiveStats.count}</div>
@@ -456,20 +469,19 @@ const EasyModeBid = ({
                     <div className="text-base font-bold text-white leading-tight">{specialLiveStats.total}</div>
                 </div>
             </div>
-            {specialModeType === 'jodi' && activeTab === 'special' && (
-                <div className="flex flex-row items-center gap-2">
-                    <label className="text-gray-200 text-xs sm:text-sm font-medium shrink-0 w-24 sm:w-28">Quick Points</label>
-                    <div className="flex-1 min-w-0 grid grid-cols-5 gap-1.5 sm:gap-2">
+            {isJodiSpecialActive && (
+                <div className="flex flex-row items-center gap-2 md:gap-1.5 md:flex-wrap">
+                    <label className="text-gray-200 text-xs sm:text-sm font-medium shrink-0 w-24 sm:w-28 md:w-auto">Quick Points</label>
+                    <div className="flex-1 min-w-0 grid grid-cols-5 gap-1.5 sm:gap-2 md:flex md:flex-none md:w-auto md:gap-1">
                         {quickPointValues.map((pts) => (
                             <button
                                 key={pts}
                                 type="button"
                                 onClick={() => {
                                     const val = String(pts);
-                                    setJodiSpecialQuickSelected(val);
-                                    setSpecialInputs(Object.fromEntries(jodiNumbers.map((n) => [n, val])));
+                                    setJodiSpecialQuickSelected((prev) => (prev === val ? null : val));
                                 }}
-                                className={`py-2 min-h-[36px] rounded-lg border-2 text-xs sm:text-sm font-medium transition-colors active:scale-95 ${
+                                className={`shrink-0 py-2 min-h-[36px] rounded-lg border-2 text-xs sm:text-sm md:py-0 md:min-h-0 md:h-7 md:px-2.5 md:rounded-md md:text-[11px] font-medium transition-colors active:scale-95 ${
                                     jodiSpecialQuickSelected === String(pts)
                                         ? 'border-[#1a74e5] bg-[#1a74e5] text-white'
                                         : 'border-[#374151] bg-[#111827] text-white hover:border-[#1a74e5]'
@@ -485,10 +497,20 @@ const EasyModeBid = ({
                             setSpecialInputs(Object.fromEntries(jodiNumbers.map((n) => [n, ''])));
                             setJodiSpecialQuickSelected(null);
                         }}
-                        className="px-3 sm:px-4 py-2 min-h-[36px] rounded-lg border-2 border-[#374151] bg-[#111827] text-xs sm:text-sm font-medium text-white hover:border-[#1a74e5] active:scale-95"
+                        className="shrink-0 px-3 sm:px-4 py-2 min-h-[36px] rounded-lg border-2 border-[#374151] bg-[#111827] text-xs sm:text-sm md:px-3 md:py-0 md:min-h-0 md:h-7 md:rounded-md font-medium text-white hover:border-[#1a74e5] active:scale-95"
                     >
                         Clear
                     </button>
+                    <div className="hidden md:flex items-center gap-2 shrink-0 md:ml-auto">
+                        <div className="rounded-lg border border-[#374151] bg-[#111827] px-2.5 py-1 text-center min-w-[64px]">
+                            <div className="text-[10px] text-gray-300 font-medium leading-tight">Count</div>
+                            <div className="text-sm font-bold text-white leading-tight">{specialLiveStats.count}</div>
+                        </div>
+                        <div className="rounded-lg border border-[#374151] bg-[#111827] px-2.5 py-1 text-center min-w-[80px]">
+                            <div className="text-[10px] text-gray-300 font-medium leading-tight">Bet Amount</div>
+                            <div className="text-sm font-bold text-white leading-tight">{specialLiveStats.total}</div>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
@@ -651,9 +673,24 @@ const EasyModeBid = ({
                             <>
                                 {showModeTabs && desktopSplit && <div className="mb-4">{modeHeader}</div>}
                                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 xl:grid-rows-10 xl:grid-flow-col xl:gap-2">
-                                    {jodiNumbers.map((num) => (
+                                    {jodiNumbers.map((num) => {
+                                        const hasPoints = Number(specialInputs[num]) > 0;
+                                        return (
                                         <div key={num} className="flex items-center gap-1.5">
-                                            <div className="w-10 h-9 bg-[#1a74e5] border-2 border-[#374151] text-white flex items-center justify-center rounded-l-md font-bold text-xs shrink-0">
+                                            <div
+                                                role="button"
+                                                tabIndex={jodiSpecialQuickSelected != null ? 0 : -1}
+                                                onPointerDown={(e) => {
+                                                    if (jodiSpecialQuickSelected == null) return;
+                                                    e.preventDefault();
+                                                    applyJodiSpecialQuickToNumber(num);
+                                                }}
+                                                className={`w-10 h-9 border-2 text-white flex items-center justify-center rounded-l-md font-bold text-xs shrink-0 transition-colors ${
+                                                    hasPoints
+                                                        ? 'bg-[#5ba8ff] border-[#7eb8ff]'
+                                                        : 'bg-[#1a74e5] border-[#374151]'
+                                                } ${jodiSpecialQuickSelected != null ? 'cursor-pointer active:opacity-80' : ''}`}
+                                            >
                                                 <span className="inline-flex items-center gap-1">
                                                     <span>{num[0]}</span>
                                                     <span>{num[1]}</span>
@@ -673,10 +710,18 @@ const EasyModeBid = ({
                                                         }
                                                     }
                                                 }
-                                                className="w-full h-9 bg-[#111827] border-2 border-[#374151] text-white placeholder-gray-400 rounded-r-md focus:outline-none focus:border-[#1a74e5] px-2 text-xs font-semibold"
+                                                onPointerDown={(e) => {
+                                                    if (jodiSpecialQuickSelected == null) return;
+                                                    e.preventDefault();
+                                                    applyJodiSpecialQuickToNumber(num);
+                                                }}
+                                                className={`w-full h-9 bg-[#111827] border-2 border-[#374151] text-white placeholder-gray-400 rounded-r-md focus:outline-none focus:border-[#1a74e5] px-2 text-xs font-semibold ${
+                                                    jodiSpecialQuickSelected != null ? 'cursor-pointer' : ''
+                                                }`}
                                             />
                                         </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                                 {/* Mobile: sticky Submit button for special mode */}
                                 {showInlineSubmit && (

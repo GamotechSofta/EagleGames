@@ -196,7 +196,15 @@ export async function getPlayerGameBetHistory(userId, { limit = 100, gameCode = 
 /**
  * Admin game bet history from GameBetHistory collection (DB).
  */
-export async function getAdminGameBetHistory({ userId, limit = 50, page = 1 } = {}) {
+export async function getAdminGameBetHistory({
+    userId,
+    limit = 50,
+    page = 1,
+    gameCode,
+    status,
+    startDate,
+    endDate,
+} = {}) {
     const cap = Math.min(Math.max(Number(limit) || 50, 1), 200);
     const pg = Math.max(Number(page) || 1, 1);
     const skip = (pg - 1) * cap;
@@ -205,6 +213,25 @@ export async function getAdminGameBetHistory({ userId, limit = 50, page = 1 } = 
 
     const query = {};
     if (userId) query.user = userId;
+    const code = String(gameCode || '').trim().toUpperCase();
+    if (code && code !== 'ALL') query.gameCode = code;
+    if (status === 'won') query.status = 'won';
+    if (status === 'lost') query.status = 'lost';
+    if (status === 'pending') query.status = 'pending';
+    if (startDate || endDate) {
+        query.createdAt = {};
+        if (startDate) {
+            const d = new Date(startDate);
+            if (!Number.isNaN(d.getTime())) query.createdAt.$gte = d;
+        }
+        if (endDate) {
+            const d = new Date(endDate);
+            if (!Number.isNaN(d.getTime())) {
+                d.setHours(23, 59, 59, 999);
+                query.createdAt.$lte = d;
+            }
+        }
+    }
 
     const [docs, total] = await Promise.all([
         GameBetHistory.find(query)

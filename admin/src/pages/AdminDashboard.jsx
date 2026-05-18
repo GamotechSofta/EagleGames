@@ -17,6 +17,7 @@ import {
     FaExclamationTriangle,
 } from 'react-icons/fa';
 import { useLanguage } from '../context/LanguageContext';
+import ProfitLossPanel from '../components/ProfitLossPanel';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3010/api/v1';
 import { getAuthHeaders, clearAdminSession, fetchWithAuth } from '../lib/auth';
@@ -417,6 +418,13 @@ const AdminDashboard = () => {
                 </div>
             )}
 
+            <ProfitLossPanel
+                revenue={stats?.revenue}
+                bets={stats?.bets}
+                periodLabel={displayLabel}
+                t={t}
+            />
+
             {/* Primary KPIs */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <div className="bg-gradient-to-br from-green-50 to-transparent rounded-xl p-5 border border-green-200">
@@ -424,9 +432,21 @@ const AdminDashboard = () => {
                     <p className="text-2xl font-bold text-green-600 font-mono">{formatCurrency(stats?.revenue?.total)}</p>
                     <p className="text-xs text-gray-500 mt-1">{t('dash_betAmountCollected')}</p>
                 </div>
-                <div className="bg-gradient-to-br from-blue-50 to-transparent rounded-xl p-5 border border-blue-200">
+                <div
+                    className={`bg-gradient-to-br rounded-xl p-5 border ${
+                        (stats?.revenue?.netProfit ?? 0) >= 0
+                            ? 'from-blue-50 to-transparent border-blue-200'
+                            : 'from-red-50 to-transparent border-red-200'
+                    }`}
+                >
                     <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">{t('dash_netProfitPeriod')}</p>
-                    <p className="text-2xl font-bold text-blue-600 font-mono">{formatCurrency(stats?.revenue?.netProfit)}</p>
+                    <p
+                        className={`text-2xl font-bold font-mono ${
+                            (stats?.revenue?.netProfit ?? 0) >= 0 ? 'text-blue-600' : 'text-red-600'
+                        }`}
+                    >
+                        {formatCurrency(stats?.revenue?.netProfit)}
+                    </p>
                     <p className="text-xs text-gray-500 mt-1">{t('dash_revenueMinusPayouts')}</p>
                 </div>
                 <div className="bg-gradient-to-br from-purple-50 to-transparent rounded-xl p-5 border border-purple-200">
@@ -447,7 +467,11 @@ const AdminDashboard = () => {
                 <SectionCard title={t('dash_revenuePayouts')} description={t('dash_selectedPeriod')} icon={FaMoneyBillWave} linkTo="/reports" linkLabel={t('dash_reportsLink')}>
                     <StatRow label={t('dash_totalRevenue')} value={formatCurrency(stats?.revenue?.total)} colorClass="text-green-600" />
                     <StatRow label={t('dash_totalPayouts')} value={formatCurrency(stats?.revenue?.payouts)} colorClass="text-red-500" />
-                    <StatRow label={t('dash_netProfit')} value={formatCurrency(stats?.revenue?.netProfit)} colorClass="text-blue-600" />
+                    <StatRow
+                        label={t('dash_netProfit')}
+                        value={formatCurrency(stats?.revenue?.netProfit)}
+                        colorClass={(stats?.revenue?.netProfit ?? 0) >= 0 ? 'text-blue-600' : 'text-red-600'}
+                    />
                 </SectionCard>
 
                 {/* Players */}
@@ -560,7 +584,13 @@ const AdminDashboard = () => {
                                             <td className="py-2 px-1 sm:px-2 text-right font-mono tabular-nums">{row.bets}</td>
                                             <td className="py-2 px-1 sm:px-2 text-right font-mono tabular-nums text-green-600">{formatCurrency(row.revenue)}</td>
                                             <td className="py-2 px-1 sm:px-2 text-right font-mono tabular-nums text-red-500">{formatCurrency(row.payouts)}</td>
-                                            <td className="py-2 px-1 sm:px-2 text-right font-mono tabular-nums text-blue-600">{formatCurrency(row.netProfit)}</td>
+                                            <td
+                                                className={`py-2 px-1 sm:px-2 text-right font-mono tabular-nums font-semibold ${
+                                                    (row.netProfit ?? 0) >= 0 ? 'text-blue-600' : 'text-red-600'
+                                                }`}
+                                            >
+                                                {formatCurrency(row.netProfit)}
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>

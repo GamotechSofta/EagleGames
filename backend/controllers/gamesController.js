@@ -392,7 +392,19 @@ export async function getAdminGameBetHistoryHandler(req, res) {
         const limit = Number(req.query?.limit) || 50;
         const page = Number(req.query?.page) || 1;
         const userId = req.query?.userId ? String(req.query.userId).trim() : '';
-        const result = await getAdminGameBetHistory({ userId: userId || undefined, limit, page });
+        const gameCode = req.query?.gameCode ? String(req.query.gameCode).trim() : '';
+        const status = req.query?.status ? String(req.query.status).trim().toLowerCase() : '';
+        const startDate = req.query?.startDate ? String(req.query.startDate).trim() : '';
+        const endDate = req.query?.endDate ? String(req.query.endDate).trim() : '';
+        const result = await getAdminGameBetHistory({
+            userId: userId || undefined,
+            limit,
+            page,
+            gameCode: gameCode || undefined,
+            status: status || undefined,
+            startDate: startDate || undefined,
+            endDate: endDate || undefined,
+        });
         return res.status(200).json({ success: true, ...result });
     } catch (err) {
         return res.status(500).json({ success: false, message: err.message || 'Failed to load admin game bet history' });
