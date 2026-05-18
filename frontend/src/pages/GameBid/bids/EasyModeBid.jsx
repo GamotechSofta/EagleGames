@@ -432,6 +432,13 @@ const EasyModeBid = ({
     };
 
     const isJodiSpecialActive = specialModeType === 'jodi' && activeTab === 'special';
+    const jodiSpecialCanSubmit =
+        bids.length > 0 || Object.values(specialInputs).some((v) => Number(v) > 0);
+
+    const jodiSpecialDesktopSubmitClass = (enabled) =>
+        enabled
+            ? 'shrink-0 px-4 h-9 rounded-lg bg-[#1a74e5] text-white text-xs font-bold shadow-md hover:bg-[#152842] transition-all active:scale-[0.98] whitespace-nowrap'
+            : 'shrink-0 px-4 h-9 rounded-lg bg-gray-400 text-white text-xs font-bold shadow-md opacity-50 cursor-not-allowed whitespace-nowrap';
 
     const modeHeader = showModeTabs ? (
         <div className="space-y-2 md:space-y-3">
@@ -510,6 +517,16 @@ const EasyModeBid = ({
                             <div className="text-[10px] text-gray-300 font-medium leading-tight">Bet Amount</div>
                             <div className="text-sm font-bold text-white leading-tight">{specialLiveStats.total}</div>
                         </div>
+                        {showInlineSubmit && (
+                            <button
+                                type="button"
+                                disabled={!jodiSpecialCanSubmit}
+                                onClick={handleSubmitFromSpecial}
+                                className={jodiSpecialDesktopSubmitClass(jodiSpecialCanSubmit)}
+                            >
+                                Submit Bet
+                            </button>
+                        )}
                     </div>
                 </div>
             )}
@@ -894,24 +911,24 @@ const EasyModeBid = ({
                             </div>
                         )}
 
-                        {showInlineSubmit && (
+                        {showInlineSubmit && !isJodiSpecialActive && (
                             <>
                                 {/* Desktop/Tablet inline submit */}
                                 <div className="hidden md:block mt-4">
                                     {(() => {
                                         const enabled =
-                                            (specialModeType === 'jodi' || specialModeType === 'doublePana' || specialModeType === 'singlePana')
+                                            (specialModeType === 'doublePana' || specialModeType === 'singlePana')
                                                 ? bids.length > 0 || Object.values(specialInputs).some((v) => Number(v) > 0)
                                                 : bids.length > 0;
                                         return (
                                     <button
                                         type="button"
                                         disabled={
-                                            (specialModeType === 'jodi' || specialModeType === 'doublePana')
+                                            specialModeType === 'doublePana'
                                                 ? bids.length === 0 && !Object.values(specialInputs).some((v) => Number(v) > 0)
                                                 : !bids.length
                                         }
-                                        onClick={(specialModeType === 'jodi' || specialModeType === 'doublePana' || specialModeType === 'singlePana') ? handleSubmitFromSpecial : () => { setReviewRows(bids); setIsReviewOpen(true); }}
+                                        onClick={(specialModeType === 'doublePana' || specialModeType === 'singlePana') ? handleSubmitFromSpecial : () => { setReviewRows(bids); setIsReviewOpen(true); }}
                                         className={submitBtnClass(enabled)}
                                     >
                                         Submit Bet
