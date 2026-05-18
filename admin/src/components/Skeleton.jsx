@@ -43,7 +43,7 @@ export const Spinner = ({ size = 'md', className = '' }) => {
     };
 
     return (
-        <div className={`${sizes[size]} border-gray-200 border-t-orange-500 rounded-full animate-spin ${className}`}></div>
+        <div className={`${sizes[size]} border-gray-200 border-t-blue-500 rounded-full animate-spin ${className}`}></div>
     );
 };
 
@@ -54,7 +54,7 @@ export const LoadingOverlay = ({ message }) => {
     <div className="flex flex-col items-center justify-center py-20">
         <div className="relative">
             <div className="w-16 h-16 rounded-full border-4 border-gray-200"></div>
-            <div className="absolute inset-0 w-16 h-16 rounded-full border-4 border-transparent border-t-orange-500 animate-spin"></div>
+            <div className="absolute inset-0 w-16 h-16 rounded-full border-4 border-transparent border-t-blue-500 animate-spin"></div>
         </div>
         <p className="mt-6 text-gray-600 font-medium">{msg}</p>
         <p className="mt-2 text-sm text-gray-400">{t('wontTakeLong')}</p>

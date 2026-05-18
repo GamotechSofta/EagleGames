@@ -1,5 +1,6 @@
 import React from 'react';
 import EasyModeBid from './EasyModeBid';
+import { useBidI18n } from '../useBidI18n';
 
 const validatePana = (n) => {
     if (!n) return false;
@@ -49,20 +50,23 @@ const getAllValidDoublePana = () => {
     return validPanas;
 };
 
-const DoublePanaBid = (props) => (
-    <EasyModeBid
-        {...props}
-        label="Enter Pana"
-        maxLength={3}
-        validateInput={validatePana}
-        showBidsList
-        openReviewOnAdd={false}
-        showInlineSubmit
-        showModeTabs
-        desktopSplit
-        specialModeType="doublePana"
-        validDoublePanas={getAllValidDoublePana()}
-    />
-);
+const DoublePanaBid = (props) => {
+    const bid = useBidI18n();
+    return (
+        <EasyModeBid
+            {...props}
+            label={bid.enterPana}
+            maxLength={3}
+            validateInput={validatePana}
+            showBidsList
+            openReviewOnAdd={false}
+            showInlineSubmit
+            showModeTabs
+            desktopSplit
+            specialModeType="doublePana"
+            validDoublePanas={getAllValidDoublePana()}
+        />
+    );
+};
 
 export default DoublePanaBid;

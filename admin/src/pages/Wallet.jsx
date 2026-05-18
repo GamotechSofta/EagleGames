@@ -84,7 +84,7 @@ const Wallet = () => {
                         <button
                             onClick={() => setActiveTab('wallets')}
                             className={`pb-4 px-4 font-semibold ${
-                                activeTab === 'wallets' ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-400'
+                                activeTab === 'wallets' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-400'
                             }`}
                         >
                             {t('wal_tabWallets')}
@@ -92,7 +92,7 @@ const Wallet = () => {
                         <button
                             onClick={() => setActiveTab('transactions')}
                             className={`pb-4 px-4 font-semibold ${
-                                activeTab === 'transactions' ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-400'
+                                activeTab === 'transactions' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-400'
                             }`}
                         >
                             {t('wal_tabTransactions')}
@@ -125,7 +125,7 @@ const Wallet = () => {
                                         wallets.map((wallet) => (
                                             <tr key={wallet._id} className="hover:bg-gray-100">
                                                 <td className="px-6 py-4 text-sm">{wallet.userId?.username || wallet.userId}</td>
-                                                <td className="px-6 py-4 text-sm font-semibold text-orange-500">₹{wallet.balance}</td>
+                                                <td className="px-6 py-4 text-sm font-semibold text-blue-500">₹{wallet.balance}</td>
                                                 <td className="px-6 py-4 text-sm">
                                                     <div className="flex gap-2">
                                                         <button

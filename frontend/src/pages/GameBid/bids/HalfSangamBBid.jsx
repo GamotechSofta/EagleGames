@@ -1,5 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { useMarketBetContextTitle } from '../../../hooks/useMarketBetContextTitle';
+import { useBidI18n } from '../useBidI18n';
 import BidLayout from '../BidLayout';
 import BidReviewModal from './BidReviewModal';
 import { isValidAnyPana } from './panaRules';
@@ -10,6 +11,7 @@ const sanitizePoints = (v) => (v ?? '').toString().replace(/\D/g, '').slice(0, 6
 
 // Half Sangam (C): Open Ank (1 digit) + Close Pana (3 digits)
 const HalfSangamBBid = ({ market, title }) => {
+    const bid = useBidI18n();
     const [session, setSession] = useState('OPEN');
     const [openAnk, setOpenAnk] = useState('');
     const [closePana, setClosePana] = useState('');
@@ -123,7 +125,7 @@ const HalfSangamBBid = ({ market, title }) => {
     const handleAdd = () => {
         const pts = Number(points);
         if (!pts || pts <= 0) {
-            showWarning('Please enter points.');
+            showWarning(bid.pleaseEnterPoints);
             return;
         }
         if (!isValidAnyPana(closePana)) {
@@ -132,7 +134,7 @@ const HalfSangamBBid = ({ market, title }) => {
         }
         const enteredOpenAnk = (openAnk ?? '').toString().trim();
         if (!/^[0-9]$/.test(enteredOpenAnk)) {
-            showWarning('Please enter a valid Open Ank (0-9).');
+            showWarning(bid.pleaseEnterOpenAnk);
             return;
         }
 
@@ -240,7 +242,7 @@ const HalfSangamBBid = ({ market, title }) => {
                             </div>
 
                             <div className="flex flex-row items-center gap-2">
-                                <label className="text-gray-200 text-sm font-medium shrink-0 w-40">Enter Points:</label>
+                                <label className="text-gray-200 text-sm font-medium shrink-0 w-40">{bid.enterPointsColon}</label>
                                 <input
                                     ref={pointsInputRef}
                                     type="text"
@@ -268,7 +270,7 @@ const HalfSangamBBid = ({ market, title }) => {
                                 disabled={!bids.length}
                                 className={submitBtnClass(!!bids.length)}
                             >
-                                Submit Bet
+                                {bid.submitBet}
                             </button>
                         </div>
                     </div>

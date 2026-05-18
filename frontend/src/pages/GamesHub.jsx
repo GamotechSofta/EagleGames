@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL, fetchWithAuth } from '../config/api';
 import { useLanguage } from '../context/LanguageContext';
 import { partnerRequiresTopLevelNavigation } from '../utils/partnerGameEmbed';
+import { getGameDisplayName } from '../utils/gameDisplayName';
 
 function gameLaunchSessionKeys(gameCode) {
   const c = String(gameCode || '').trim().toUpperCase();
@@ -124,7 +125,7 @@ const GamesHub = () => {
 
       if (launchUrl) {
         const codeForRoute = encodeURIComponent(gameCode);
-        const gameName = String(game?.name || gameCode);
+        const gameName = getGameDisplayName(t, game) || gameCode;
         const embedAllowed = data?.embedAllowed !== false;
         if (partnerRequiresTopLevelNavigation(launchUrl, gameCode, embedAllowed)) {
           window.location.assign(String(launchUrl).trim());
@@ -190,7 +191,7 @@ const GamesHub = () => {
           <div className="grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-4">
             {games.map((game, index) => {
               const theme = CARD_THEMES[index % CARD_THEMES.length];
-              const title = game?.name || t('games_unnamed');
+              const title = getGameDisplayName(t, game);
               const code = String(game?.gameCode || '').trim().toUpperCase();
               return (
                 <div

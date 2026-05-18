@@ -322,12 +322,12 @@ const AddResult = () => {
                 )}
 
                 {activeTab === 'regular' && mainPendingCount > 0 && !isDirectEditMode && (
-                    <div className="mb-3 sm:mb-4 p-3 sm:p-4 bg-orange-500/10 border border-orange-200 rounded-lg overflow-hidden">
-                        <h3 className="text-xs sm:text-sm font-semibold text-orange-500 flex items-center gap-2 mb-2 flex-wrap">
+                    <div className="mb-3 sm:mb-4 p-3 sm:p-4 bg-blue-500/10 border border-blue-200 rounded-lg overflow-hidden">
+                        <h3 className="text-xs sm:text-sm font-semibold text-blue-500 flex items-center gap-2 mb-2 flex-wrap">
                             <FaExclamationTriangle className="w-4 h-4 shrink-0" />
                             Regular market result declaration pending
                         </h3>
-                        <p className="text-orange-700 text-xs sm:text-sm break-words">
+                        <p className="text-blue-700 text-xs sm:text-sm break-words">
                             {mainPendingCount} market{mainPendingCount !== 1 ? 's' : ''} need{mainPendingCount === 1 ? 's' : ''} result declaration: {mainPendingList.map((m) => m.marketName).join(', ')}
                         </p>
                         <p className="text-red text-[11px] sm:text-xs mt-2">
@@ -353,7 +353,7 @@ const AddResult = () => {
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`inline-flex items-center gap-2 px-4 py-2.5 sm:px-5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base transition-all ${
                                     isActive
-                                        ? 'bg-orange-500 text-gray-800 shadow-lg shadow-orange-500/20'
+                                        ? 'bg-blue-500 text-gray-800 shadow-lg shadow-blue-500/20'
                                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800 border border-gray-200'
                                 }`}
                             >
@@ -395,7 +395,7 @@ const AddResult = () => {
                                         const timeline = `${formatTime(market.startingTime)} - ${formatTime(market.closingTime)}`;
                                         const resultDisplay = market.displayResult || '***-**-***';
                                         return (
-                                            <div key={market._id} className={`p-3 ${isPendingResult ? 'bg-orange-500/5' : ''}`}>
+                                            <div key={market._id} className={`p-3 ${isPendingResult ? 'bg-blue-500/5' : ''}`}>
                                                 <div className="flex items-center justify-between gap-2">
                                                     <div className="font-semibold text-gray-800 truncate">{market.marketName}</div>
                                                     {isClosed && (
@@ -406,21 +406,21 @@ const AddResult = () => {
                                                 <div className="mt-2 grid grid-cols-3 gap-2 text-xs">
                                                     <div className="rounded bg-gray-50 p-2">
                                                         <div className="text-gray-500">Result</div>
-                                                        <div className="font-mono text-orange-500">{resultDisplay}</div>
+                                                        <div className="font-mono text-blue-500">{resultDisplay}</div>
                                                     </div>
                                                     <div className="rounded bg-gray-50 p-2">
                                                         <div className="text-gray-500">Open</div>
-                                                        <div className="font-mono text-orange-500">{hasOpen ? market.openingNumber : '—'}</div>
+                                                        <div className="font-mono text-blue-500">{hasOpen ? market.openingNumber : '—'}</div>
                                                     </div>
                                                     <div className="rounded bg-gray-50 p-2">
                                                         <div className="text-gray-500">Close</div>
-                                                        <div className="font-mono text-orange-500">{hasClose ? market.closingNumber : '—'}</div>
+                                                        <div className="font-mono text-blue-500">{hasClose ? market.closingNumber : '—'}</div>
                                                     </div>
                                                 </div>
                                                 <button
                                                     type="button"
                                                     onClick={() => openPanelForEdit(market)}
-                                                    className="mt-3 w-full px-3 py-2 bg-orange-500 hover:bg-orange-600 text-gray-800 font-semibold rounded-lg transition-colors text-sm"
+                                                    className="mt-3 w-full px-3 py-2 bg-blue-500 hover:bg-blue-600 text-gray-800 font-semibold rounded-lg transition-colors text-sm"
                                                 >
                                                     Edit Result
                                                 </button>
@@ -434,12 +434,12 @@ const AddResult = () => {
                                 <table className="w-full border-collapse text-[11px] sm:text-xs md:text-sm lg:text-base">
                                     <thead>
                                         <tr className="border-b border-gray-200">
-                                            <th className="text-left py-2 sm:py-3 px-1.5 sm:px-3 md:px-4 font-semibold text-orange-500 bg-white whitespace-nowrap">Market</th>
-                                            <th className="text-left py-2 sm:py-3 px-1.5 sm:px-3 md:px-4 font-semibold text-orange-500 bg-white border-l border-gray-200 whitespace-nowrap">Timeline</th>
-                                            <th className="text-left py-2 sm:py-3 px-1.5 sm:px-3 md:px-4 font-semibold text-orange-500 bg-white border-l border-gray-200 whitespace-nowrap min-w-[4rem] sm:min-w-[5rem] md:min-w-[6.5rem]">Result</th>
-                                            <th className="text-left py-2 sm:py-3 px-1.5 sm:px-3 md:px-4 font-semibold text-orange-500 bg-white border-l border-gray-200 whitespace-nowrap">Opening</th>
-                                            <th className="text-left py-2 sm:py-3 px-1.5 sm:px-3 md:px-4 font-semibold text-orange-500 bg-white border-l border-gray-200 whitespace-nowrap">Closing</th>
-                                            <th className="text-left py-2 sm:py-3 px-1.5 sm:px-3 md:px-4 font-semibold text-orange-500 bg-white border-l border-gray-200 whitespace-nowrap min-w-[4.5rem] sm:min-w-[5.5rem] md:min-w-[6.5rem]">Actions</th>
+                                            <th className="text-left py-2 sm:py-3 px-1.5 sm:px-3 md:px-4 font-semibold text-blue-500 bg-white whitespace-nowrap">Market</th>
+                                            <th className="text-left py-2 sm:py-3 px-1.5 sm:px-3 md:px-4 font-semibold text-blue-500 bg-white border-l border-gray-200 whitespace-nowrap">Timeline</th>
+                                            <th className="text-left py-2 sm:py-3 px-1.5 sm:px-3 md:px-4 font-semibold text-blue-500 bg-white border-l border-gray-200 whitespace-nowrap min-w-[4rem] sm:min-w-[5rem] md:min-w-[6.5rem]">Result</th>
+                                            <th className="text-left py-2 sm:py-3 px-1.5 sm:px-3 md:px-4 font-semibold text-blue-500 bg-white border-l border-gray-200 whitespace-nowrap">Opening</th>
+                                            <th className="text-left py-2 sm:py-3 px-1.5 sm:px-3 md:px-4 font-semibold text-blue-500 bg-white border-l border-gray-200 whitespace-nowrap">Closing</th>
+                                            <th className="text-left py-2 sm:py-3 px-1.5 sm:px-3 md:px-4 font-semibold text-blue-500 bg-white border-l border-gray-200 whitespace-nowrap min-w-[4.5rem] sm:min-w-[5.5rem] md:min-w-[6.5rem]">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -451,11 +451,11 @@ const AddResult = () => {
                                             const timeline = `${formatTime(market.startingTime)} - ${formatTime(market.closingTime)}`;
                                             const resultDisplay = market.displayResult || '***-**-***';
                                             return (
-                                                <tr key={market._id} className={`border-b border-gray-200 hover:bg-gray-50 ${isPendingResult ? 'bg-orange-500/5' : ''}`}>
+                                                <tr key={market._id} className={`border-b border-gray-200 hover:bg-gray-50 ${isPendingResult ? 'bg-blue-500/5' : ''}`}>
                                                     <td className="py-2 sm:py-3 px-1.5 sm:px-3 md:px-4 font-medium text-gray-800 whitespace-nowrap min-w-0 max-w-[110px] sm:max-w-[180px] md:max-w-none">
                                                         <div className="flex flex-wrap items-center gap-1.5 truncate">
                                                             {isPendingResult && (
-                                                                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-orange-500/30 text-orange-500 shrink-0" title="Result declaration pending">
+                                                                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-500/30 text-blue-500 shrink-0" title="Result declaration pending">
                                                                     <FaExclamationTriangle className="w-3 h-3" />
                                                                 </span>
                                                             )}
@@ -465,23 +465,23 @@ const AddResult = () => {
                                                     <td className="py-2 sm:py-3 px-1.5 sm:px-3 md:px-4 text-gray-600 border-l border-gray-200 whitespace-nowrap text-[10px] sm:text-xs md:text-sm">{timeline}</td>
                                                     <td className="py-2 sm:py-3 px-1.5 sm:px-3 md:px-4 border-l border-gray-200 min-w-[4rem] sm:min-w-[5rem] md:min-w-[6.5rem]">
                                                         <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 sm:gap-x-2">
-                                                            <span className="font-mono text-orange-500 text-[10px] sm:text-xs md:text-sm">{resultDisplay}</span>
+                                                            <span className="font-mono text-blue-500 text-[10px] sm:text-xs md:text-sm">{resultDisplay}</span>
                                                             {isClosed && (
                                                                 <span className="inline-flex shrink-0 px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs font-semibold rounded-full bg-red-600 text-gray-800">Closed</span>
                                                             )}
                                                         </div>
                                                     </td>
                                                     <td className="py-2 sm:py-3 px-1.5 sm:px-3 md:px-4 border-l border-gray-200">
-                                                        {hasOpen ? <span className="font-mono text-orange-500 text-[10px] sm:text-xs md:text-sm">{market.openingNumber}</span> : <span className="text-gray-500">—</span>}
+                                                        {hasOpen ? <span className="font-mono text-blue-500 text-[10px] sm:text-xs md:text-sm">{market.openingNumber}</span> : <span className="text-gray-500">—</span>}
                                                     </td>
                                                     <td className="py-2 sm:py-3 px-1.5 sm:px-3 md:px-4 border-l border-gray-200">
-                                                        {hasClose ? <span className="font-mono text-orange-500 text-[10px] sm:text-xs md:text-sm">{market.closingNumber}</span> : <span className="text-gray-500">—</span>}
+                                                        {hasClose ? <span className="font-mono text-blue-500 text-[10px] sm:text-xs md:text-sm">{market.closingNumber}</span> : <span className="text-gray-500">—</span>}
                                                     </td>
                                                     <td className="py-2 sm:py-3 px-1.5 sm:px-3 md:px-4 border-l border-gray-200 min-w-[4.5rem] sm:min-w-[5.5rem] md:min-w-[6.5rem]">
                                                         <button
                                                             type="button"
                                                             onClick={() => openPanelForEdit(market)}
-                                                            className="px-2 sm:px-3 py-1.5 sm:py-2 bg-orange-500 hover:bg-orange-600 text-gray-800 font-semibold rounded-lg transition-colors text-xs sm:text-sm"
+                                                            className="px-2 sm:px-3 py-1.5 sm:py-2 bg-blue-500 hover:bg-blue-600 text-gray-800 font-semibold rounded-lg transition-colors text-xs sm:text-sm"
                                                         >
                                                             Edit Result
                                                         </button>
@@ -513,13 +513,13 @@ const AddResult = () => {
                             className={`bg-white rounded-xl border border-gray-200 shadow-xl p-4 sm:p-5 md:p-6 ${isDirectEditMode ? 'w-full max-w-lg mx-auto' : 'w-full max-w-lg max-h-[92vh] overflow-y-auto'}`}
                             onClick={isDirectEditMode ? undefined : (e) => e.stopPropagation()}
                         >
-                            <h2 className="text-lg sm:text-xl font-bold text-orange-500 mb-1 border-b border-gray-200 pb-2 truncate" title={selectedMarket.marketName}>
+                            <h2 className="text-lg sm:text-xl font-bold text-blue-500 mb-1 border-b border-gray-200 pb-2 truncate" title={selectedMarket.marketName}>
                                 {selectedMarket.marketName}
                             </h2>
                             {getMarketId() && (
                                 <p className="text-[11px] text-gray-500 mb-3 flex flex-wrap items-center gap-x-2 gap-y-1" title="Compare with Market Detail: open same ID in URL">
                                     <span className="font-mono text-gray-400">ID: {getMarketId()}</span>
-                                    <Link to={`/markets/${getMarketId()}`} className="text-orange-500 hover:underline shrink-0">View details</Link>
+                                    <Link to={`/markets/${getMarketId()}`} className="text-blue-500 hover:underline shrink-0">View details</Link>
                                 </p>
                             )}
 
@@ -576,7 +576,7 @@ const AddResult = () => {
                                             </div>
                                         <div className="flex justify-between items-center gap-2">
                                             <span className="text-gray-400 text-xs sm:text-sm shrink-0">Total Profit</span>
-                                            <span className="font-mono text-orange-500 bg-gray-100 px-2 py-1 rounded text-xs sm:text-sm truncate">{formatNum(preview.profit)}</span>
+                                            <span className="font-mono text-blue-500 bg-gray-100 px-2 py-1 rounded text-xs sm:text-sm truncate">{formatNum(preview.profit)}</span>
                                         </div>
                                         <div className="flex justify-between items-center gap-2">
                                             <span className="text-gray-400 text-xs sm:text-sm shrink-0">
@@ -655,7 +655,7 @@ const AddResult = () => {
                                             </div>
                                             <div className="flex justify-between items-center gap-2">
                                                 <span className="text-gray-400 text-xs sm:text-sm shrink-0">Total Profit</span>
-                                                <span className="font-mono text-orange-500 bg-gray-100 px-2 py-1 rounded text-xs sm:text-sm truncate">{formatNum(previewClose.profit)}</span>
+                                                <span className="font-mono text-blue-500 bg-gray-100 px-2 py-1 rounded text-xs sm:text-sm truncate">{formatNum(previewClose.profit)}</span>
                                             </div>
                                         </div>
                                     )}

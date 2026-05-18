@@ -119,19 +119,19 @@ const Logs = () => {
                     placeholder="Filter by action..."
                     value={filterAction}
                     onChange={(e) => { setFilterAction(e.target.value); setPage(1); }}
-                    className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-800 text-sm placeholder-gray-400 focus:ring-2 focus:ring-orange-500 min-w-0 w-full"
+                    className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-800 text-sm placeholder-gray-400 focus:ring-2 focus:ring-blue-500 min-w-0 w-full"
                 />
                 <input
                     type="text"
                     placeholder="Filter by user..."
                     value={filterPerformedBy}
                     onChange={(e) => { setFilterPerformedBy(e.target.value); setPage(1); }}
-                    className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-800 text-sm placeholder-gray-400 focus:ring-2 focus:ring-orange-500 min-w-0 w-full"
+                    className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-800 text-sm placeholder-gray-400 focus:ring-2 focus:ring-blue-500 min-w-0 w-full"
                 />
                 <select
                     value={filterType}
                     onChange={(e) => { setFilterType(e.target.value); setPage(1); }}
-                    className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-800 text-sm focus:ring-2 focus:ring-orange-500 min-w-0 w-full"
+                    className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 min-w-0 w-full"
                 >
                     <option value="">All types</option>
                     {Object.entries(TYPE_LABELS).map(([val, label]) => (
@@ -141,7 +141,7 @@ const Logs = () => {
                 <select
                     value={sortOrder}
                     onChange={(e) => { setSortOrder(e.target.value); setPage(1); }}
-                    className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-800 text-sm focus:ring-2 focus:ring-orange-500 min-w-0 w-full"
+                    className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 min-w-0 w-full"
                 >
                     <option value="desc">Newest first</option>
                     <option value="asc">Oldest first</option>
@@ -163,7 +163,7 @@ const Logs = () => {
             <div className="bg-white rounded-lg overflow-hidden border border-gray-200">
                 {loading ? (
                     <div className="p-8 text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto" />
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto" />
                         <p className="mt-4 text-gray-400">Loading logs...</p>
                     </div>
                 ) : logs.length === 0 ? (
@@ -192,7 +192,7 @@ const Logs = () => {
                                             <td className="px-4 sm:px-6 py-3 text-gray-400 whitespace-nowrap">{(pagination.page - 1) * 50 + index + 1}</td>
                                             <td className="px-4 sm:px-6 py-3 text-gray-600 font-mono text-xs whitespace-nowrap">{formatTimestamp(log.createdAt)}</td>
                                             <td className="px-4 sm:px-6 py-3 min-w-0">
-                                                <span className="inline-block px-2 py-1 rounded text-xs font-medium bg-orange-50 text-orange-600 border border-orange-200 break-words max-w-full">
+                                                <span className="inline-block px-2 py-1 rounded text-xs font-medium bg-blue-50 text-blue-600 border border-blue-200 break-words max-w-full">
                                                     {getActionLabel(log.action)}
                                                 </span>
                                             </td>
@@ -215,7 +215,7 @@ const Logs = () => {
                             {logs.map((log, index) => (
                                 <div key={log._id} className="p-4 hover:bg-gray-100/30">
                                     <div className="flex flex-wrap items-start gap-2 mb-2">
-                                        <span className="px-2 py-1 rounded text-xs font-medium bg-orange-50 text-orange-600 border border-orange-200 break-words">
+                                        <span className="px-2 py-1 rounded text-xs font-medium bg-blue-50 text-blue-600 border border-blue-200 break-words">
                                             {getActionLabel(log.action)}
                                         </span>
                                         <span className="px-2 py-0.5 rounded text-xs bg-gray-200 text-gray-700 capitalize">

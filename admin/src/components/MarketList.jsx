@@ -93,7 +93,7 @@ const MarketList = ({ markets, onEdit, onDelete, apiBaseUrl, getAuthHeaders }) =
                 return (
                     <div
                         key={market._id}
-                        className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5 lg:p-6 hover:border-orange-300 hover:shadow-md transition-all min-w-0 overflow-hidden"
+                        className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5 lg:p-6 hover:border-blue-300 hover:shadow-md transition-all min-w-0 overflow-hidden"
                     >
                         {/* Top row: status (left) + result (right) */}
                         <div className="flex items-start justify-between gap-2 mb-3 sm:mb-4">
@@ -101,7 +101,7 @@ const MarketList = ({ markets, onEdit, onDelete, apiBaseUrl, getAuthHeaders }) =
                                 {status.status === 'open' && statusOpen}
                                 {status.status === 'closed' && statusClosed}
                             </div>
-                            <div className="text-orange-500 font-mono font-semibold text-xs sm:text-sm text-right leading-tight px-2 py-0.5 rounded-md bg-orange-50 border border-orange-100">
+                            <div className="text-blue-500 font-mono font-semibold text-xs sm:text-sm text-right leading-tight px-2 py-0.5 rounded-md bg-blue-50 border border-blue-100">
                                 {resultDisplay}
                             </div>
                         </div>
@@ -125,7 +125,7 @@ const MarketList = ({ markets, onEdit, onDelete, apiBaseUrl, getAuthHeaders }) =
                         <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
                             <button
                                 onClick={() => onEdit(market)}
-                                className="px-2 sm:px-3 py-2 bg-orange-100 hover:bg-orange-200 text-orange-700 rounded-lg text-[11px] sm:text-sm font-semibold min-h-[36px] sm:min-h-0"
+                                className="px-2 sm:px-3 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg text-[11px] sm:text-sm font-semibold min-h-[36px] sm:min-h-0"
                             >
                                 {t('edit')}
                             </button>
@@ -137,7 +137,7 @@ const MarketList = ({ markets, onEdit, onDelete, apiBaseUrl, getAuthHeaders }) =
                             </button>
                             <button
                                 onClick={() => navigate(`/markets/${market._id}`)}
-                                className="col-span-2 px-2 sm:px-3 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-[11px] sm:text-sm font-semibold min-h-[36px] sm:min-h-0"
+                                className="col-span-2 px-2 sm:px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-[11px] sm:text-sm font-semibold min-h-[36px] sm:min-h-0"
                             >
                                 {t('view')}
                             </button>
@@ -151,7 +151,7 @@ const MarketList = ({ markets, onEdit, onDelete, apiBaseUrl, getAuthHeaders }) =
         {showPasswordModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
                 <div className="bg-white rounded-xl border border-gray-200 shadow-2xl max-w-md w-full p-6">
-                    <h3 className="text-lg font-bold text-orange-500 mb-2">{t('ml_secretModalTitle')}</h3>
+                    <h3 className="text-lg font-bold text-blue-500 mb-2">{t('ml_secretModalTitle')}</h3>
                     <p className="text-gray-500 text-sm mb-4">
                         {t('ml_secretModalHint')}
                     </p>
@@ -162,7 +162,7 @@ const MarketList = ({ markets, onEdit, onDelete, apiBaseUrl, getAuthHeaders }) =
                             onChange={(e) => { setSecretPassword(e.target.value); setPasswordError(''); }}
                             placeholder={t('ml_secretPlaceholder')}
                             autoFocus
-                            className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                         {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
                         <div className="flex gap-3">

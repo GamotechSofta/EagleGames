@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useMarketBetContextTitle } from '../../../hooks/useMarketBetContextTitle';
+import { useBidI18n } from '../useBidI18n';
 import BidLayout from '../BidLayout';
 import BidReviewModal from './BidReviewModal';
 import { useBettingWindow } from '../BettingWindowContext';
@@ -7,6 +8,7 @@ import { placeBet, updateUserBalance } from '../../../api/bets';
 import { generateDPCommon, validateDigit } from './dpCommonGenerator';
 
 const DPCommon = ({ market, title }) => {
+    const bid = useBidI18n();
     const [session, setSession] = useState(() => (market?.status === 'running' ? 'CLOSE' : 'OPEN'));
     const [warning, setWarning] = useState('');
     const [selectedDate, setSelectedDate] = useState(() => {
@@ -217,7 +219,7 @@ const DPCommon = ({ market, title }) => {
                             />
                         </div>
                         <div>
-                            <label className="block text-xs sm:text-sm font-semibold text-gray-300 mb-1.5">Enter Points</label>
+                            <label className="block text-xs sm:text-sm font-semibold text-gray-300 mb-1.5">{bid.enterPoints}</label>
                             <input
                                 type="text"
                                 inputMode="numeric"
@@ -291,11 +293,11 @@ const DPCommon = ({ market, title }) => {
 
                 <div className="mt-3 mb-1 flex items-center gap-6 text-white">
                     <div className="text-center">
-                        <div className="text-[11px] text-gray-400">Count</div>
+                        <div className="text-[11px] text-gray-400">{bid.count}</div>
                         <div className="text-2xl leading-none font-bold">{bidsCount}</div>
                     </div>
                     <div className="text-center">
-                        <div className="text-[11px] text-gray-400">Bet Amount</div>
+                        <div className="text-[11px] text-gray-400">{bid.betAmount}</div>
                         <div className="text-2xl leading-none font-bold">{totalPoints}</div>
                     </div>
                 </div>

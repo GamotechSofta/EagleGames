@@ -238,7 +238,7 @@ const PaymentManagement = () => {
 
     const getStatusBadge = (status) => {
         const styles = {
-            pending: 'bg-orange-50 text-orange-600 border-orange-200',
+            pending: 'bg-blue-50 text-blue-600 border-blue-200',
             approved: 'bg-green-600/30 text-green-600 border-green-600/50',
             rejected: 'bg-red-600/30 text-red-500 border-red-600/50',
             completed: 'bg-blue-600/30 text-blue-600 border-blue-600/50',
@@ -260,7 +260,7 @@ const PaymentManagement = () => {
             {/* Header */}
             <div className="mb-6">
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 flex items-center gap-3">
-                    <FaWallet className="text-orange-500" />
+                    <FaWallet className="text-blue-500" />
                     Payment Management
                 </h1>
             </div>
@@ -270,7 +270,7 @@ const PaymentManagement = () => {
                 <div
                     className={`order-2 sm:order-1 rounded-xl p-2.5 sm:p-5 border-2 transition-all cursor-pointer ${
                         filters.status === 'pending' && filters.type === 'deposit'
-                            ? 'border-amber-500 bg-orange-500/10'
+                            ? 'border-amber-500 bg-blue-500/10'
                             : 'border-gray-200 bg-white hover:border-gray-200'
                     }`}
                     onClick={() => setFilters({ status: 'pending', type: 'deposit' })}
@@ -279,16 +279,16 @@ const PaymentManagement = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-[10px] sm:text-xs font-medium text-gray-400 uppercase tracking-wide sm:tracking-wider leading-tight">Pending Deposits</p>
-                            <p className="text-lg sm:text-3xl font-bold text-orange-500 mt-0">{pendingCounts.deposits}</p>
+                            <p className="text-lg sm:text-3xl font-bold text-blue-500 mt-0">{pendingCounts.deposits}</p>
                             <p className="text-[10px] sm:text-xs text-gray-500 mt-0 leading-tight">Click to filter</p>
                         </div>
-                        <FaArrowDown className="w-6 h-6 sm:w-10 sm:h-10 text-orange-500/50 shrink-0" />
+                        <FaArrowDown className="w-6 h-6 sm:w-10 sm:h-10 text-blue-500/50 shrink-0" />
                     </div>
                 </div>
                 <div
                     className={`order-3 sm:order-2 rounded-xl p-2.5 sm:p-5 border-2 transition-all cursor-pointer ${
                         filters.status === 'pending' && filters.type === 'withdrawal'
-                            ? 'border-amber-500 bg-orange-500/10'
+                            ? 'border-amber-500 bg-blue-500/10'
                             : 'border-gray-200 bg-white hover:border-gray-200'
                     }`}
                     onClick={() => setFilters({ status: 'pending', type: 'withdrawal' })}
@@ -297,7 +297,7 @@ const PaymentManagement = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-[10px] sm:text-xs font-medium text-gray-400 uppercase tracking-wide sm:tracking-wider leading-tight">Pending Withdrawals</p>
-                            <p className="text-lg sm:text-3xl font-bold text-orange-500 mt-0">{pendingCounts.withdrawals}</p>
+                            <p className="text-lg sm:text-3xl font-bold text-blue-500 mt-0">{pendingCounts.withdrawals}</p>
                             <p className="text-[10px] sm:text-xs text-gray-500 mt-0 leading-tight">Click to filter</p>
                         </div>
                         <FaArrowUp className="w-6 h-6 sm:w-10 sm:h-10 text-purple-500/50 shrink-0" />
@@ -329,7 +329,7 @@ const PaymentManagement = () => {
                     <FaFilter className="text-gray-500 w-4 h-4" />
                     <span className="text-xs sm:text-sm font-medium text-gray-400">Filter Payments</span>
                     {hasActiveFilters && (
-                        <span className="ml-1 sm:ml-2 px-1.5 sm:px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-500 text-[10px] sm:text-xs">
+                        <span className="ml-1 sm:ml-2 px-1.5 sm:px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-500 text-[10px] sm:text-xs">
                             Filters active
                         </span>
                     )}
@@ -378,11 +378,11 @@ const PaymentManagement = () => {
                     <p className="text-sm text-gray-400">
                         Showing <span className="font-semibold text-gray-800">{payments.length}</span> payment{payments.length !== 1 ? 's' : ''}
                         {hasActiveFilters && (
-                            <span className="ml-2 text-orange-500">(filtered)</span>
+                            <span className="ml-2 text-blue-500">(filtered)</span>
                         )}
                     </p>
                     {pendingRequireAction && payments.some((p) => p.status === 'pending') && (
-                        <p className="text-xs text-orange-500 flex items-center gap-2">
+                        <p className="text-xs text-blue-500 flex items-center gap-2">
                             <FaClock className="w-3.5 h-3.5" />
                             Some payments need your approval
                         </p>
@@ -541,7 +541,7 @@ const PaymentManagement = () => {
                                                 {hasActiveFilters && (
                                                     <button
                                                         onClick={() => setFilters({ status: '', type: '' })}
-                                                        className="mt-4 px-4 py-2 bg-orange-600 hover:bg-orange-500 rounded-lg text-gray-800 text-sm font-medium"
+                                                        className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-gray-800 text-sm font-medium"
                                                     >
                                                         Clear Filters
                                                     </button>

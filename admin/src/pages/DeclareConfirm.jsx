@@ -142,7 +142,7 @@ const DeclareConfirm = () => {
                 <button
                     type="button"
                     onClick={handleBack}
-                    className="inline-flex items-center gap-2 text-gray-400 hover:text-orange-500 text-xs sm:text-sm mb-4 transition-colors min-h-[44px] touch-manipulation"
+                    className="inline-flex items-center gap-2 text-gray-400 hover:text-blue-500 text-xs sm:text-sm mb-4 transition-colors min-h-[44px] touch-manipulation"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -163,23 +163,23 @@ const DeclareConfirm = () => {
                     </div>
                 ) : data ? (
                     <>
-                        <div className="rounded-xl border border-orange-200 bg-orange-500/10 p-3 sm:p-4 mb-4 sm:mb-6 overflow-hidden">
-                            <p className="text-orange-500 font-semibold text-sm sm:text-base break-words">Total payout to winning players: ₹{formatNum(data.totalWinAmount)}</p>
+                        <div className="rounded-xl border border-blue-200 bg-blue-500/10 p-3 sm:p-4 mb-4 sm:mb-6 overflow-hidden">
+                            <p className="text-blue-500 font-semibold text-sm sm:text-base break-words">Total payout to winning players: ₹{formatNum(data.totalWinAmount)}</p>
                             <p className="text-gray-400 text-xs sm:text-sm mt-1">{data.winningBets?.length ?? 0} winning bet(s)</p>
                         </div>
 
                         <div className="rounded-xl border border-gray-200 bg-white shadow-lg overflow-hidden mb-4 sm:mb-6">
-                            <h2 className="text-base sm:text-lg font-bold text-orange-500 bg-white px-3 sm:px-4 py-2 sm:py-3 border-b border-gray-200">Winning players</h2>
+                            <h2 className="text-base sm:text-lg font-bold text-blue-500 bg-white px-3 sm:px-4 py-2 sm:py-3 border-b border-gray-200">Winning players</h2>
                             <div className="overflow-x-auto overscroll-x-contain touch-pan-x">
                                 <table className="w-full text-xs sm:text-sm border-collapse min-w-[340px] sm:min-w-[480px]">
                                     <thead>
                                         <tr className="bg-gray-100/70 border-b border-gray-200">
-                                            <th className="text-left py-2 sm:py-3 px-2 sm:px-3 font-semibold text-orange-500 text-[11px] sm:text-sm">#</th>
+                                            <th className="text-left py-2 sm:py-3 px-2 sm:px-3 font-semibold text-blue-500 text-[11px] sm:text-sm">#</th>
                                             <th className="text-left py-2 sm:py-3 px-2 sm:px-3 font-semibold text-gray-600 text-[11px] sm:text-sm">Username</th>
                                             <th className="text-left py-2 sm:py-3 px-2 sm:px-3 font-semibold text-gray-600 text-[11px] sm:text-sm">Bet type</th>
                                             <th className="text-left py-2 sm:py-3 px-2 sm:px-3 font-semibold text-gray-600 text-[11px] sm:text-sm">Bet number</th>
                                             <th className="text-right py-2 sm:py-3 px-2 sm:px-3 font-semibold text-gray-600 text-[11px] sm:text-sm">Amount (₹)</th>
-                                            <th className="text-right py-2 sm:py-3 px-2 sm:px-3 font-semibold text-orange-500 text-[11px] sm:text-sm">Payout (₹)</th>
+                                            <th className="text-right py-2 sm:py-3 px-2 sm:px-3 font-semibold text-blue-500 text-[11px] sm:text-sm">Payout (₹)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -226,7 +226,7 @@ const DeclareConfirm = () => {
                         {showPasswordModal && (
                             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-3 sm:p-4 overflow-y-auto">
                                 <div className="bg-white rounded-xl border border-gray-200 shadow-xl max-w-md w-full p-4 sm:p-6 my-auto">
-                                    <h3 className="text-base sm:text-lg font-bold text-orange-500 mb-2">Enter Secret Declare Password</h3>
+                                    <h3 className="text-base sm:text-lg font-bold text-blue-500 mb-2">Enter Secret Declare Password</h3>
                                     <p className="text-gray-400 text-xs sm:text-sm mb-4">
                                         Please enter the secret password to confirm and declare this result.
                                     </p>
@@ -237,14 +237,14 @@ const DeclareConfirm = () => {
                                             onChange={(e) => { setSecretPassword(e.target.value); setPasswordError(''); }}
                                             placeholder="Secret password"
                                             autoFocus
-                                            className="w-full px-4 py-3 min-h-[44px] rounded-lg bg-gray-100 border border-gray-200 text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-orange-500 focus:border-transparent touch-manipulation"
+                                            className="w-full px-4 py-3 min-h-[44px] rounded-lg bg-gray-100 border border-gray-200 text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent touch-manipulation"
                                         />
                                         {passwordError && <p className="text-red-500 text-xs sm:text-sm">{passwordError}</p>}
                                         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                                             <button
                                                 type="submit"
                                                 disabled={declaring}
-                                                className="flex-1 px-4 py-3 min-h-[44px] bg-orange-500 hover:bg-orange-600 text-gray-800 font-semibold rounded-lg disabled:opacity-50 touch-manipulation"
+                                                className="flex-1 px-4 py-3 min-h-[44px] bg-blue-500 hover:bg-blue-600 text-gray-800 font-semibold rounded-lg disabled:opacity-50 touch-manipulation"
                                             >
                                                 {declaring ? 'Declaring...' : 'Confirm & Declare'}
                                             </button>

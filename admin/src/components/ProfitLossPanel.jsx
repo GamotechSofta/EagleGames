@@ -28,7 +28,7 @@ const ProfitLossPanel = ({ revenue, bets, periodLabel, t }) => {
             <div className="px-5 sm:px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-slate-50 to-white">
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900">{t('dash_plTitle')}</h2>
                 <p className="text-sm text-gray-500 mt-0.5">
-                    {t('dash_plSubtitle')} · <span className="text-orange-600 font-medium">{periodLabel}</span>
+                    {t('dash_plSubtitle')} · <span className="text-blue-600 font-medium">{periodLabel}</span>
                 </p>
             </div>
 
@@ -90,7 +90,7 @@ const ProfitLossPanel = ({ revenue, bets, periodLabel, t }) => {
                 </div>
 
                 <p className="mt-4 text-xs text-gray-500 leading-relaxed border-t border-gray-100 pt-4">
-                    <FaArrowRight className="inline w-3 h-3 mr-1 text-orange-500" />
+                    <FaArrowRight className="inline w-3 h-3 mr-1 text-blue-500" />
                     {isProfit ? t('dash_plExplainProfit') : t('dash_plExplainLoss')}
                 </p>
             </div>

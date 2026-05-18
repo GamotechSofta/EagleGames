@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useMemo, useRef, useState 
 import { useNavigate } from 'react-router-dom';
 import { FaTimesCircle } from 'react-icons/fa';
 import { isBettingAllowed } from '../../utils/marketTiming';
+import { useLanguage } from '../../context/LanguageContext';
 
 const BettingWindowContext = createContext({ allowed: true, closeOnly: false, message: null });
 
@@ -19,6 +20,7 @@ function computeWindowState(market) {
 
 function MarketClosedModal({ market, allowed }) {
     const navigate = useNavigate();
+    const { t } = useLanguage();
     const [visible, setVisible] = useState(false);
     const prevAllowedRef = useRef(null);
     const hasShownRef = useRef(false);
@@ -70,17 +72,17 @@ function MarketClosedModal({ market, allowed }) {
                         <FaTimesCircle className="w-20 h-20 text-red-500" aria-hidden />
                     </div>
                     <h2 id="market-closed-title" className="text-xl font-bold text-white mb-2">
-                        Market is closed
+                        {t('bid_marketClosedTitle')}
                     </h2>
                     <p className="text-sm text-gray-300 mb-6">
-                        Betting for this market has ended. You will be taken to the home page.
+                        {t('bid_marketClosedBody')}
                     </p>
                     <button
                         type="button"
                         onClick={goHome}
                         className="w-full py-3 rounded-xl bg-[#1a74e5] text-white font-semibold text-base hover:bg-[#152842] transition-colors"
                     >
-                        OK
+                        {t('ok')}
                     </button>
                 </div>
             </div>

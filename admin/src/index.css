@@ -119,12 +119,14 @@ button, a, input, select, textarea {
 }
 
 /* Glow Effects (light theme) */
-.glow-orange {
-  box-shadow: 0 10px 15px -3px rgba(249, 115, 22, 0.15);
+.glow-blue,
+.glow-blue {
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.15);
 }
 
-.glow-orange:hover {
-  box-shadow: 0 20px 25px -5px rgba(249, 115, 22, 0.25);
+.glow-blue:hover,
+.glow-blue:hover {
+  box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.25);
 }
 
 .glow-green {
@@ -191,8 +193,8 @@ input[type="number"] {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .bet-closure-group:focus-within {
-  border-color: #f97316; /* orange-500 */
-  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
+  border-color: #2563eb; /* blue-600 */
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
 }
 .bet-closure-group input {
   border: none;
@@ -209,7 +211,7 @@ input[type="number"] {
 
 /* Focus Styles for Accessibility */
 *:focus-visible {
-  outline: 2px solid #f97316;
+  outline: 2px solid #2563eb;
   outline-offset: 2px;
 }
 

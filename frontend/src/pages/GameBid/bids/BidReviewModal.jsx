@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useBettingWindow } from '../BettingWindowContext';
+import { useLanguage } from '../../../context/LanguageContext';
 
 const formatMoney = (v) => {
   const n = Number(v);
@@ -7,11 +8,11 @@ const formatMoney = (v) => {
   return n.toFixed(1);
 };
 
-const formatDateTitle = (marketTitle, dateText) => {
+const formatDateTitle = (marketTitle, dateText, reviewFallback) => {
   const m = (marketTitle || '').toString().trim();
   const d = (dateText || '').toString().trim();
   if (m && d) return `${m} - ${d}`;
-  return m || d || 'Review Bet';
+  return m || d || reviewFallback;
 };
 
 const renderBetNumber = (val) => {
@@ -54,6 +55,27 @@ const readLatestWalletBalance = () => {
   }
 };
 
+const COLUMN_LABEL_KEYS = {
+  Pana: 'bid_columnPana',
+  Digit: 'bid_columnDigit',
+  Jodi: 'bid_columnJodi',
+  Sangam: 'bid_columnSangam',
+};
+
+const resolveColumnLabel = (t, labelKey) => {
+  if (!labelKey) return '';
+  if (String(labelKey).startsWith('bid_')) return t(labelKey);
+  const key = COLUMN_LABEL_KEYS[labelKey];
+  return key ? t(key) : labelKey;
+};
+
+const formatSessionType = (t, type) => {
+  const s = String(type || '').toUpperCase();
+  if (s === 'OPEN') return t('bid_sessionOpen');
+  if (s === 'CLOSE') return t('bid_sessionClose');
+  return type ?? '';
+};
+
 const BidReviewModal = ({
   open,
   onClose,
@@ -66,6 +88,8 @@ const BidReviewModal = ({
   totalBids = 0,
   totalAmount = 0
 }) => {
+  const { t } = useLanguage();
+  const columnLabel = resolveColumnLabel(t, labelKey);
   const { allowed: bettingAllowed, message: bettingMessage } = useBettingWindow();
   const [stage, setStage] = useState('review'); // 'review' | 'success'
   const [submitting, setSubmitting] = useState(false);
@@ -100,7 +124,7 @@ const BidReviewModal = ({
 
       setStage('success');
     } catch (e) {
-      setSubmitError(e?.message || 'Failed to place bet');
+      setSubmitError(e?.message || t('bid_failedPlace'));
     } finally {
       setSubmitting(false);
     }
@@ -110,7 +134,7 @@ const BidReviewModal = ({
     <div className="fixed inset-0 z-[999] flex items-center justify-center p-3 sm:p-6">
       {/* Overlay */}
       {stage === 'review' ? (
-        <button type="button" onClick={handleClose} aria-label="Close" className="absolute inset-0 bg-black/60" />
+        <button type="button" onClick={handleClose} aria-label={t('bid_close')} className="absolute inset-0 bg-black/60" />
       ) : (
         <div aria-hidden="true" className="absolute inset-0 bg-black/60" />
       )}
@@ -145,7 +169,7 @@ const BidReviewModal = ({
               </div>
               <div className="mt-6 text-center">
                 <div className="text-green-600 font-semibold text-base sm:text-lg">
-                  Your Bet Placed Sucessfully
+                  {t('bid_successTitle')}
                 </div>
               </div>
             </div>
@@ -158,7 +182,7 @@ const BidReviewModal = ({
                 }}
                 className="w-full bg-[#1a74e5] text-white font-bold py-3.5 rounded-lg shadow-md active:scale-[0.99] transition-transform hover:bg-[#152842]"
               >
-                OK
+                {t('ok')}
               </button>
             </div>
           </div>
@@ -169,7 +193,7 @@ const BidReviewModal = ({
           >
             {/* Title bar */}
             <div className="bg-[#1a74e5] text-white px-3 sm:px-4 py-2.5 text-center text-sm sm:text-lg font-semibold shrink-0 border-b-2 border-[#1a74e5]">
-              {formatDateTitle(marketTitle, dateText)}
+              {formatDateTitle(marketTitle, dateText, t('bid_reviewBet'))}
             </div>
 
             {/* Content: only history list scrolls */}
@@ -177,9 +201,9 @@ const BidReviewModal = ({
               {/* History (scroll only this section) */}
               <div className="flex-1 overflow-y-auto overscroll-contain ios-scroll-touch px-3 sm:px-4 pt-3 sm:pt-4 min-h-0">
                 <div className="grid grid-cols-3 text-center font-semibold text-white text-[11px] sm:text-base">
-                  <div className="truncate">{labelKey}</div>
-                  <div className="truncate">Points</div>
-                  <div className="truncate">Type</div>
+                  <div className="truncate">{columnLabel}</div>
+                  <div className="truncate">{t('bid_points')}</div>
+                  <div className="truncate">{t('bid_type')}</div>
                 </div>
                 <div className="mt-2.5 sm:mt-3 space-y-2 sm:space-y-3">
                   {rows.map((r) => (
@@ -187,7 +211,7 @@ const BidReviewModal = ({
                       <div className="grid grid-cols-3 text-center text-white font-semibold text-[12px] sm:text-base">
                         <div className="truncate">{renderBetNumber(r.displayNumber ?? r.number)}</div>
                         <div className="truncate text-white">{r.points}</div>
-                        <div className="truncate font-medium text-gray-300 uppercase">{r.type}</div>
+                        <div className="truncate font-medium text-gray-300 uppercase">{formatSessionType(t, r.type)}</div>
                       </div>
                     </div>
                   ))}
@@ -199,19 +223,19 @@ const BidReviewModal = ({
                 <div className="rounded-2xl overflow-hidden border-2 border-[#374151] bg-[#1f2937]">
                   <div className="grid grid-cols-2">
                     <div className="p-3 sm:p-4 text-center border-r-2 border-b-2 border-[#374151]">
-                      <div className="text-gray-300 text-[11px] sm:text-sm">Total Bets</div>
+                      <div className="text-gray-300 text-[11px] sm:text-sm">{t('bid_totalBets')}</div>
                       <div className="text-white font-bold text-base sm:text-lg leading-tight">{totalBids}</div>
                     </div>
                     <div className="p-3 sm:p-4 text-center border-b-2 border-[#374151]">
-                      <div className="text-gray-300 text-[11px] sm:text-sm">Total Bet Amount</div>
+                      <div className="text-gray-300 text-[11px] sm:text-sm">{t('bid_totalBetAmount')}</div>
                       <div className="text-white font-bold text-base sm:text-lg leading-tight">{amount}</div>
                     </div>
                     <div className="p-3 sm:p-4 text-center border-r-2 border-[#374151]">
-                      <div className="text-gray-300 text-[11px] sm:text-sm">Wallet Balance Before Deduction</div>
+                      <div className="text-gray-300 text-[11px] sm:text-sm">{t('bid_walletBefore')}</div>
                       <div className="text-white font-bold text-base sm:text-lg leading-tight">{formatMoney(before)}</div>
                     </div>
                     <div className="p-3 sm:p-4 text-center">
-                      <div className="text-gray-300 text-[11px] sm:text-sm">Wallet Balance After Deduction</div>
+                      <div className="text-gray-300 text-[11px] sm:text-sm">{t('bid_walletAfter')}</div>
                       <div className={`font-bold text-base sm:text-lg leading-tight ${after < 0 ? 'text-red-600' : 'text-white'}`}>{formatMoney(after)}</div>
                     </div>
                   </div>
@@ -228,7 +252,10 @@ const BidReviewModal = ({
               {/* Insufficient balance warning */}
               {insufficientBalance && (
                 <div className="mx-3 sm:mx-4 mt-2 p-3 rounded-xl bg-amber-50 border-2 border-amber-300 text-amber-700 text-sm shrink-0">
-                  Insufficient balance. Required: ₹{amount.toLocaleString('en-IN')}, Available: ₹{before.toLocaleString('en-IN')}. Add funds to place this bet.
+                  {t('bid_insufficientBalance', {
+                    required: amount.toLocaleString('en-IN'),
+                    available: before.toLocaleString('en-IN'),
+                  })}
                 </div>
               )}
 
@@ -241,7 +268,7 @@ const BidReviewModal = ({
 
               {/* Note */}
               <div className="px-3 sm:px-4 pt-3 sm:pt-4 pb-3 sm:pb-4 text-center text-red-600 font-semibold text-[12px] sm:text-base shrink-0">
-                *Note: Bet once placed cannot be cancelled*
+                {t('bid_note')}
               </div>
             </div>
 
@@ -253,7 +280,7 @@ const BidReviewModal = ({
                 disabled={submitting}
                 className="bg-[#111827] border-2 border-[#374151] text-gray-200 font-bold py-3 rounded-xl sm:rounded-2xl shadow-md active:scale-[0.99] transition-transform hover:border-[#4b5563] hover:bg-[#1f2937] disabled:opacity-50"
               >
-                Cancel
+                {t('bid_cancel')}
               </button>
               <button
                 type="button"
@@ -264,10 +291,10 @@ const BidReviewModal = ({
                 {submitting ? (
                   <>
                     <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Placing...
+                    {t('bid_placing')}
                   </>
                 ) : (
-                  'Submit Bet'
+                  t('bid_submitBet')
                 )}
               </button>
             </div>

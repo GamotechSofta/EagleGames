@@ -90,7 +90,7 @@ const PlayerDevices = () => {
             <AdminLayout onLogout={handleLogout} title="Devices used">
                 <div className="flex flex-col items-center justify-center min-h-[40vh]">
                     <p className="text-red-500 mb-4">{error || 'Player not found'}</p>
-                    <Link to="/all-users" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 text-gray-800 font-semibold">
+                    <Link to="/all-users" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500 text-gray-800 font-semibold">
                         <FaArrowLeft /> Back to All Players
                     </Link>
                 </div>
@@ -104,10 +104,10 @@ const PlayerDevices = () => {
         <AdminLayout onLogout={handleLogout} title="Devices used">
             <div className="min-w-0 max-w-full">
                 <div className="mb-4">
-                    <Link to="/all-users" className="text-gray-400 hover:text-orange-500 text-sm inline-flex items-center gap-1 mb-1">
+                    <Link to="/all-users" className="text-gray-400 hover:text-blue-500 text-sm inline-flex items-center gap-1 mb-1">
                         <FaArrowLeft className="w-4 h-4" /> All Players
                     </Link>
-                    <Link to={`/all-users/${userId}`} className="text-gray-400 hover:text-orange-500 text-sm inline-flex items-center gap-1 mb-2 block">
+                    <Link to={`/all-users/${userId}`} className="text-gray-400 hover:text-blue-500 text-sm inline-flex items-center gap-1 mb-2 block">
                         Player » {player.username}
                     </Link>
                     <h1 className="text-2xl sm:text-3xl font-bold">Devices used <span className="text-gray-400 font-normal">» {player.username}</span></h1>

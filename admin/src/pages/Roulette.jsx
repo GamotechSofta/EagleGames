@@ -127,7 +127,7 @@ const Roulette = () => {
                             type="button"
                             onClick={saveTargetWinRate}
                             disabled={savingConfig}
-                            className="px-4 py-2 bg-orange-500 text-white rounded-lg font-medium disabled:opacity-50"
+                            className="px-4 py-2 bg-blue-500 text-white rounded-lg font-medium disabled:opacity-50"
                         >
                             {savingConfig ? 'Saving...' : 'Save'}
                         </button>
@@ -159,7 +159,7 @@ const Roulette = () => {
                 <button
                     type="button"
                     onClick={() => { setPagination((p) => ({ ...p, page: 1 })); setApplyKey((k) => k + 1); }}
-                    className="px-4 py-2 bg-orange-500 text-white rounded-lg font-medium"
+                    className="px-4 py-2 bg-blue-500 text-white rounded-lg font-medium"
                 >
                     Apply
                 </button>

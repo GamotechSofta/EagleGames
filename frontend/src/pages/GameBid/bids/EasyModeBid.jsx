@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useMarketBetContextTitle } from '../../../hooks/useMarketBetContextTitle';
+import { useLanguage } from '../../../context/LanguageContext';
 import BidLayout from '../BidLayout';
 import BidReviewModal from './BidReviewModal';
 import { placeBet, updateUserBalance } from '../../../api/bets';
@@ -21,6 +22,7 @@ const EasyModeBid = ({
     validSinglePanas = [],
     apiBetType = null, // when set, used in payload instead of derived betType (e.g. 'sp-common')
 }) => {
+    const { t } = useLanguage();
     const [activeTab, setActiveTab] = useState('easy'); // easy | special
     const [jodiSpecialQuickSelected, setJodiSpecialQuickSelected] = useState(null);
     const lockSessionToOpen = specialModeType === 'jodi';
@@ -136,23 +138,23 @@ const EasyModeBid = ({
         const n = inputNumber?.toString().trim() || '';
 
         if (!pts || pts <= 0) {
-            showWarning('Please enter points.');
+            showWarning(t('bid_pleaseEnterPoints'));
             return;
         }
 
         if (!n) {
-            showWarning(maxLength === 2 ? 'Please enter Digit (00-99).' : `Please enter ${labelKey}.`);
+            showWarning(maxLength === 2 ? t('bid_pleaseEnterDigit') : t('bid_pleaseEnterPoints'));
             return;
         }
 
         // Jodi specific: must be exactly 2 digits (00-99)
         if (maxLength === 2 && n.length !== 2) {
-            showWarning('Please enter 2-digit Digit (00-99).');
+            showWarning(t('bid_pleaseEnter2Digit'));
             return;
         }
 
         if (!isValid(n)) {
-            showWarning(maxLength === 2 ? 'Invalid Digit. Use 00-99.' : 'Invalid number.');
+            showWarning(maxLength === 2 ? t('bid_invalidDigit') : t('bid_invalidNumber'));
             return;
         }
 
@@ -193,10 +195,9 @@ const EasyModeBid = ({
                 type: session,
             }));
         if (!toAdd.length) {
-            const label =
-                specialModeType === 'jodi' ? 'Digit (00-99)'
-                : (specialModeType === 'doublePana' ? 'Double Pana' : 'Single Pana');
-            showWarning(`Please enter points for at least one ${label}.`);
+            if (specialModeType === 'jodi') showWarning(t('bid_atLeastOneJodi'));
+            else if (specialModeType === 'doublePana') showWarning(t('bid_atLeastOneDoublePana'));
+            else showWarning(t('bid_atLeastOneSinglePana'));
             return;
         }
         setBids((prev) => mergeBids(prev, toAdd));
@@ -219,10 +220,9 @@ const EasyModeBid = ({
             }));
 
         if (!toAdd.length && bids.length === 0) {
-            const label =
-                specialModeType === 'jodi' ? 'Digit (00-99)'
-                : (specialModeType === 'doublePana' ? 'Double Pana' : 'Single Pana');
-            showWarning(`Please enter points for at least one ${label}.`);
+            if (specialModeType === 'jodi') showWarning(t('bid_atLeastOneJodi'));
+            else if (specialModeType === 'doublePana') showWarning(t('bid_atLeastOneDoublePana'));
+            else showWarning(t('bid_atLeastOneSinglePana'));
             return;
         }
 
@@ -452,7 +452,7 @@ const EasyModeBid = ({
                             : 'bg-[#111827] text-gray-300 border-[#374151] hover:border-[#4b5563]'
                     }`}
                 >
-                    EASY MODE
+                    {t('bid_easyMode')}
                 </button>
                 <button
                     type="button"
@@ -463,22 +463,22 @@ const EasyModeBid = ({
                             : 'bg-[#111827] text-gray-300 border-[#374151] hover:border-[#4b5563]'
                     }`}
                 >
-                    SPECIAL MODE
+                    {t('bid_specialMode')}
                 </button>
             </div>
             <div className={`grid grid-cols-2 gap-2 ${isJodiSpecialActive ? 'md:hidden' : ''}`}>
                 <div className="rounded-xl border border-[#374151] bg-[#111827] px-3 py-2 text-center">
-                    <div className="text-[11px] text-gray-300 font-medium">Count</div>
+                    <div className="text-[11px] text-gray-300 font-medium">{t('bid_count')}</div>
                     <div className="text-base font-bold text-white leading-tight">{specialLiveStats.count}</div>
                 </div>
                 <div className="rounded-xl border border-[#374151] bg-[#111827] px-3 py-2 text-center">
-                    <div className="text-[11px] text-gray-300 font-medium">Bet Amount</div>
+                    <div className="text-[11px] text-gray-300 font-medium">{t('bid_betAmount')}</div>
                     <div className="text-base font-bold text-white leading-tight">{specialLiveStats.total}</div>
                 </div>
             </div>
             {isJodiSpecialActive && (
                 <div className="flex flex-row items-center gap-2 md:gap-1.5 md:flex-wrap">
-                    <label className="text-gray-200 text-xs sm:text-sm font-medium shrink-0 w-24 sm:w-28 md:w-auto">Quick Points</label>
+                    <label className="text-gray-200 text-xs sm:text-sm font-medium shrink-0 w-24 sm:w-28 md:w-auto">{t('bid_quickPoints')}</label>
                     <div className="flex-1 min-w-0 grid grid-cols-5 gap-1.5 sm:gap-2 md:flex md:flex-none md:w-auto md:gap-1">
                         {quickPointValues.map((pts) => (
                             <button
@@ -506,15 +506,15 @@ const EasyModeBid = ({
                         }}
                         className="shrink-0 px-3 sm:px-4 py-2 min-h-[36px] rounded-lg border-2 border-[#374151] bg-[#111827] text-xs sm:text-sm md:px-3 md:py-0 md:min-h-0 md:h-7 md:rounded-md font-medium text-white hover:border-[#1a74e5] active:scale-95"
                     >
-                        Clear
+                        {t('bid_clear')}
                     </button>
                     <div className="hidden md:flex items-center gap-2 shrink-0 md:ml-auto">
                         <div className="rounded-lg border border-[#374151] bg-[#111827] px-2.5 py-1 text-center min-w-[64px]">
-                            <div className="text-[10px] text-gray-300 font-medium leading-tight">Count</div>
+                            <div className="text-[10px] text-gray-300 font-medium leading-tight">{t('bid_count')}</div>
                             <div className="text-sm font-bold text-white leading-tight">{specialLiveStats.count}</div>
                         </div>
                         <div className="rounded-lg border border-[#374151] bg-[#111827] px-2.5 py-1 text-center min-w-[80px]">
-                            <div className="text-[10px] text-gray-300 font-medium leading-tight">Bet Amount</div>
+                            <div className="text-[10px] text-gray-300 font-medium leading-tight">{t('bid_betAmount')}</div>
                             <div className="text-sm font-bold text-white leading-tight">{specialLiveStats.total}</div>
                         </div>
                         {showInlineSubmit && (
@@ -524,7 +524,7 @@ const EasyModeBid = ({
                                 onClick={handleSubmitFromSpecial}
                                 className={jodiSpecialDesktopSubmitClass(jodiSpecialCanSubmit)}
                             >
-                                Submit Bet
+                                {t('bid_submitBet')}
                             </button>
                         )}
                     </div>
@@ -537,9 +537,9 @@ const EasyModeBid = ({
         <>
             <div className="grid grid-cols-4 gap-1 sm:gap-2 text-center text-white font-bold text-xs sm:text-sm mb-2 px-1">
                 <div>{labelKey}</div>
-                <div>Point</div>
-                <div>Type</div>
-                <div>Delete</div>
+                <div>{t('bid_point')}</div>
+                <div>{t('bid_type')}</div>
+                <div>{t('bid_delete')}</div>
             </div>
             <div className="h-px bg-[#1a74e5] w-full mb-2"></div>
             <div className="space-y-2">
@@ -565,7 +565,7 @@ const EasyModeBid = ({
                                 type="button"
                                 onClick={() => handleDeleteBid(bid.id)}
                                 className="p-2 text-red-500 hover:text-red-600 active:scale-95"
-                                aria-label="Delete"
+                                aria-label={t('bid_delete')}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path
@@ -629,7 +629,7 @@ const EasyModeBid = ({
         const marketId = market?._id || market?.id;
         if (!marketId) throw new Error('Market not found');
         const rows = bids.length ? bids : reviewRows;
-        if (!rows.length) throw new Error('No bets to place');
+        if (!rows.length) throw new Error(t('bid_noBetsToPlace'));
         const betType = apiBetType || (specialModeType === 'jodi' ? 'jodi' : (specialModeType === 'singlePana' || specialModeType === 'doublePana' ? 'panna' : 'single'));
         const payload = rows.map((r) => ({
             betType,
@@ -753,7 +753,7 @@ const EasyModeBid = ({
                                                     onClick={handleSubmitFromSpecial}
                                                     className={submitBtnClass(enabled)}
                                                 >
-                                                    Submit Bet
+                                                    {t('bid_submitBet')}
                                                 </button>
                                             );
                                         })()}
@@ -771,7 +771,7 @@ const EasyModeBid = ({
 
                                         <div className="flex flex-col gap-3 mb-4">
                                             <div className="flex flex-row items-center gap-2">
-                                                <label className="text-gray-200 text-sm font-medium shrink-0 w-28">Enter Points</label>
+                                                <label className="text-gray-200 text-sm font-medium shrink-0 w-28">{t('bid_enterPoints')}</label>
                                                 <div className="flex-1 min-w-0 grid grid-cols-[1fr_auto] gap-2">
                                                     <input
                                                         ref={pointsInputRef}
@@ -787,12 +787,12 @@ const EasyModeBid = ({
                                                         onClick={handleFormClear}
                                                         className="px-4 min-h-[40px] rounded-xl border-2 border-[#374151] bg-[#111827] text-white text-sm font-medium hover:border-[#1a74e5] active:scale-95"
                                                     >
-                                                        Clear
+                                                        {t('bid_clear')}
                                                     </button>
                                                 </div>
                                             </div>
                                             <div className="flex flex-row items-center gap-2">
-                                                <label className="text-gray-200 text-sm font-medium shrink-0 w-28">Quick Points</label>
+                                                <label className="text-gray-200 text-sm font-medium shrink-0 w-28">{t('bid_quickPoints')}</label>
                                                 <div className="flex-1 min-w-0 grid grid-cols-5 gap-2">
                                                     {quickPointValues.map((pts) => (
                                                         <button
@@ -812,7 +812,7 @@ const EasyModeBid = ({
                                         <div className="flex gap-4 mb-4">
                                             <div className={`flex-1 rounded-xl ${(specialModeType === 'singlePana' || specialModeType === 'doublePana') ? 'p-0 bg-transparent border-0' : 'bg-[#111827] border-2 border-[#374151] p-2'}`}>
                                                 {!(specialModeType === 'singlePana' || specialModeType === 'doublePana') && (
-                                                    <h3 className="text-sm font-bold text-white mb-3 text-center">Select Sum</h3>
+                                                    <h3 className="text-sm font-bold text-white mb-3 text-center">{t('bid_selectSum')}</h3>
                                                 )}
                                                 <div className="grid grid-cols-5 sm:grid-cols-5 gap-1.5 sm:gap-2 md:gap-3">
                                                     {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => {
@@ -872,7 +872,7 @@ const EasyModeBid = ({
                                                                     : ''
                                                         }`}
                                                     >
-                                                        Submit Bet
+                                                        {t('bid_submitBet')}
                                                     </button>
                                                 </div>
                                             )}
@@ -892,7 +892,7 @@ const EasyModeBid = ({
                                                         onClick={handleSubmitFromSpecial}
                                                         className={submitBtnClass(!!bids.length)}
                                                     >
-                                                        Submit Bet
+                                                        {t('bid_submitBet')}
                                                     </button>
                                                 </div>
                                                 <div className="md:hidden h-16" aria-hidden="true" />
@@ -931,7 +931,7 @@ const EasyModeBid = ({
                                         onClick={(specialModeType === 'doublePana' || specialModeType === 'singlePana') ? handleSubmitFromSpecial : () => { setReviewRows(bids); setIsReviewOpen(true); }}
                                         className={submitBtnClass(enabled)}
                                     >
-                                        Submit Bet
+                                        {t('bid_submitBet')}
                                     </button>
                                         );
                                     })()}
@@ -961,7 +961,7 @@ const EasyModeBid = ({
                         />
                     </div>
                     <div className="flex flex-row items-center gap-2">
-                        <label className="text-gray-200 text-sm font-medium shrink-0 w-28">Enter Points</label>
+                        <label className="text-gray-200 text-sm font-medium shrink-0 w-28">{t('bid_enterPoints')}</label>
                         <div className="flex-1 min-w-0 grid grid-cols-[1fr_auto] gap-2">
                             <input
                                 ref={pointsInputRef}
@@ -977,12 +977,12 @@ const EasyModeBid = ({
                                 onClick={handleFormClear}
                                 className="px-4 min-h-[40px] rounded-xl border-2 border-[#374151] bg-[#111827] text-white text-sm font-medium hover:border-[#1a74e5] active:scale-95"
                             >
-                                Clear
+                                {t('bid_clear')}
                             </button>
                         </div>
                     </div>
                     <div className="flex flex-row items-center gap-2">
-                        <label className="text-gray-200 text-sm font-medium shrink-0 w-28">Quick Points</label>
+                        <label className="text-gray-200 text-sm font-medium shrink-0 w-28">{t('bid_quickPoints')}</label>
                         <div className="flex-1 min-w-0 grid grid-cols-5 gap-2">
                             {quickPointValues.map((pts) => (
                                 <button
@@ -1013,7 +1013,7 @@ const EasyModeBid = ({
                                             onClick={() => { setReviewRows(bids); setIsReviewOpen(true); }}
                                             className={submitBtnClass(!!bids.length)}
                                         >
-                                            Submit Bet
+                                            {t('bid_submitBet')}
                                         </button>
                                     </div>
                                 ) : (

@@ -1,5 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { useMarketBetContextTitle } from '../../../hooks/useMarketBetContextTitle';
+import { useBidI18n } from '../useBidI18n';
 import BidLayout from '../BidLayout';
 import BidReviewModal from './BidReviewModal';
 import { placeBet, updateUserBalance } from '../../../api/bets';
@@ -10,6 +11,7 @@ const sanitizePoints = (v) => (v ?? '').toString().replace(/\D/g, '').slice(0, 6
 const quickPointValues = [10, 20, 30, 40, 50];
 
 const FullSangamBid = ({ market, title }) => {
+    const bid = useBidI18n();
     const [session, setSession] = useState('OPEN');
     const [openPana, setOpenPana] = useState('');
     const [closePana, setClosePana] = useState('');
@@ -108,7 +110,7 @@ const FullSangamBid = ({ market, title }) => {
     const handleAdd = () => {
         const pts = Number(points);
         if (!pts || pts <= 0) {
-            showWarning('Please enter points.');
+            showWarning(bid.pleaseEnterPoints);
             return;
         }
         if (!isValidAnyPana(openPana)) {
@@ -192,11 +194,11 @@ const FullSangamBid = ({ market, title }) => {
                         <div>
                             <div className="grid grid-cols-2 gap-1.5 md:gap-2 px-1">
                                 <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
-                                    <div className="text-[11px] text-gray-300 font-medium">Count</div>
+                                    <div className="text-[11px] text-gray-300 font-medium">{bid.count}</div>
                                     <div className="text-base font-bold text-white leading-tight">{bids.length}</div>
                                 </div>
                                 <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
-                                    <div className="text-[11px] text-gray-300 font-medium">Bet Amount</div>
+                                    <div className="text-[11px] text-gray-300 font-medium">{bid.betAmount}</div>
                                     <div className="text-base font-bold text-white leading-tight">{totalPoints}</div>
                                 </div>
                             </div>
@@ -244,7 +246,7 @@ const FullSangamBid = ({ market, title }) => {
                                 </div>
 
                                 <div className="flex flex-row items-center gap-2">
-                                    <label className="text-gray-200 text-sm font-medium shrink-0 w-28">Enter Points</label>
+                                    <label className="text-gray-200 text-sm font-medium shrink-0 w-28">{bid.enterPoints}</label>
                                     <div className="flex-1 min-w-0 grid grid-cols-[1fr_auto] gap-2">
                                         <input
                                             ref={pointsInputRef}
@@ -266,7 +268,7 @@ const FullSangamBid = ({ market, title }) => {
                                 </div>
 
                                 <div className="flex flex-row items-center gap-2">
-                                    <label className="text-gray-200 text-sm font-medium shrink-0 w-28">Quick Points</label>
+                                    <label className="text-gray-200 text-sm font-medium shrink-0 w-28">{bid.quickPoints}</label>
                                     <div className="flex-1 min-w-0 grid grid-cols-5 gap-2">
                                         {quickPointValues.map((v) => (
                                             <button
@@ -291,7 +293,7 @@ const FullSangamBid = ({ market, title }) => {
                                     Add to List
                                 </button>
                                 <button type="button" onClick={openReview} disabled={!bids.length} className={submitBtnClass(!!bids.length)}>
-                                    Submit Bet
+                                    {bid.submitBet}
                                 </button>
                             </div>
 

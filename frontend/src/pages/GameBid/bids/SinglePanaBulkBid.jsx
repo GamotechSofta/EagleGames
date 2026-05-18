@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useMarketBetContextTitle } from '../../../hooks/useMarketBetContextTitle';
+import { useBidI18n } from '../useBidI18n';
 import BidLayout from '../BidLayout';
 import BidReviewModal from './BidReviewModal';
 import { placeBet, updateUserBalance } from '../../../api/bets';
@@ -27,6 +28,7 @@ const buildSinglePanas = () =>
         .flatMap((k) => SINGLE_PANA_BY_SUM[k]);
 
 const SinglePanaBulkBid = ({ market, title }) => {
+    const bid = useBidI18n();
     const [session, setSession] = useState(() => (market?.status === 'running' ? 'CLOSE' : 'OPEN'));
     const [warning, setWarning] = useState('');
     const [isReviewOpen, setIsReviewOpen] = useState(false);
@@ -163,7 +165,7 @@ const SinglePanaBulkBid = ({ market, title }) => {
             }));
 
         if (!rows.length) {
-            showWarning('Please enter points for at least one Single Panna.');
+            showWarning(bid.atLeastOneSinglePanna);
             return;
         }
 
@@ -203,7 +205,7 @@ const SinglePanaBulkBid = ({ market, title }) => {
                             : 'bg-gray-400 text-white opacity-50 cursor-not-allowed'
                     }`}
                 >
-                    Submit Bet
+                    {bid.submitBet}
                 </button>
             }
             walletBalance={walletBefore}
@@ -220,11 +222,11 @@ const SinglePanaBulkBid = ({ market, title }) => {
 
                 <div className="grid grid-cols-2 gap-1.5 md:gap-2 px-1 mb-3">
                     <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
-                        <div className="text-[11px] text-gray-300 font-medium">Count</div>
+                        <div className="text-[11px] text-gray-300 font-medium">{bid.count}</div>
                         <div className="text-base font-bold text-white leading-tight">{specialCount}</div>
                     </div>
                     <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
-                        <div className="text-[11px] text-gray-300 font-medium">Bet Amount</div>
+                        <div className="text-[11px] text-gray-300 font-medium">{bid.betAmount}</div>
                         <div className="text-base font-bold text-white leading-tight">{selectedTotalPoints}</div>
                     </div>
                 </div>
@@ -239,7 +241,7 @@ const SinglePanaBulkBid = ({ market, title }) => {
                             const p = sanitizePoints(pts);
                             const n = Number(p);
                             if (!n || n <= 0) {
-                                showWarning('Please enter points.');
+                                showWarning(bid.pleaseEnterPoints);
                                 return;
                             }
                             setSpecialInputs((prev) => {
@@ -280,7 +282,7 @@ const SinglePanaBulkBid = ({ market, title }) => {
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter' && groupBulk[groupKey]) applyGroup(groupBulk[groupKey]);
                                         }}
-                                        placeholder="All pts"
+                                        placeholder={bid.allPts}
                                         className="no-spinner w-[86px] sm:w-[96px] md:w-[72px] lg:w-[80px] h-9 bg-[#111827] border-2 border-[#374151] text-white placeholder-gray-400 rounded focus:outline-none focus:border-[#1a74e5] px-2 text-xs md:text-[11px] font-semibold text-center"
                                     />
                                     <button
@@ -292,23 +294,23 @@ const SinglePanaBulkBid = ({ market, title }) => {
                                                 ? 'bg-[#111827] border-[#4b5563] text-white hover:border-gray-500 hover:bg-[#374151]'
                                                 : 'bg-[#374151] border-[#374151] text-gray-400 cursor-not-allowed'
                                         }`}
-                                        title="Apply points to all numbers in this group"
+                                        title={bid.applyGroupTitle}
                                     >
-                                        Apply
+                                        {bid.apply}
                                     </button>
                                     <button
                                         type="button"
                                         onClick={clearGroup}
                                         className="h-9 px-3 rounded-md font-bold text-xs border-2 border-[#374151] text-gray-300 bg-[#111827] hover:bg-[#374151] transition-colors"
-                                        title="Clear this group"
+                                        title={bid.clearGroup}
                                     >
-                                        Clear
+                                        {bid.clear}
                                     </button>
                                 </div>
                                 <div className="flex items-center gap-2 w-full">
                                     <span className="text-[11px] font-semibold text-gray-200 shrink-0 leading-tight flex flex-col">
-                                        <span>Quick</span>
-                                        <span>Points :</span>
+                                        <span>{bid.quickWord}</span>
+                                        <span>{bid.pointsColonLine}</span>
                                     </span>
                                     <div className="grid grid-cols-5 gap-2 flex-1">
                                     {QUICK_POINT_OPTIONS.map((pts) => (
@@ -334,7 +336,7 @@ const SinglePanaBulkBid = ({ market, title }) => {
                                             <input
                                                 type="text"
                                                 inputMode="numeric"
-                                                placeholder="Pts"
+                                                placeholder={bid.pts}
                                                 value={specialInputs[num]}
                                                 onChange={(e) =>
                                                     setSpecialInputs((p) => ({
@@ -356,7 +358,7 @@ const SinglePanaBulkBid = ({ market, title }) => {
             {/* Submit Bet: match Jodi Special Mode (mobile sticky, desktop inline) */}
             <div className="md:hidden fixed left-0 right-0 bottom-[88px] z-20 px-3">
                 <button type="button" onClick={openReview} disabled={!canSubmit} className={submitBtnClass(canSubmit)}>
-                    Submit Bet
+                    {bid.submitBet}
                 </button>
             </div>
 
@@ -366,7 +368,7 @@ const SinglePanaBulkBid = ({ market, title }) => {
                 onSubmit={handleSubmit}
                 marketTitle={marketTitle}
                 dateText={dateText}
-                labelKey="Pana"
+                labelKey="bid_columnPana"
                 rows={reviewRows}
                 walletBefore={walletBefore}
                 totalBids={reviewRows.length}

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useMarketBetContextTitle } from '../../../hooks/useMarketBetContextTitle';
+import { useBidI18n } from '../useBidI18n';
 import BidLayout from '../BidLayout';
 import BidReviewModal from './BidReviewModal';
 import { useBettingWindow } from '../BettingWindowContext';
@@ -12,6 +13,7 @@ const DIGIT_ORDER = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
 const QUICK_POINTS = [10, 20, 30, 40, 50];
 
 const ChartBid = ({ market, title }) => {
+    const bid = useBidI18n();
     const [session, setSession] = useState(() => (market?.status === 'running' ? 'CLOSE' : 'OPEN'));
     const [warning, setWarning] = useState('');
     const [selectedChart, setSelectedChart] = useState('');
@@ -80,7 +82,7 @@ const ChartBid = ({ market, title }) => {
         }
         const pts = Number(pointsInput);
         if (!pts || pts <= 0) {
-            showWarning('Please enter points.');
+            showWarning(bid.pleaseEnterPoints);
             return;
         }
         const numbers = getNumbersForChartDigit(selectedChart, selectedDigit);
@@ -219,11 +221,11 @@ const ChartBid = ({ market, title }) => {
                     <div className="md:hidden w-full px-3 py-1">
                         <div className="grid grid-cols-2 gap-1.5 md:gap-2">
                             <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
-                                <div className="text-[11px] text-gray-300 font-medium">Count</div>
+                                <div className="text-[11px] text-gray-300 font-medium">{bid.count}</div>
                                 <div className="text-base font-bold text-white leading-tight">{bidsCount}</div>
                             </div>
                             <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
-                                <div className="text-[11px] text-gray-300 font-medium">Bet Amount</div>
+                                <div className="text-[11px] text-gray-300 font-medium">{bid.betAmount}</div>
                                 <div className="text-base font-bold text-white leading-tight">{totalPoints}</div>
                             </div>
                         </div>
@@ -231,12 +233,12 @@ const ChartBid = ({ market, title }) => {
                     <div className="hidden md:flex pr-12 pl-1 pb-0 justify-end w-full">
                         <div className="inline-flex items-center gap-2 md:gap-4">
                             <div className="text-center">
-                                <div className="text-[10px] md:text-xs text-gray-400">Count</div>
+                                <div className="text-[10px] md:text-xs text-gray-400">{bid.count}</div>
                                 <div className="text-xs md:text-base font-bold text-white">{bidsCount}</div>
                             </div>
                             <div className="w-px h-6 md:h-8 bg-[#4b5563]" />
                             <div className="text-center">
-                                <div className="text-[10px] md:text-xs text-gray-400">Bet Amount</div>
+                                <div className="text-[10px] md:text-xs text-gray-400">{bid.betAmount}</div>
                                 <div className="text-xs md:text-base font-bold text-white">{totalPoints}</div>
                             </div>
                         </div>
@@ -322,7 +324,7 @@ const ChartBid = ({ market, title }) => {
                         </div>
 
                         <div className="flex items-center gap-2">
-                            <label className="shrink-0 w-20 sm:w-24 text-xs sm:text-sm font-semibold text-gray-300">Quick Points</label>
+                            <label className="shrink-0 w-20 sm:w-24 text-xs sm:text-sm font-semibold text-gray-300">{bid.quickPoints}</label>
                             <div className="flex-1 min-w-0 grid grid-cols-5 gap-2">
                                 {QUICK_POINTS.map((pts) => {
                                     const selected = String(pointsInput || '') === String(pts);
@@ -370,7 +372,7 @@ const ChartBid = ({ market, title }) => {
                                     !bidsCount || !bettingAllowed ? 'opacity-50 cursor-not-allowed' : ''
                                 }`}
                             >
-                                Submit Bet {bidsCount > 0 && `(${bidsCount})`}
+                                {bid.submitBet}{bidsCount > 0 ? ` (${bidsCount})` : ''}
                             </button>
                         </div>
                     </div>

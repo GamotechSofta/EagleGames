@@ -44,7 +44,7 @@ const DeclareSuccess = () => {
                         <p className="text-gray-600 text-sm sm:text-base mb-1 truncate" title={marketName}>{marketName}</p>
                     )}
                     {displayText && (
-                        <p className="text-orange-500 font-mono text-sm sm:text-base">{displayText}</p>
+                        <p className="text-blue-500 font-mono text-sm sm:text-base">{displayText}</p>
                     )}
                 </div>
 
@@ -56,7 +56,7 @@ const DeclareSuccess = () => {
                     <button
                         type="button"
                         onClick={handleAddAnother}
-                        className="px-5 py-3 bg-orange-500 hover:bg-orange-600 text-gray-800 font-semibold rounded-xl transition-colors"
+                        className="px-5 py-3 bg-blue-500 hover:bg-blue-600 text-gray-800 font-semibold rounded-xl transition-colors"
                     >
                         Add another result
                     </button>

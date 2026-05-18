@@ -17,9 +17,9 @@ const AdminLayout = ({ children, onLogout, title }) => {
                     className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                     aria-label={t('aria_openMenu')}
                 >
-                    <FaBars className="w-6 h-6 text-orange-500" />
+                    <FaBars className="w-6 h-6 text-blue-500" />
                 </button>
-                <h1 className="text-lg font-bold text-orange-600 truncate mx-2">{title || t('adminDefaultTitle')}</h1>
+                <h1 className="text-lg font-bold text-blue-600 truncate mx-2">{title || t('adminDefaultTitle')}</h1>
                 <button
                     type="button"
                     onClick={onLogout}

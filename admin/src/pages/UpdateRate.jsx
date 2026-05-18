@@ -163,9 +163,9 @@ const UpdateRate = () => {
                     <table className="w-full border-collapse text-sm sm:text-base">
                         <thead>
                             <tr className="bg-white border-b-2 border-black">
-                                <th className="text-left py-3 px-4 font-bold text-orange-500 border-r border-gray-200">Sr No</th>
-                                <th className="text-left py-3 px-4 font-bold text-orange-500 border-r border-gray-200">Game</th>
-                                <th className="text-left py-3 px-4 font-bold text-orange-500">Rate (1 =)</th>
+                                <th className="text-left py-3 px-4 font-bold text-blue-500 border-r border-gray-200">Sr No</th>
+                                <th className="text-left py-3 px-4 font-bold text-blue-500 border-r border-gray-200">Game</th>
+                                <th className="text-left py-3 px-4 font-bold text-blue-500">Rate (1 =)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -200,7 +200,7 @@ const UpdateRate = () => {
                                                 </button>
                                             </div>
                                         ) : (
-                                            <span className="font-mono text-orange-500">{item.rate}</span>
+                                            <span className="font-mono text-blue-500">{item.rate}</span>
                                         )}
                                         {editingKey !== item.gameType && (
                                             <button
@@ -224,7 +224,7 @@ const UpdateRate = () => {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/30">
                     <div className="bg-white rounded-xl border border-gray-200 shadow-xl w-full max-w-md">
                         <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-                            <h3 className="text-lg font-semibold text-orange-500">Confirm Update Rate</h3>
+                            <h3 className="text-lg font-semibold text-blue-500">Confirm Update Rate</h3>
                             <button type="button" onClick={closePasswordModal} className="text-gray-400 hover:text-gray-800 p-1">×</button>
                         </div>
                         <form onSubmit={handlePasswordSubmit} className="p-4 space-y-4">
@@ -244,7 +244,7 @@ const UpdateRate = () => {
                             )}
                             <div className="flex gap-2 justify-end">
                                 <button type="button" onClick={closePasswordModal} className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-500 text-gray-800 font-semibold">Cancel</button>
-                                <button type="submit" disabled={saveLoading} className="px-4 py-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-gray-800 font-semibold disabled:opacity-50">
+                                <button type="submit" disabled={saveLoading} className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-gray-800 font-semibold disabled:opacity-50">
                                     {saveLoading ? <span className="animate-spin">⏳</span> : 'Confirm'}
                                 </button>
                             </div>

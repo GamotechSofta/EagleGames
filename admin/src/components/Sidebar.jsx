@@ -105,7 +105,7 @@ const Sidebar = ({ onLogout, isOpen = true, onClose }) => {
             `}
         >
             <div className="p-4 sm:p-6 border-b border-gray-200 shrink-0 flex items-center justify-between">
-                <h2 className="text-lg sm:text-xl font-bold text-orange-500">{t('superAdmin')}</h2>
+                <h2 className="text-lg sm:text-xl font-bold text-blue-500">{t('superAdmin')}</h2>
                 <button
                     type="button"
                     onClick={onClose}
@@ -123,8 +123,8 @@ const Sidebar = ({ onLogout, isOpen = true, onClose }) => {
                         type="button"
                         onClick={() => handleNav(item.path)}
                         className={`w-full flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl transition-all duration-200 text-sm sm:text-base ${isActive(item.path)
-                            ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold shadow-lg shadow-orange-500/20'
-                            : 'text-gray-600 hover:bg-orange-50 hover:text-orange-600 hover:-translate-y-0.5'
+                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold shadow-lg shadow-blue-500/20'
+                            : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600 hover:-translate-y-0.5'
                             }`}
                     >
                         <item.icon className="w-5 h-5 sm:text-xl shrink-0" />
@@ -135,7 +135,7 @@ const Sidebar = ({ onLogout, isOpen = true, onClose }) => {
 
             <div className="p-3 sm:p-4 border-t border-gray-200 shrink-0 space-y-2">
                 <div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2">
-                    <FaGlobe className="w-4 h-4 text-orange-500 shrink-0" aria-hidden />
+                    <FaGlobe className="w-4 h-4 text-blue-500 shrink-0" aria-hidden />
                     <select
                         value={language}
                         onChange={(e) => changeLanguage(e.target.value)}

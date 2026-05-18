@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useMarketBetContextTitle } from '../../../hooks/useMarketBetContextTitle';
+import { useBidI18n } from '../useBidI18n';
 import BidLayout from '../BidLayout';
 import BidReviewModal from './BidReviewModal';
 import { placeBet, updateUserBalance } from '../../../api/bets';
 
 const SingleDigitBulkBid = ({ market, title }) => {
+    const bid = useBidI18n();
     const [session, setSession] = useState(() => (market?.status === 'running' ? 'CLOSE' : 'OPEN'));
     const [inputPoints, setInputPoints] = useState('');
     const [bids, setBids] = useState([]);
@@ -58,7 +60,7 @@ const SingleDigitBulkBid = ({ market, title }) => {
     const handleDigitClick = (num) => {
         const pts = Number(inputPoints);
         if (!pts || pts <= 0) {
-            showWarning('Please enter points.');
+            showWarning(bid.pleaseEnterPoints);
             return;
         }
         setBids((prev) => {
@@ -178,11 +180,11 @@ const SingleDigitBulkBid = ({ market, title }) => {
     const mobileModeHeader = (
         <div className="grid grid-cols-2 gap-1.5 md:gap-2 px-1">
             <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
-                <div className="text-[11px] text-gray-300 font-medium">Count</div>
+                <div className="text-[11px] text-gray-300 font-medium">{bid.count}</div>
                 <div className="text-base font-bold text-white leading-tight">{bulkBidsCount}</div>
             </div>
             <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
-                <div className="text-[11px] text-gray-300 font-medium">Bet Amount</div>
+                <div className="text-[11px] text-gray-300 font-medium">{bid.betAmount}</div>
                 <div className="text-base font-bold text-white leading-tight">{bulkTotalPoints}</div>
             </div>
         </div>
@@ -251,7 +253,7 @@ const SingleDigitBulkBid = ({ market, title }) => {
             onSubmit={() => setIsReviewOpen(true)}
             hideFooter={false}
             showFooterStats={false}
-            submitLabel="Submit Bet"
+            submitLabel={bid.submitBet}
             contentPaddingClass="pb-[calc(7rem+env(safe-area-inset-bottom,0px))] md:pb-32"
             walletBalance={walletBefore}
         >
@@ -267,7 +269,7 @@ const SingleDigitBulkBid = ({ market, title }) => {
                     {mobileModeHeader}
                     <div className="flex flex-col gap-3 px-1">
                         <div className="flex flex-row items-center gap-2">
-                            <label className="text-gray-200 text-sm font-medium shrink-0 w-28">Enter Points</label>
+                            <label className="text-gray-200 text-sm font-medium shrink-0 w-28">{bid.enterPoints}</label>
                             <div className="flex-1 min-w-0 grid grid-cols-[1fr_auto] gap-2">
                                 <input
                                     type="text"
@@ -287,7 +289,7 @@ const SingleDigitBulkBid = ({ market, title }) => {
                             </div>
                         </div>
                         <div className="flex flex-row items-center gap-2">
-                            <label className="text-gray-200 text-sm font-medium shrink-0 w-28">Quick Points</label>
+                            <label className="text-gray-200 text-sm font-medium shrink-0 w-28">{bid.quickPoints}</label>
                             <div className="flex-1 min-w-0 grid grid-cols-5 gap-2">
                                 {quickPointValues.map((pts) => (
                                     <button
@@ -349,17 +351,17 @@ const SingleDigitBulkBid = ({ market, title }) => {
                                     className={`flex-1 min-w-0 appearance-none bg-[#111827] border-2 border-[#374151] text-white font-bold text-xs py-2 min-h-[36px] px-4 rounded-full text-center focus:outline-none focus:border-[#4b5563] ${isRunning ? 'opacity-80 cursor-not-allowed' : ''}`}
                                 >
                                     {isRunning ? (
-                                        <option value="CLOSE">CLOSE</option>
+                                        <option value="CLOSE">{bid.sessionClose}</option>
                                     ) : (
                                         <>
-                                            <option value="OPEN">OPEN</option>
-                                            <option value="CLOSE">CLOSE</option>
+                                            <option value="OPEN">{bid.sessionOpen}</option>
+                                            <option value="CLOSE">{bid.sessionClose}</option>
                                         </>
                                     )}
                                 </select>
                             </div>
                             <div className="flex flex-row items-center gap-2">
-                                <label className="text-gray-300 text-xs font-medium shrink-0 w-20">Enter Points:</label>
+                                <label className="text-gray-300 text-xs font-medium shrink-0 w-20">{bid.enterPointsColon}</label>
                                 <div className="flex-1 min-w-0 grid grid-cols-[1fr_auto] gap-2">
                                     <input
                                         type="text"
@@ -379,7 +381,7 @@ const SingleDigitBulkBid = ({ market, title }) => {
                                 </div>
                             </div>
                             <div className="flex flex-row items-center gap-2">
-                                <label className="text-gray-300 text-xs font-medium shrink-0 w-20">Quick Points:</label>
+                                <label className="text-gray-300 text-xs font-medium shrink-0 w-20">{bid.quickPointsColon}</label>
                                 <div className="flex-1 min-w-0 grid grid-cols-5 gap-2">
                                     {quickPointValues.map((pts) => (
                                         <button
@@ -417,11 +419,11 @@ const SingleDigitBulkBid = ({ market, title }) => {
                     </div>
                     <div className="hidden md:grid mt-3 grid-cols-2 gap-2 w-full max-w-[320px] mx-auto">
                         <div className="rounded-xl border border-[#374151] bg-[#111827] px-3 py-2 text-center">
-                            <div className="text-[11px] text-gray-300 font-medium">Count</div>
+                            <div className="text-[11px] text-gray-300 font-medium">{bid.count}</div>
                             <div className="text-base font-bold text-white leading-tight">{bulkBidsCount}</div>
                         </div>
                         <div className="rounded-xl border border-[#374151] bg-[#111827] px-3 py-2 text-center">
-                            <div className="text-[11px] text-gray-300 font-medium">Bet Amount</div>
+                            <div className="text-[11px] text-gray-300 font-medium">{bid.betAmount}</div>
                             <div className="text-base font-bold text-white leading-tight">{bulkTotalPoints}</div>
                         </div>
                     </div>

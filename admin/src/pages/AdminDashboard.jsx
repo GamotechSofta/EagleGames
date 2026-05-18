@@ -92,13 +92,13 @@ const SectionCard = ({ title, description, icon: Icon, children, linkTo, linkLab
         <div className="flex items-start justify-between mb-4">
             <div>
                 <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                    {Icon && <Icon className="w-5 h-5 text-orange-500" />}
+                    {Icon && <Icon className="w-5 h-5 text-blue-500" />}
                     {title}
                 </h3>
                 {description && <p className="text-xs text-gray-500 mt-1">{description}</p>}
             </div>
             {linkTo && (
-                <Link to={linkTo} className="text-xs font-medium text-orange-500 hover:text-orange-600 flex items-center gap-1">
+                <Link to={linkTo} className="text-xs font-medium text-blue-500 hover:text-blue-600 flex items-center gap-1">
                     {linkLabel} <FaArrowRight className="w-3 h-3" />
                 </Link>
             )}
@@ -271,7 +271,7 @@ const AdminDashboard = () => {
                         <FaExclamationTriangle className="w-8 h-8 text-red-500" />
                     </div>
                     <p className="text-red-500 text-lg font-medium mb-2">{error}</p>
-                    <button onClick={fetchDashboardStats} className="mt-4 px-6 py-2 bg-orange-600 hover:bg-orange-500 text-white font-semibold rounded-xl">
+                    <button onClick={fetchDashboardStats} className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl">
                         {t('retry')}
                     </button>
                 </div>
@@ -289,8 +289,8 @@ const AdminDashboard = () => {
                 <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                     <div>
                         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 flex items-center gap-3">
-                            <span className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center">
-                                <FaChartLine className="w-5 h-5 text-orange-500" />
+                            <span className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                                <FaChartLine className="w-5 h-5 text-blue-500" />
                             </span>
                             {t('dash_overviewTitle')}
                         </h1>
@@ -305,7 +305,7 @@ const AdminDashboard = () => {
                             type="button"
                             onClick={handleRefresh}
                             disabled={refreshing}
-                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-orange-500/20 border border-gray-200 hover:border-orange-300 text-gray-600 hover:text-orange-500 transition-all disabled:opacity-60 text-xs font-medium"
+                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-blue-500/20 border border-gray-200 hover:border-blue-300 text-gray-600 hover:text-blue-500 transition-all disabled:opacity-60 text-xs font-medium"
                         >
                             <FaSyncAlt className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
                             {t('refresh')}
@@ -319,7 +319,7 @@ const AdminDashboard = () => {
                                     key={p.id}
                                     type="button"
                                     onClick={() => handlePresetSelect(p.id)}
-                                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${isActive ? 'bg-orange-500 text-white' : 'bg-gray-100 border border-gray-200 text-gray-600 hover:bg-gray-200'}`}
+                                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${isActive ? 'bg-blue-500 text-white' : 'bg-gray-100 border border-gray-200 text-gray-600 hover:bg-gray-200'}`}
                                 >
                                     {p.label}
                                 </button>
@@ -328,7 +328,7 @@ const AdminDashboard = () => {
                         <button
                             type="button"
                             onClick={handleCustomToggle}
-                            className={`px-4 py-2 rounded-lg text-sm font-semibold ${customMode ? 'bg-orange-500 text-white' : 'bg-gray-100 border border-gray-200 text-gray-600 hover:bg-gray-200'}`}
+                            className={`px-4 py-2 rounded-lg text-sm font-semibold ${customMode ? 'bg-blue-500 text-white' : 'bg-gray-100 border border-gray-200 text-gray-600 hover:bg-gray-200'}`}
                         >
                             {t('custom')}
                         </button>
@@ -342,13 +342,13 @@ const AdminDashboard = () => {
                                     <label className="block text-xs text-gray-400 mb-1">{t('to')}</label>
                                     <input type="date" value={customTo} onChange={(e) => setCustomTo(e.target.value)} className="px-3 py-2 rounded-lg bg-gray-100 border border-gray-200 text-sm text-gray-800" />
                                 </div>
-                                <button type="button" onClick={handleCustomApply} className="px-4 py-2 rounded-lg bg-orange-500 text-white font-semibold text-sm">
+                                <button type="button" onClick={handleCustomApply} className="px-4 py-2 rounded-lg bg-blue-500 text-white font-semibold text-sm">
                                     {t('apply')}
                                 </button>
                             </div>
                         )}
                     </div>
-                    <p className="text-xs text-gray-500 mt-2">{t('showingDataFor')} <span className="text-orange-500 font-medium">{displayLabel}</span></p>
+                    <p className="text-xs text-gray-500 mt-2">{t('showingDataFor')} <span className="text-blue-500 font-medium">{displayLabel}</span></p>
                     <div className="mt-3">
                         <p className="text-xs text-gray-500 mb-1 uppercase tracking-wider">{t('marketFilter')}</p>
                         <select
@@ -368,21 +368,21 @@ const AdminDashboard = () => {
                                 <option key={m.id} value={m.id}>{m.name}</option>
                             ))}
                         </select>
-                        <p className="text-xs text-gray-500 mt-2">{t('selectedMarketLine')} <span className="text-orange-500 font-medium">{selectedMarketName}</span></p>
+                        <p className="text-xs text-gray-500 mt-2">{t('selectedMarketLine')} <span className="text-blue-500 font-medium">{selectedMarketName}</span></p>
                     </div>
                 </div>
             </div>
 
             {/* Action Required */}
             {hasActionRequired && (
-                <div className="mb-6 p-4 rounded-xl bg-orange-500/10 border border-orange-200">
-                    <h3 className="text-sm font-semibold text-orange-500 flex items-center gap-2 mb-3">
+                <div className="mb-6 p-4 rounded-xl bg-blue-500/10 border border-blue-200">
+                    <h3 className="text-sm font-semibold text-blue-500 flex items-center gap-2 mb-3">
                         <FaExclamationTriangle className="w-4 h-4" />
                         {t('dash_actionRequired')}
                     </h3>
                     <div className="flex flex-wrap gap-3">
                         {pendingPayments > 0 && (
-                            <Link to="/payment-management" className="px-4 py-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-white font-medium text-sm">
+                            <Link to="/payment-management" className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm">
                                 {pendingPayments === 1
                                     ? t('dash_payment_pending_one', { count: pendingPayments })
                                     : t('dash_payment_pending_many', { count: pendingPayments })}
@@ -390,14 +390,14 @@ const AdminDashboard = () => {
                         )}
                         {/* Help Desk tickets are shown only inside the Help Desk section-card (super admin). */}
                         {starlinePendingCount > 0 && (
-                            <Link to="/markets" state={{ marketType: 'starline' }} className="px-4 py-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-white font-medium text-sm">
+                            <Link to="/markets" state={{ marketType: 'starline' }} className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm">
                                 {starlinePendingCount === 1
                                     ? t('dash_starline_pending_one', { count: starlinePendingCount })
                                     : t('dash_starline_pending_many', { count: starlinePendingCount })}
                             </Link>
                         )}
                         {mainPendingCount > 0 && (
-                            <Link to="/add-result" className="px-4 py-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-white font-medium text-sm">
+                            <Link to="/add-result" className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm">
                                 {mainPendingCount === 1
                                     ? t('dash_market_pending_one', { count: mainPendingCount })
                                     : t('dash_market_pending_many', { count: mainPendingCount })}
@@ -405,7 +405,7 @@ const AdminDashboard = () => {
                         )}
                     </div>
                     {(starlinePendingList.length > 0 || mainPendingList.length > 0) && (
-                        <p className="text-xs text-orange-700 mt-2">
+                        <p className="text-xs text-blue-700 mt-2">
                             {starlinePendingList.length > 0 && (
                                 <span>{t('dash_starlinePrefix')} {starlinePendingList.map((m) => m.marketName).join(', ')}</span>
                             )}
@@ -454,9 +454,9 @@ const AdminDashboard = () => {
                     <p className="text-2xl font-bold text-purple-600 font-mono">{stats?.users?.total ?? 0}</p>
                     <p className="text-xs text-gray-500 mt-1">{t('dash_activeNewInRange', { active: stats?.users?.active ?? 0, newInRange: stats?.users?.newToday ?? 0 })}</p>
                 </div>
-                <div className="bg-gradient-to-br from-orange-50 to-transparent rounded-xl p-5 border border-orange-200">
+                <div className="bg-gradient-to-br from-blue-50 to-transparent rounded-xl p-5 border border-blue-200">
                     <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">{t('dash_totalBetsPeriod')}</p>
-                    <p className="text-2xl font-bold text-orange-500 font-mono">{stats?.bets?.total ?? 0}</p>
+                    <p className="text-2xl font-bold text-blue-500 font-mono">{stats?.bets?.total ?? 0}</p>
                     <p className="text-xs text-gray-500 mt-1">{t('dash_winRate', { pct: stats?.bets?.winRate ?? 0 })}</p>
                 </div>
             </div>
@@ -478,7 +478,7 @@ const AdminDashboard = () => {
                 <SectionCard title={t('dash_playersSection')} description={t('dash_allTimeCounts')} icon={FaUserFriends} linkTo="/all-users" linkLabel={t('allPlayers')}>
                     <StatRow label={t('dash_totalPlayers')} value={stats?.users?.total ?? 0} />
                     <StatRow label={t('dash_activePlayers')} value={stats?.users?.active ?? 0} colorClass="text-green-600" />
-                    <StatRow label={t('dash_newInPeriod')} value={stats?.users?.newToday ?? 0} colorClass="text-orange-500" />
+                    <StatRow label={t('dash_newInPeriod')} value={stats?.users?.newToday ?? 0} colorClass="text-blue-500" />
                 </SectionCard>
 
                 {/* Bets */}
@@ -486,7 +486,7 @@ const AdminDashboard = () => {
                     <StatRow label={t('dash_totalBets')} value={stats?.bets?.total ?? 0} />
                     <StatRow label={t('dash_winningBets')} value={stats?.bets?.winning ?? 0} colorClass="text-green-600" />
                     <StatRow label={t('dash_losingBets')} value={stats?.bets?.losing ?? 0} colorClass="text-red-500" />
-                    <StatRow label={t('dash_pendingBets')} value={stats?.bets?.pending ?? 0} colorClass="text-orange-500" />
+                    <StatRow label={t('dash_pendingBets')} value={stats?.bets?.pending ?? 0} colorClass="text-blue-500" />
                     <StatRow label={t('dash_winRateRow')} value={`${stats?.bets?.winRate ?? 0}%`} />
                 </SectionCard>
 
@@ -494,7 +494,7 @@ const AdminDashboard = () => {
                 <SectionCard title={t('markets')} description={t('dash_mainStarline')} icon={FaChartBar} linkTo="/markets" linkLabel={t('markets')}>
                     <StatRow label={t('dash_totalMarkets')} value={stats?.markets?.total ?? 0} />
                     <StatRow label={t('dash_openNow')} value={stats?.markets?.open ?? 0} colorClass="text-green-600" />
-                    <StatRow label={t('dash_resultPending')} value={marketsPendingResult} colorClass={marketsPendingResult > 0 ? 'text-orange-500' : 'text-gray-400'} />
+                    <StatRow label={t('dash_resultPending')} value={marketsPendingResult} colorClass={marketsPendingResult > 0 ? 'text-blue-500' : 'text-gray-400'} />
                     <StatRow label={t('dash_mainMarkets')} value={stats?.markets?.main ?? stats?.markets?.total ?? 0} subValue={t('dash_openCount', { n: stats?.markets?.openMain ?? 0 })} />
                     <StatRow label={t('dash_starlineMarkets')} value={stats?.markets?.starline ?? 0} subValue={t('dash_openCount', { n: stats?.markets?.openStarline ?? 0 })} />
                 </SectionCard>
@@ -503,9 +503,9 @@ const AdminDashboard = () => {
                 <SectionCard title={t('payments')} description={t('dash_depositsWithdrawals')} icon={FaCreditCard} linkTo="/payment-management" linkLabel={t('dash_managePayments')}>
                     <StatRow label={t('dash_depositsPeriod')} value={formatCurrency(stats?.payments?.totalDeposits)} colorClass="text-green-600" />
                     <StatRow label={t('dash_withdrawalsPeriod')} value={formatCurrency(stats?.payments?.totalWithdrawals)} colorClass="text-red-500" />
-                    <StatRow label={t('dash_pendingDeposits')} value={pendingDeposits} colorClass="text-orange-500" />
-                    <StatRow label={t('dash_pendingWithdrawals')} value={pendingWithdrawals} colorClass="text-orange-500" />
-                    <StatRow label={t('dash_totalPending')} value={pendingPayments} colorClass="text-orange-500" />
+                    <StatRow label={t('dash_pendingDeposits')} value={pendingDeposits} colorClass="text-blue-500" />
+                    <StatRow label={t('dash_pendingWithdrawals')} value={pendingWithdrawals} colorClass="text-blue-500" />
+                    <StatRow label={t('dash_totalPending')} value={pendingPayments} colorClass="text-blue-500" />
                 </SectionCard>
 
                 {/* Wallet */}
@@ -525,7 +525,7 @@ const AdminDashboard = () => {
                 {isSuperAdmin && (
                     <SectionCard title={t('dash_helpDeskSection')} description={t('dash_supportTickets')} icon={FaLifeRing} linkTo="/help-desk" linkLabel={t('helpDeskIssues')}>
                         <StatRow label={t('dash_totalTickets')} value={stats?.helpDesk?.total ?? 0} />
-                        <StatRow label={t('dash_openTickets')} value={stats?.helpDesk?.open ?? 0} colorClass="text-orange-500" />
+                        <StatRow label={t('dash_openTickets')} value={stats?.helpDesk?.open ?? 0} colorClass="text-blue-500" />
                         <StatRow label={t('dash_inProgress')} value={stats?.helpDesk?.inProgress ?? 0} colorClass="text-blue-600" />
                     </SectionCard>
                 )}
@@ -534,7 +534,7 @@ const AdminDashboard = () => {
             {/* Revenue Timeline (period summary) */}
             <div className="bg-white rounded-xl p-5 border border-gray-200 mb-6">
                 <h3 className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <FaMoneyBillWave className="w-4 h-4 text-orange-500" />
+                    <FaMoneyBillWave className="w-4 h-4 text-blue-500" />
                     {t('dash_revenueSummaryTitle')}
                 </h3>
                 <p className="text-xs text-gray-500 mb-4">{t('dash_revenueSummaryHint')}</p>
@@ -557,7 +557,7 @@ const AdminDashboard = () => {
             {isSuperAdmin && !selectedMarketId && (
                 <div className="bg-white rounded-xl p-5 border border-gray-200 mb-6">
                     <h3 className="text-base font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                        <FaChartBar className="w-4 h-4 text-orange-500" />
+                        <FaChartBar className="w-4 h-4 text-blue-500" />
                         {t('dash_marketWiseTitle')}
                     </h3>
                     <p className="text-xs text-gray-500 mb-3">
@@ -603,24 +603,24 @@ const AdminDashboard = () => {
             {/* Quick Links */}
             <div className="bg-white rounded-xl p-5 border border-gray-200">
                 <h3 className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <FaClipboardList className="w-4 h-4 text-orange-500" />
+                    <FaClipboardList className="w-4 h-4 text-blue-500" />
                     {t('dash_quickLinks')}
                 </h3>
                 <p className="text-xs text-gray-500 mb-4">{t('dash_quickLinksHint')}</p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                    <Link to="/add-result" className="px-4 py-3 rounded-lg bg-gray-100 hover:bg-orange-500/20 border border-gray-200 hover:border-orange-300 text-gray-600 hover:text-orange-500 text-sm font-medium transition-all text-center">
+                    <Link to="/add-result" className="px-4 py-3 rounded-lg bg-gray-100 hover:bg-blue-500/20 border border-gray-200 hover:border-blue-300 text-gray-600 hover:text-blue-500 text-sm font-medium transition-all text-center">
                         {t('addResult')}
                     </Link>
-                    <Link to="/update-rate" className="px-4 py-3 rounded-lg bg-gray-100 hover:bg-orange-500/20 border border-gray-200 hover:border-orange-300 text-gray-600 hover:text-orange-500 text-sm font-medium transition-all text-center">
+                    <Link to="/update-rate" className="px-4 py-3 rounded-lg bg-gray-100 hover:bg-blue-500/20 border border-gray-200 hover:border-blue-300 text-gray-600 hover:text-blue-500 text-sm font-medium transition-all text-center">
                         {t('updateRate')}
                     </Link>
-                    <Link to="/add-user" className="px-4 py-3 rounded-lg bg-gray-100 hover:bg-orange-500/20 border border-gray-200 hover:border-orange-300 text-gray-600 hover:text-orange-500 text-sm font-medium transition-all text-center">
+                    <Link to="/add-user" className="px-4 py-3 rounded-lg bg-gray-100 hover:bg-blue-500/20 border border-gray-200 hover:border-blue-300 text-gray-600 hover:text-blue-500 text-sm font-medium transition-all text-center">
                         {t('title_addPlayer')}
                     </Link>
-                    <Link to="/add-market" className="px-4 py-3 rounded-lg bg-gray-100 hover:bg-orange-500/20 border border-gray-200 hover:border-orange-300 text-gray-600 hover:text-orange-500 text-sm font-medium transition-all text-center">
+                    <Link to="/add-market" className="px-4 py-3 rounded-lg bg-gray-100 hover:bg-blue-500/20 border border-gray-200 hover:border-blue-300 text-gray-600 hover:text-blue-500 text-sm font-medium transition-all text-center">
                         {t('title_addMarketPage')}
                     </Link>
-                    <Link to="/logs" className="px-4 py-3 rounded-lg bg-gray-100 hover:bg-orange-500/20 border border-gray-200 hover:border-orange-300 text-gray-600 hover:text-orange-500 text-sm font-medium transition-all text-center">
+                    <Link to="/logs" className="px-4 py-3 rounded-lg bg-gray-100 hover:bg-blue-500/20 border border-gray-200 hover:border-blue-300 text-gray-600 hover:text-blue-500 text-sm font-medium transition-all text-center">
                         {t('dash_linkActivityLogs')}
                     </Link>
                 </div>

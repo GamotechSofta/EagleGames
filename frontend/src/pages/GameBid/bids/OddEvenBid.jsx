@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useMarketBetContextTitle } from '../../../hooks/useMarketBetContextTitle';
+import { useBidI18n } from '../useBidI18n';
 import BidLayout from '../BidLayout';
 import BidReviewModal from './BidReviewModal';
 import { placeBet, updateUserBalance } from '../../../api/bets';
@@ -8,6 +9,7 @@ const ODD_DIGITS = [1, 3, 5, 7, 9];
 const EVEN_DIGITS = [0, 2, 4, 6, 8];
 
 const OddEvenBid = ({ market, title }) => {
+    const bid = useBidI18n();
     const [session, setSession] = useState(() => (market?.status === 'running' ? 'CLOSE' : 'OPEN'));
     const [choice, setChoice] = useState('odd'); // 'odd' | 'even'
     const [inputPoints, setInputPoints] = useState('');
@@ -54,7 +56,7 @@ const OddEvenBid = ({ market, title }) => {
     const handleAddBid = () => {
         const pts = Number(inputPoints);
         if (!pts || pts <= 0) {
-            showWarning('Please enter points.');
+            showWarning(bid.pleaseEnterPoints);
             return;
         }
         const nextMap = new Map();
@@ -138,11 +140,11 @@ const OddEvenBid = ({ market, title }) => {
             <div className="w-full basis-full min-w-0 shrink-0 md:hidden px-3 py-1">
                 <div className="grid grid-cols-2 gap-1.5">
                     <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 text-center">
-                        <div className="text-[11px] text-gray-300 font-medium">Count</div>
+                        <div className="text-[11px] text-gray-300 font-medium">{bid.count}</div>
                         <div className="text-base font-bold text-white leading-tight">{bids.length}</div>
                     </div>
                     <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 text-center">
-                        <div className="text-[11px] text-gray-300 font-medium">Bet Amount</div>
+                        <div className="text-[11px] text-gray-300 font-medium">{bid.betAmount}</div>
                         <div className="text-base font-bold text-white leading-tight">{totalPoints}</div>
                     </div>
                 </div>
@@ -184,7 +186,7 @@ const OddEvenBid = ({ market, title }) => {
                 </button>
             </div>
             <div className="flex items-center gap-3">
-                <label className="text-gray-200 text-sm font-medium shrink-0">Enter Points:</label>
+                <label className="text-gray-200 text-sm font-medium shrink-0">{bid.enterPointsColon}</label>
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                     <input
                         type="text"
@@ -204,7 +206,7 @@ const OddEvenBid = ({ market, title }) => {
                 </div>
             </div>
             <div className="flex items-center gap-3">
-                <label className="text-gray-200 text-sm font-medium shrink-0">Quick Points</label>
+                <label className="text-gray-200 text-sm font-medium shrink-0">{bid.quickPoints}</label>
                 <div className="grid grid-cols-5 gap-2 flex-1 min-w-0">
                     {quickPointValues.map((pts) => (
                         <button

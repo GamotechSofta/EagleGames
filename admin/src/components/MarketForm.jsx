@@ -181,7 +181,7 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                         {/* Startline edit: fixed market */}
                         {market && market.marketType === 'startline' ? (
                             <>
-                                <div className="rounded-lg bg-orange-50 border border-orange-200 px-3 py-2 text-sm text-orange-700">
+                                <div className="rounded-lg bg-blue-50 border border-blue-200 px-3 py-2 text-sm text-blue-700">
                                     {t('mf_startlineFixedHint')}
                                 </div>
                                 <div>
@@ -202,7 +202,7 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                                         name="marketName"
                                         value={formData.marketName}
                                         onChange={handleChange}
-                                        className="w-full px-3 sm:px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm sm:text-base"
+                                        className="w-full px-3 sm:px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                                         placeholder={t('mf_placeholderMarket')}
                                         required
                                     />
@@ -216,7 +216,7 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                                         name="marketNameHi"
                                         value={formData.marketNameHi}
                                         onChange={handleChange}
-                                        className="w-full px-3 sm:px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm sm:text-base"
+                                        className="w-full px-3 sm:px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                                         placeholder="e.g., नाइट मार्केट"
                                     />
                                     <p className="text-xs text-gray-500 mt-0.5">{t('mf_optionalHi')}</p>
@@ -230,7 +230,7 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                                         name="marketNameMr"
                                         value={formData.marketNameMr}
                                         onChange={handleChange}
-                                        className="w-full px-3 sm:px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm sm:text-base"
+                                        className="w-full px-3 sm:px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                                         placeholder="उदा. रात्री बाजार"
                                     />
                                     <p className="text-xs text-gray-500 mt-0.5">{t('mf_optionalMr')}</p>
@@ -244,7 +244,7 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                                         name="marketNameTe"
                                         value={formData.marketNameTe}
                                         onChange={handleChange}
-                                        className="w-full px-3 sm:px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm sm:text-base"
+                                        className="w-full px-3 sm:px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                                         placeholder={t('mf_placeholderTe')}
                                     />
                                 </div>
@@ -257,7 +257,7 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                                         name="marketNameTa"
                                         value={formData.marketNameTa}
                                         onChange={handleChange}
-                                        className="w-full px-3 sm:px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm sm:text-base"
+                                        className="w-full px-3 sm:px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                                         placeholder={t('mf_placeholderTa')}
                                     />
                                 </div>
@@ -270,7 +270,7 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                                         name="marketNameKn"
                                         value={formData.marketNameKn}
                                         onChange={handleChange}
-                                        className="w-full px-3 sm:px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm sm:text-base"
+                                        className="w-full px-3 sm:px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                                         placeholder={t('mf_placeholderKn')}
                                     />
                                 </div>
@@ -283,7 +283,7 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                                         name="marketNameMl"
                                         value={formData.marketNameMl}
                                         onChange={handleChange}
-                                        className="w-full px-3 sm:px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm sm:text-base"
+                                        className="w-full px-3 sm:px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                                         placeholder={t('mf_placeholderMl')}
                                     />
                                     <p className="text-xs text-gray-500 mt-0.5">
@@ -302,7 +302,7 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                                     <select
                                         value={start12.hour12}
                                         onChange={(e) => handleStart12Change('hour12', e.target.value)}
-                                        className="w-full min-w-0 px-2 sm:px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-orange-500 text-sm sm:text-base"
+                                        className="w-full min-w-0 px-2 sm:px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                                     >
                                         {HOURS_12.map((h) => (
                                             <option key={h} value={h}>{h}</option>
@@ -312,7 +312,7 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                                     <select
                                         value={start12.minute}
                                         onChange={(e) => handleStart12Change('minute', e.target.value)}
-                                        className="w-full min-w-0 px-2 sm:px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-orange-500 text-sm sm:text-base"
+                                        className="w-full min-w-0 px-2 sm:px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                                     >
                                         {MINUTES.map((m) => (
                                             <option key={m} value={m}>{m}</option>
@@ -322,7 +322,7 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                                     <select
                                         value={start12.ampm}
                                         onChange={(e) => handleStart12Change('ampm', e.target.value)}
-                                        className="w-full min-w-[4rem] px-2 sm:px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-orange-500 text-sm sm:text-base"
+                                        className="w-full min-w-[4rem] px-2 sm:px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                                     >
                                         <option value="AM">AM</option>
                                         <option value="PM">PM</option>
@@ -332,7 +332,7 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                         )}
 
                         {formData.marketType === 'startline' && (
-                            <p className="text-xs text-orange-700 bg-orange-50 border border-orange-200 rounded-lg px-3 py-1.5">
+                            <p className="text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded-lg px-3 py-1.5">
                                 {t('mf_startlineNoOpen')}
                             </p>
                         )}
@@ -341,14 +341,14 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                             <label className="block text-gray-600 text-sm font-medium mb-1.5">
                                 {t('mf_closingTime')}{' '}
                                 {formData.marketType === 'startline' && (
-                                    <span className="text-orange-500">{t('mf_betCutoffTag')}</span>
+                                    <span className="text-blue-500">{t('mf_betCutoffTag')}</span>
                                 )}
                             </label>
                             <div className="grid grid-cols-[1fr_auto_1fr_auto_auto] gap-1 sm:gap-2 items-center">
                                 <select
                                     value={close12.hour12}
                                     onChange={(e) => handleClose12Change('hour12', e.target.value)}
-                                    className="w-full min-w-0 px-2 sm:px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-orange-500 text-sm sm:text-base"
+                                    className="w-full min-w-0 px-2 sm:px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                                 >
                                     {HOURS_12.map((h) => (
                                         <option key={h} value={h}>{h}</option>
@@ -358,7 +358,7 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                                 <select
                                     value={close12.minute}
                                     onChange={(e) => handleClose12Change('minute', e.target.value)}
-                                    className="w-full min-w-0 px-2 sm:px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-orange-500 text-sm sm:text-base"
+                                    className="w-full min-w-0 px-2 sm:px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                                 >
                                     {MINUTES.map((m) => (
                                         <option key={m} value={m}>{m}</option>
@@ -368,7 +368,7 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                                 <select
                                     value={close12.ampm}
                                     onChange={(e) => handleClose12Change('ampm', e.target.value)}
-                                    className="w-full min-w-[4rem] px-2 sm:px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-orange-500 text-sm sm:text-base"
+                                    className="w-full min-w-[4rem] px-2 sm:px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                                 >
                                     <option value="AM">AM</option>
                                     <option value="PM">PM</option>
@@ -390,7 +390,7 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                                     step="1"
                                     placeholder={t('mf_placeholderBetClosure')}
                                     inputMode="numeric"
-                                    className="flex-1 min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-2 bg-gray-50 text-gray-800 placeholder-gray-400 text-sm sm:text-base border-0 focus:ring-2 focus:ring-orange-500 focus:ring-inset"
+                                    className="flex-1 min-w-[80px] sm:min-w-[100px] px-3 sm:px-4 py-2 bg-gray-50 text-gray-800 placeholder-gray-400 text-sm sm:text-base border-0 focus:ring-2 focus:ring-blue-500 focus:ring-inset"
                                 />
                                 <span className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-gray-100 text-gray-500 text-xs sm:text-sm font-medium whitespace-nowrap">
                                     {t('mf_seconds')}
@@ -409,7 +409,7 @@ const MarketForm = ({ market, defaultMarketType = 'main', onClose, onSuccess, ap
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 sm:py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
+                                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2.5 sm:py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
                             >
                                 {loading ? t('mf_saving') : market ? t('mf_update') : t('btn_create')}
                             </button>

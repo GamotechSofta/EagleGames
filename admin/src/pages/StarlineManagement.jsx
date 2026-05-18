@@ -499,12 +499,12 @@ const StarlineManagement = ({ embedded = false }) => {
                 {!activeTab ? (
                     <>
                         <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
-                            <h1 className="text-xl sm:text-2xl font-bold text-orange-500">Starline</h1>
+                            <h1 className="text-xl sm:text-2xl font-bold text-blue-500">Starline</h1>
                             {!loadingGroups && starlineGroups.length > 0 && (
                                 <button
                                     type="button"
                                     onClick={() => { setShowAddMarket(true); setNewMarketLabel(''); setAddMarketError(''); }}
-                                    className="px-4 py-2.5 rounded-xl font-semibold text-sm bg-emerald-600 hover:bg-orange-500 text-gray-800 shadow-lg shadow-emerald-900/30"
+                                    className="px-4 py-2.5 rounded-xl font-semibold text-sm bg-emerald-600 hover:bg-blue-500 text-gray-800 shadow-lg shadow-emerald-900/30"
                                 >
                                     + Add market
                                 </button>
@@ -519,16 +519,16 @@ const StarlineManagement = ({ embedded = false }) => {
                                 Loading markets…
                             </div>
                         ) : starlineGroups.length === 0 ? (
-                            <div className="rounded-2xl border-2 border-dashed border-orange-200 bg-white p-10 text-center">
-                                <div className="w-14 h-14 rounded-2xl bg-orange-500/20 flex items-center justify-center mx-auto mb-4">
-                                    <svg className="w-8 h-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <div className="rounded-2xl border-2 border-dashed border-blue-200 bg-white p-10 text-center">
+                                <div className="w-14 h-14 rounded-2xl bg-blue-500/20 flex items-center justify-center mx-auto mb-4">
+                                    <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 </div>
                                 <p className="text-gray-600 font-medium mb-1">No Starline markets yet</p>
                                 <p className="text-gray-500 text-sm mb-5">Add your first market, then add time slots and declare results.</p>
                                 <button
                                     type="button"
                                     onClick={() => { setShowAddMarket(true); setNewMarketLabel(''); setAddMarketError(''); }}
-                                    className="px-5 py-3 rounded-xl bg-orange-500 hover:bg-amber-400 text-gray-800 font-semibold text-sm"
+                                    className="px-5 py-3 rounded-xl bg-blue-500 hover:bg-blue-600 text-gray-800 font-semibold text-sm"
                                 >
                                     + Add Starline market
                                 </button>
@@ -581,7 +581,7 @@ const StarlineManagement = ({ embedded = false }) => {
                                                     <button
                                                         type="button"
                                                         onClick={() => setActiveTab(g.key)}
-                                                        className="w-full mt-auto px-4 py-3 rounded-xl bg-orange-500 hover:bg-amber-400 text-gray-800 font-semibold text-sm flex items-center justify-center gap-2 shadow-md shadow-amber-900/20"
+                                                        className="w-full mt-auto px-4 py-3 rounded-xl bg-blue-500 hover:bg-blue-600 text-gray-800 font-semibold text-sm flex items-center justify-center gap-2 shadow-md shadow-blue-900/20"
                                                     >
                                                         Manage slots & result
                                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
@@ -597,7 +597,7 @@ const StarlineManagement = ({ embedded = false }) => {
                     <>
                         {/* ═══ Detail view: breadcrumb + title ═══ */}
                         <nav className="flex items-center gap-2 text-sm text-gray-400 mb-3">
-                            <button type="button" onClick={() => { setActiveTab(''); setSelectedResultMarket(null); }} className="hover:text-orange-500 transition-colors">Starline</button>
+                            <button type="button" onClick={() => { setActiveTab(''); setSelectedResultMarket(null); }} className="hover:text-blue-500 transition-colors">Starline</button>
                             <span>/</span>
                             <span className="text-gray-800 font-medium">{activeGroup?.label || activeTab}</span>
                         </nav>
@@ -640,7 +640,7 @@ const StarlineManagement = ({ embedded = false }) => {
                                 <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                                     <div>
                                         <h2 className="text-base font-bold text-gray-800 flex items-center gap-2">
-                                            <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-orange-500/20 text-orange-500 font-mono text-sm">1</span>
+                                            <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-blue-500/20 text-blue-500 font-mono text-sm">1</span>
                                             Time slots
                                         </h2>
                                         <p className="text-gray-500 text-xs mt-1">Add slots and set when each closes. Edit or delete below.</p>
@@ -648,18 +648,18 @@ const StarlineManagement = ({ embedded = false }) => {
                                     <button
                                         type="button"
                                         onClick={() => { setShowAddSlot(true); setAddError(''); }}
-                                        className="px-4 py-2.5 rounded-xl bg-orange-500 hover:bg-amber-400 text-gray-800 font-semibold text-sm"
+                                        className="px-4 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-gray-800 font-semibold text-sm"
                                     >
                                         + Add slot
                                     </button>
                                 </div>
                                 {slotsForTab.length === 0 ? (
-                                    <div className="rounded-xl border-2 border-dashed border-orange-200 bg-white p-8 text-center">
+                                    <div className="rounded-xl border-2 border-dashed border-blue-200 bg-white p-8 text-center">
                                         <p className="text-gray-400 text-sm mb-4">No time slots yet. Add one to set closing time and accept bets.</p>
                                         <button
                                             type="button"
                                             onClick={() => { setShowAddSlot(true); setAddError(''); }}
-                                            className="px-4 py-2.5 rounded-xl bg-orange-500 hover:bg-amber-400 text-gray-800 font-semibold text-sm"
+                                            className="px-4 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-gray-800 font-semibold text-sm"
                                         >
                                             + Add time slot
                                         </button>
@@ -672,7 +672,7 @@ const StarlineManagement = ({ embedded = false }) => {
                                             const statusLabel = hasOpen ? 'Result declared' : slotClosedToday ? 'Close For Today' : 'Open';
                                             const statusVariant = hasOpen ? 'red' : slotClosedToday ? 'red' : 'emerald';
                                             return (
-                                                <div key={m._id} className="bg-white rounded-xl border border-gray-200 p-4 hover:border-orange-200 transition-colors">
+                                                <div key={m._id} className="bg-white rounded-xl border border-gray-200 p-4 hover:border-blue-200 transition-colors">
                                                     <div className="flex items-center justify-between gap-2 mb-2">
                                                         <span className={`text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded ${statusVariant === 'red' ? 'bg-red-50 text-red-300' : 'bg-emerald-900/50 text-emerald-300'}`}>
                                                             {statusLabel}
@@ -682,7 +682,7 @@ const StarlineManagement = ({ embedded = false }) => {
                                                     <p className="text-xs text-gray-500 mb-3">Closes {formatTime(m.closingTime)}</p>
                                                     <div className="flex flex-wrap gap-2">
                                                         <button type="button" onClick={() => navigate(`/markets/${m._id}`)} className="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-medium">View details</button>
-                                                        <button type="button" onClick={() => handleEdit(m)} className="px-3 py-1.5 rounded-lg bg-orange-600/80 hover:bg-orange-600 text-gray-800 text-xs font-medium">Edit time</button>
+                                                        <button type="button" onClick={() => handleEdit(m)} className="px-3 py-1.5 rounded-lg bg-blue-600/80 hover:bg-blue-600 text-gray-800 text-xs font-medium">Edit time</button>
                                                         <button type="button" onClick={() => handleDelete(m)} className="px-3 py-1.5 rounded-lg bg-red-900/60 hover:bg-red-800 text-red-600 text-xs font-medium">Delete</button>
                                                     </div>
                                                 </div>
@@ -696,7 +696,7 @@ const StarlineManagement = ({ embedded = false }) => {
                         {/* Add slot modal */}
                         {showAddSlot && (
                             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-                                <div className="bg-white rounded-2xl border border-orange-200 shadow-xl max-w-md w-full p-6">
+                                <div className="bg-white rounded-2xl border border-blue-200 shadow-xl max-w-md w-full p-6">
                                     <h3 className="text-base font-bold text-gray-800 mb-1">Add time slot</h3>
                                     <p className="text-gray-500 text-sm mb-4">Set closing time for a new slot. Name will be e.g. &quot;{activeGroup?.label || ''} 10:00 PM&quot;.</p>
                                     <form onSubmit={handleAddSlotSubmit} className="space-y-4">
@@ -722,7 +722,7 @@ const StarlineManagement = ({ embedded = false }) => {
                                             <input type="number" min="0" value={addBetClosure} onChange={(e) => setAddBetClosure(e.target.value)} placeholder="e.g. 300" className="w-full px-3 py-2.5 bg-gray-100 border border-gray-200 rounded-xl text-gray-800 text-sm" />
                                         </div>
                                         <div className="flex gap-3 pt-1">
-                                            <button type="submit" disabled={addLoading} className="flex-1 py-2.5 rounded-xl bg-orange-500 hover:bg-amber-400 text-gray-800 font-semibold text-sm disabled:opacity-50">
+                                            <button type="submit" disabled={addLoading} className="flex-1 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-gray-800 font-semibold text-sm disabled:opacity-50">
                                                 {addLoading ? 'Creating...' : 'Create slot'}
                                             </button>
                                             <button type="button" onClick={() => { setShowAddSlot(false); setAddError(''); }} disabled={addLoading} className="px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium text-sm">
@@ -756,14 +756,14 @@ const StarlineManagement = ({ embedded = false }) => {
                         {/* Declare password modal */}
                         {showPasswordModal && (
                             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-                                <div className="bg-white rounded-2xl border border-orange-200 shadow-xl max-w-md w-full p-6">
+                                <div className="bg-white rounded-2xl border border-blue-200 shadow-xl max-w-md w-full p-6">
                                     <h3 className="text-base font-bold text-gray-800 mb-1">Declare result</h3>
                                     <p className="text-gray-500 text-sm mb-4">Enter secret declare password to confirm.</p>
                                     <form onSubmit={handlePasswordSubmit} className="space-y-4">
                                         <input type="password" value={secretPassword} onChange={(e) => { setSecretPassword(e.target.value); setPasswordError(''); }} placeholder="Secret password" className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 text-gray-800 text-sm" />
                                         {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
                                         <div className="flex gap-3">
-                                            <button type="submit" disabled={declareLoading} className="flex-1 py-2.5 rounded-xl bg-orange-500 hover:bg-amber-400 text-gray-800 font-semibold text-sm disabled:opacity-50">Declare</button>
+                                            <button type="submit" disabled={declareLoading} className="flex-1 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-gray-800 font-semibold text-sm disabled:opacity-50">Declare</button>
                                             <button type="button" onClick={() => { setShowPasswordModal(false); setSecretPassword(''); setPasswordError(''); }} disabled={declareLoading} className="px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium text-sm">Cancel</button>
                                         </div>
                                     </form>
@@ -778,7 +778,7 @@ const StarlineManagement = ({ embedded = false }) => {
                 {/* Add Starline market modal (available on list view) */}
                 {showAddMarket && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-                        <div className="bg-white rounded-2xl border border-orange-200 shadow-xl max-w-md w-full p-6">
+                        <div className="bg-white rounded-2xl border border-blue-200 shadow-xl max-w-md w-full p-6">
                             <h3 className="text-base font-bold text-gray-800 mb-1">Add Starline market</h3>
                             <p className="text-gray-500 text-sm mb-4">Add a new market (e.g. Pune Starline). You can then add time slots and declare results for it.</p>
                             <form onSubmit={handleAddMarketSubmit} className="space-y-4">
@@ -794,7 +794,7 @@ const StarlineManagement = ({ embedded = false }) => {
                                     />
                                 </div>
                                 <div className="flex gap-3 pt-1">
-                                    <button type="submit" disabled={addMarketLoading} className="flex-1 py-2.5 rounded-xl bg-orange-500 hover:bg-amber-400 text-gray-800 font-semibold text-sm disabled:opacity-50">
+                                    <button type="submit" disabled={addMarketLoading} className="flex-1 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-gray-800 font-semibold text-sm disabled:opacity-50">
                                         {addMarketLoading ? 'Adding...' : 'Add market'}
                                     </button>
                                     <button type="button" onClick={() => { setShowAddMarket(false); setNewMarketLabel(''); setAddMarketError(''); }} disabled={addMarketLoading} className="px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium text-sm">Cancel</button>

@@ -88,7 +88,7 @@ const Settings = () => {
                 <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-6">Settings</h1>
 
                 <div className="rounded-xl border border-gray-200 bg-white shadow-lg overflow-hidden max-w-xl">
-                    <h2 className="text-lg font-bold text-orange-500 bg-white px-4 py-3 border-b border-gray-200">
+                    <h2 className="text-lg font-bold text-blue-500 bg-white px-4 py-3 border-b border-gray-200">
                         Secret Declare Password
                     </h2>
                     <div className="p-4 space-y-3">
@@ -109,14 +109,14 @@ const Settings = () => {
                                                 value={currentSecretPassword}
                                                 onChange={(e) => { setCurrentSecretPassword(e.target.value); setAdminLoginPassword(''); setStatusMsg(''); }}
                                                 placeholder=""
-                                                className="w-full px-4 py-2.5 rounded-lg bg-gray-100 border border-gray-200 text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                                className="w-full px-4 py-2.5 rounded-lg bg-gray-100 border border-gray-200 text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                                 autoComplete="current-password"
                                             />
                                             <p className="mt-1 text-xs text-gray-500">Enter current secret password to verify it&apos;s you before changing.</p>
                                             <button
                                                 type="button"
                                                 onClick={() => { setForgotSecret(true); setCurrentSecretPassword(''); setAdminLoginPassword(''); setStatusMsg(''); }}
-                                                className="mt-2 text-xs text-orange-500 hover:text-orange-600 underline"
+                                                className="mt-2 text-xs text-blue-500 hover:text-blue-600 underline"
                                             >
                                                 Forgot current secret password?
                                             </button>
@@ -131,14 +131,14 @@ const Settings = () => {
                                                 value={adminLoginPassword}
                                                 onChange={(e) => { setAdminLoginPassword(e.target.value); setStatusMsg(''); }}
                                                 placeholder=""
-                                                className="w-full px-4 py-2.5 rounded-lg bg-gray-100 border border-gray-200 text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                                className="w-full px-4 py-2.5 rounded-lg bg-gray-100 border border-gray-200 text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                                 autoComplete="current-password"
                                             />
                                             <p className="mt-1 text-xs text-gray-500">Enter the password you use to log into admin panel. This proves you&apos;re the admin and allows you to reset the secret.</p>
                                             <button
                                                 type="button"
                                                 onClick={() => { setForgotSecret(false); setAdminLoginPassword(''); setCurrentSecretPassword(''); setStatusMsg(''); }}
-                                                className="mt-2 text-xs text-orange-500 hover:text-orange-600 underline"
+                                                className="mt-2 text-xs text-blue-500 hover:text-blue-600 underline"
                                             >
                                                 I remember my secret password
                                             </button>
@@ -155,7 +155,7 @@ const Settings = () => {
                                     value={secretDeclarePassword}
                                     onChange={(e) => setSecretDeclarePassword(e.target.value)}
                                     placeholder=""
-                                    className="w-full px-4 py-2.5 rounded-lg bg-gray-100 border border-gray-200 text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                    className="w-full px-4 py-2.5 rounded-lg bg-gray-100 border border-gray-200 text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
                             </div>
                             <div>
@@ -165,7 +165,7 @@ const Settings = () => {
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                     placeholder=""
-                                    className="w-full px-4 py-2.5 rounded-lg bg-gray-100 border border-gray-200 text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                    className="w-full px-4 py-2.5 rounded-lg bg-gray-100 border border-gray-200 text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
                             </div>
                             {statusMsg && (
@@ -176,7 +176,7 @@ const Settings = () => {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-gray-800 font-semibold rounded-lg disabled:opacity-50 transition-colors"
+                                className="px-6 py-2.5 bg-blue-500 hover:bg-blue-600 text-gray-800 font-semibold rounded-lg disabled:opacity-50 transition-colors"
                             >
                                 {loading ? 'Saving...' : 'Set Secret Password'}
                             </button>

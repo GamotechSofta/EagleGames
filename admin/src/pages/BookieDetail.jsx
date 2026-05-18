@@ -139,7 +139,7 @@ const BookieDetail = () => {
             <AdminLayout onLogout={handleLogout} title="Bookie Detail">
                 <div className="flex flex-col items-center justify-center min-h-[40vh]">
                     <p className="text-red-500 mb-4">{error}</p>
-                    <Link to="/revenue" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 text-gray-800 font-semibold">
+                    <Link to="/revenue" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500 text-gray-800 font-semibold">
                         <FaArrowLeft /> Back to Revenue
                     </Link>
                 </div>
@@ -157,15 +157,15 @@ const BookieDetail = () => {
             <div className="min-w-0 max-w-full space-y-4 sm:space-y-6">
                 {/* Back + Header */}
                 <div>
-                    <Link to="/revenue" className="text-gray-400 hover:text-orange-500 text-sm inline-flex items-center gap-1 mb-2">
+                    <Link to="/revenue" className="text-gray-400 hover:text-blue-500 text-sm inline-flex items-center gap-1 mb-2">
                         <FaArrowLeft className="w-3 h-3" /> Revenue
                     </Link>
                     <div className="flex flex-wrap items-center gap-3">
                         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">{bookie?.username || 'Bookie'}</h1>
-                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${bookie?.status === 'active' ? 'bg-orange-500/20 text-emerald-600' : 'bg-red-500/20 text-red-500'}`}>
+                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${bookie?.status === 'active' ? 'bg-blue-500/20 text-emerald-600' : 'bg-red-500/20 text-red-500'}`}>
                             {bookie?.status === 'active' ? 'Active' : 'Inactive'}
                         </span>
-                        <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-orange-500/15 text-orange-500">
+                        <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/15 text-blue-500">
                             {bookie?.commissionPercentage || 0}% Commission
                         </span>
                     </div>
@@ -181,7 +181,7 @@ const BookieDetail = () => {
                                 type="button"
                                 onClick={() => applyPreset(p.id)}
                                 className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
-                                    activePreset === p.id ? 'bg-orange-500 text-gray-800' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                    activePreset === p.id ? 'bg-blue-500 text-gray-800' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                 }`}
                             >
                                 {p.label}
@@ -208,7 +208,7 @@ const BookieDetail = () => {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-semibold text-xs sm:text-sm transition-colors ${
-                                activeTab === tab.id ? 'bg-orange-500 text-gray-800' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                activeTab === tab.id ? 'bg-blue-500 text-gray-800' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                             }`}
                         >
                             {tab.label}
@@ -234,12 +234,12 @@ const BookieDetail = () => {
                                 <p className="text-[10px] text-gray-500 mt-0.5">{formatNumber(revenue.winningBets)} wins, {formatNumber(revenue.losingBets)} losses</p>
                             </div>
                             <div className="bg-white rounded-xl p-3 sm:p-4 border border-gray-200/60 relative overflow-hidden">
-                                <div className="absolute top-0 left-0 right-0 h-1 bg-orange-500" />
+                                <div className="absolute top-0 left-0 right-0 h-1 bg-blue-500" />
                                 <p className="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wider">Bookie Share ({bookie?.commissionPercentage}%)</p>
-                                <p className="text-sm sm:text-lg lg:text-xl font-bold text-orange-400 mt-1 truncate">{formatCurrency(revenue.bookieShare)}</p>
+                                <p className="text-sm sm:text-lg lg:text-xl font-bold text-blue-400 mt-1 truncate">{formatCurrency(revenue.bookieShare)}</p>
                             </div>
                             <div className={`bg-white rounded-xl p-3 sm:p-4 border relative overflow-hidden ${revenue.adminProfit >= 0 ? 'border-emerald-500/40' : 'border-red-500/40'}`}>
-                                <div className={`absolute top-0 left-0 right-0 h-1 ${revenue.adminProfit >= 0 ? 'bg-orange-500' : 'bg-red-500'}`} />
+                                <div className={`absolute top-0 left-0 right-0 h-1 ${revenue.adminProfit >= 0 ? 'bg-blue-500' : 'bg-red-500'}`} />
                                 <p className="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wider">Admin Profit</p>
                                 <p className={`text-sm sm:text-lg lg:text-xl font-bold mt-1 truncate ${revenue.adminProfit >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
                                     {formatCurrency(revenue.adminProfit)}
@@ -261,7 +261,7 @@ const BookieDetail = () => {
                                 </div>
                                 <div className="flex justify-between py-1.5 border-b border-gray-200/40">
                                     <span className="text-gray-400">Bookie Commission ({bookie?.commissionPercentage}%)</span>
-                                    <span className="text-orange-400 font-medium">- {formatCurrency(revenue.bookieShare)}</span>
+                                    <span className="text-blue-400 font-medium">- {formatCurrency(revenue.bookieShare)}</span>
                                 </div>
                                 <div className="flex justify-between py-1.5 border-b border-gray-200/40">
                                     <span className="text-gray-400">Admin Pool ({100 - (bookie?.commissionPercentage || 0)}%)</span>
@@ -272,7 +272,7 @@ const BookieDetail = () => {
                                     <span className="text-red-500 font-medium">- {formatCurrency(revenue.totalPayouts)}</span>
                                 </div>
                                 <div className="flex justify-between py-2 font-bold">
-                                    <span className="text-orange-500">Admin Profit</span>
+                                    <span className="text-blue-500">Admin Profit</span>
                                     <span className={revenue.adminProfit >= 0 ? 'text-emerald-600' : 'text-red-500'}>{formatCurrency(revenue.adminProfit)}</span>
                                 </div>
                             </div>
@@ -321,7 +321,7 @@ const BookieDetail = () => {
                                             <td className="px-4 py-2.5">
                                                 <div className="flex items-center gap-2">
                                                     <div className={`w-2 h-2 rounded-full shrink-0 ${u.isActive ? 'bg-emerald-400' : 'bg-red-400'}`} />
-                                                    <Link to={`/all-users/${u.userId}`} className="font-medium text-gray-800 hover:text-orange-500 transition-colors">{u.username}</Link>
+                                                    <Link to={`/all-users/${u.userId}`} className="font-medium text-gray-800 hover:text-blue-500 transition-colors">{u.username}</Link>
                                                 </div>
                                                 {u.phone && <p className="text-[11px] text-gray-500 ml-4">{u.phone}</p>}
                                             </td>
@@ -349,7 +349,7 @@ const BookieDetail = () => {
                                     <div className="flex items-center justify-between mb-2">
                                         <div className="flex items-center gap-2 min-w-0">
                                             <div className={`w-2 h-2 rounded-full shrink-0 ${u.isActive ? 'bg-emerald-400' : 'bg-red-400'}`} />
-                                            <Link to={`/all-users/${u.userId}`} className="font-medium text-gray-800 text-sm hover:text-orange-500 truncate">{u.username}</Link>
+                                            <Link to={`/all-users/${u.userId}`} className="font-medium text-gray-800 text-sm hover:text-blue-500 truncate">{u.username}</Link>
                                         </div>
                                         <span className={`text-xs font-semibold ${u.profit >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
                                             {formatCurrency(u.profit)}
@@ -392,7 +392,7 @@ const BookieDetail = () => {
                                 <div key={b._id} className="p-3 sm:p-4 hover:bg-gray-100/20 transition-colors">
                                     <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
                                         <div className="flex items-center gap-2 min-w-0">
-                                            <span className="text-orange-500 font-mono font-medium text-sm">{b.betNumber}</span>
+                                            <span className="text-blue-500 font-mono font-medium text-sm">{b.betNumber}</span>
                                             <span className="text-gray-500 text-xs">{getBetTypeLabel(b.betType)}</span>
                                             {b.betOn && <span className="text-gray-600 text-[10px] uppercase">({b.betOn})</span>}
                                         </div>
@@ -426,8 +426,8 @@ const BookieDetail = () => {
                         <h3 className="text-sm sm:text-base font-semibold text-gray-800 mb-4">Bookie Profile</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
                             <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-lg bg-orange-500/15 flex items-center justify-center shrink-0">
-                                    <FaUserTie className="w-4 h-4 text-orange-500" />
+                                <div className="w-9 h-9 rounded-lg bg-blue-500/15 flex items-center justify-center shrink-0">
+                                    <FaUserTie className="w-4 h-4 text-blue-500" />
                                 </div>
                                 <div className="min-w-0">
                                     <p className="text-[10px] text-gray-500 uppercase tracking-wider">Username</p>
@@ -453,16 +453,16 @@ const BookieDetail = () => {
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-lg bg-orange-500/15 flex items-center justify-center shrink-0">
-                                    <FaPercent className="w-4 h-4 text-orange-400" />
+                                <div className="w-9 h-9 rounded-lg bg-blue-500/15 flex items-center justify-center shrink-0">
+                                    <FaPercent className="w-4 h-4 text-blue-400" />
                                 </div>
                                 <div className="min-w-0">
                                     <p className="text-[10px] text-gray-500 uppercase tracking-wider">Commission</p>
-                                    <p className="text-orange-400 text-sm font-bold">{bookie.commissionPercentage}%</p>
+                                    <p className="text-blue-400 text-sm font-bold">{bookie.commissionPercentage}%</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-lg bg-orange-500/15 flex items-center justify-center shrink-0">
+                                <div className="w-9 h-9 rounded-lg bg-blue-500/15 flex items-center justify-center shrink-0">
                                     <FaUsers className="w-4 h-4 text-emerald-600" />
                                 </div>
                                 <div className="min-w-0">
@@ -480,7 +480,7 @@ const BookieDetail = () => {
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
-                                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${bookie.status === 'active' ? 'bg-orange-500/15' : 'bg-red-500/15'}`}>
+                                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${bookie.status === 'active' ? 'bg-blue-500/15' : 'bg-red-500/15'}`}>
                                     <div className={`w-3 h-3 rounded-full ${bookie.status === 'active' ? 'bg-emerald-400' : 'bg-red-400'}`} />
                                 </div>
                                 <div className="min-w-0">

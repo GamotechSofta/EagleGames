@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL, fetchWithAuth } from '../config/api';
 import { useLanguage } from '../context/LanguageContext';
 import { partnerRequiresTopLevelNavigation } from '../utils/partnerGameEmbed';
+import { getGameDisplayName } from '../utils/gameDisplayName';
 
 function gameLaunchSessionKeys(gameCode) {
   const c = String(gameCode || '').trim().toUpperCase();
@@ -108,7 +109,7 @@ const GamesSection = () => {
         }
 
         const codeForRoute = encodeURIComponent(gameCode);
-        const gameName = String(game?.name || gameCode);
+        const gameName = getGameDisplayName(t, game) || gameCode;
         const embedAllowed = json?.embedAllowed !== false;
         if (partnerRequiresTopLevelNavigation(launchUrl, gameCode, embedAllowed)) {
           window.location.assign(String(launchUrl).trim());
@@ -166,13 +167,14 @@ const GamesSection = () => {
           {games.map((game) => {
             const code = String(game.gameCode || '').trim().toUpperCase();
             const busy = launchingCode === code;
+            const displayName = getGameDisplayName(t, game);
             return (
               <button
                 key={game._id || code}
                 type="button"
                 disabled={busy}
                 onClick={() => handlePlay(game)}
-                aria-label={`${t('games_play')} ${game.name}`}
+                aria-label={`${t('games_play')} ${displayName}`}
                 className="group relative w-[150px] sm:w-[180px] md:w-[220px] aspect-[4/3] rounded-xl overflow-hidden shrink-0 snap-start ring-1 ring-white/10 text-left transition-transform duration-200 hover:-translate-y-0.5 disabled:opacity-60"
               >
                 <img
@@ -190,7 +192,7 @@ const GamesSection = () => {
                     {t('games_gameLabel')}
                   </p>
                   <h3 className="text-white text-sm md:text-base font-medium leading-tight flex items-center gap-1">
-                    {game.name}
+                    {displayName}
                     <span className="text-xs text-white/80">{'->'}</span>
                   </h3>
                 </div>

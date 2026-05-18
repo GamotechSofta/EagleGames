@@ -167,11 +167,11 @@ const Reports = () => {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 flex items-center gap-2">
-                            <FaChartLine className="w-8 h-8 text-orange-500" />
+                            <FaChartLine className="w-8 h-8 text-blue-500" />
                             Reports
                         </h1>
                         <p className="text-gray-400 text-sm mt-1">Financial and betting summary for the selected period</p>
-                        <p className="text-orange-500 text-sm font-medium mt-1">{todayTopLabel}</p>
+                        <p className="text-blue-500 text-sm font-medium mt-1">{todayTopLabel}</p>
                     </div>
                 </div>
 
@@ -179,14 +179,14 @@ const Reports = () => {
                 <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
                     <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
                         <div className="flex items-center gap-2">
-                        <FaCalendarAlt className="w-5 h-5 text-orange-500 shrink-0" />
+                        <FaCalendarAlt className="w-5 h-5 text-blue-500 shrink-0" />
                         <span className="text-sm font-medium text-gray-600">Period</span>
                         </div>
                         <button
                             type="button"
                             onClick={fetchReport}
                             disabled={loading}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-amber-400 text-gray-800 font-semibold rounded-lg transition-colors disabled:opacity-50"
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-gray-800 font-semibold rounded-lg transition-colors disabled:opacity-50"
                         >
                             <FaSyncAlt className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                             Refresh
@@ -200,7 +200,7 @@ const Reports = () => {
                                 onClick={() => applyPreset(p.id)}
                                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                                     activePreset === p.id
-                                        ? 'bg-orange-500 text-gray-800'
+                                        ? 'bg-blue-500 text-gray-800'
                                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                 }`}
                             >
@@ -263,14 +263,14 @@ const Reports = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="bg-gradient-to-br from-orange-50 to-amber-600/5 rounded-xl p-5 border border-orange-200">
+                            <div className="bg-gradient-to-br from-blue-50 to-amber-600/5 rounded-xl p-5 border border-blue-200">
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="text-sm font-medium text-gray-400">Net Profit</p>
-                                        <p className="text-2xl font-bold text-orange-500 mt-1">{formatCurrency(report.netProfit)}</p>
+                                        <p className="text-2xl font-bold text-blue-500 mt-1">{formatCurrency(report.netProfit)}</p>
                                     </div>
-                                    <div className="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center">
-                                        <FaChartBar className="w-6 h-6 text-orange-500" />
+                                    <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                                        <FaChartBar className="w-6 h-6 text-blue-500" />
                                     </div>
                                 </div>
                             </div>
@@ -279,7 +279,7 @@ const Reports = () => {
                         {/* Betting stats */}
                         <div className="bg-white rounded-xl border border-gray-200 p-5">
                             <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <FaChartBar className="w-5 h-5 text-orange-500" />
+                                <FaChartBar className="w-5 h-5 text-blue-500" />
                                 Betting Summary
                             </h2>
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -311,7 +311,7 @@ const Reports = () => {
                         {/* Related reports / quick links */}
                         <div className="bg-white rounded-xl border border-gray-200 p-5">
                             <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <FaFileExport className="w-5 h-5 text-orange-500" />
+                                <FaFileExport className="w-5 h-5 text-blue-500" />
                                 Related Reports & Actions
                             </h2>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -319,13 +319,13 @@ const Reports = () => {
                                     <Link
                                         key={item.to}
                                         to={item.to}
-                                        className="flex items-start gap-3 p-4 rounded-xl bg-gray-50 border border-gray-200 hover:border-orange-200 hover:bg-gray-100/80 transition-all group"
+                                        className="flex items-start gap-3 p-4 rounded-xl bg-gray-50 border border-gray-200 hover:border-blue-200 hover:bg-gray-100/80 transition-all group"
                                     >
-                                        <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center shrink-0 group-hover:bg-orange-500/30 transition-colors">
-                                            <item.icon className="w-5 h-5 text-orange-500" />
+                                        <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center shrink-0 group-hover:bg-blue-500/30 transition-colors">
+                                            <item.icon className="w-5 h-5 text-blue-500" />
                                         </div>
                                         <div className="min-w-0">
-                                            <p className="font-semibold text-gray-800 group-hover:text-orange-500 transition-colors">{item.label}</p>
+                                            <p className="font-semibold text-gray-800 group-hover:text-blue-500 transition-colors">{item.label}</p>
                                             <p className="text-xs text-gray-500 mt-0.5">{item.description}</p>
                                         </div>
                                     </Link>
@@ -351,7 +351,7 @@ const Reports = () => {
                         <button
                             type="button"
                             onClick={fetchReport}
-                            className="mt-4 px-4 py-2 bg-orange-500 hover:bg-amber-400 text-gray-800 font-semibold rounded-lg transition-colors"
+                            className="mt-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-gray-800 font-semibold rounded-lg transition-colors"
                         >
                             Refresh
                         </button>

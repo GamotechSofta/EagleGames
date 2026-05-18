@@ -230,7 +230,7 @@ const PlatformPlayerDeposit = () => {
                     <button
                         type="submit"
                         disabled={saving}
-                        className="w-full sm:w-auto px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg disabled:opacity-50"
+                        className="w-full sm:w-auto px-6 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg disabled:opacity-50"
                     >
                         {saving ? 'Saving…' : 'Save'}
                     </button>

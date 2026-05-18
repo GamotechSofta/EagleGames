@@ -107,7 +107,7 @@ const HistoryCard = ({ entry, index, page, t }) => {
                 <div>
                     <p className="text-xs text-gray-500 font-medium">#{(page - 1) * LIMIT + index + 1}</p>
                     <p className="font-semibold text-gray-900">{playerName}</p>
-                    <p className="text-xs text-orange-600 font-medium mt-0.5">
+                    <p className="text-xs text-blue-600 font-medium mt-0.5">
                         {entry.gameName || entry.gameCode || '—'}
                     </p>
                 </div>
@@ -233,8 +233,8 @@ const GameHistory = () => {
             {/* Header */}
             <div className="mb-6">
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-3">
-                    <span className="w-10 h-10 rounded-xl bg-orange-500/15 flex items-center justify-center">
-                        <FaGamepad className="w-5 h-5 text-orange-500" />
+                    <span className="w-10 h-10 rounded-xl bg-blue-500/15 flex items-center justify-center">
+                        <FaGamepad className="w-5 h-5 text-blue-500" />
                     </span>
                     {t('gh_title')}
                 </h1>
@@ -253,8 +253,8 @@ const GameHistory = () => {
                         }}
                         className={`shrink-0 px-4 py-2 text-sm font-semibold rounded-full border transition-all ${
                             activeGame === tab.key
-                                ? 'bg-orange-500 text-white border-orange-500 shadow-md'
-                                : 'bg-white text-gray-600 border-gray-200 hover:border-orange-300 hover:text-orange-600'
+                                ? 'bg-blue-500 text-white border-blue-500 shadow-md'
+                                : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:text-blue-600'
                         }`}
                     >
                         {tabLabel(tab)}
@@ -265,7 +265,7 @@ const GameHistory = () => {
             {/* Filters */}
             <div className="bg-white rounded-xl border border-gray-200 p-4 mb-5 shadow-sm">
                 <div className="flex items-center gap-2 mb-3">
-                    <FaFilter className="w-4 h-4 text-orange-500" />
+                    <FaFilter className="w-4 h-4 text-blue-500" />
                     <span className="text-sm font-semibold text-gray-800">Filters</span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -276,7 +276,7 @@ const GameHistory = () => {
                             placeholder="MongoDB user ID"
                             value={filters.userId}
                             onChange={(e) => setFilters((f) => ({ ...f, userId: e.target.value }))}
-                            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 text-sm focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400 outline-none"
+                            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 text-sm focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 outline-none"
                         />
                     </div>
                     <div>
@@ -284,7 +284,7 @@ const GameHistory = () => {
                         <select
                             value={filters.status}
                             onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))}
-                            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 text-sm focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400 outline-none"
+                            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 text-sm focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 outline-none"
                         >
                             <option value="">All results</option>
                             <option value="won">{t('gh_won')}</option>
@@ -298,7 +298,7 @@ const GameHistory = () => {
                             type="date"
                             value={filters.startDate}
                             onChange={(e) => setFilters((f) => ({ ...f, startDate: e.target.value }))}
-                            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 text-sm focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400 outline-none"
+                            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 text-sm focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 outline-none"
                         />
                     </div>
                     <div>
@@ -307,7 +307,7 @@ const GameHistory = () => {
                             type="date"
                             value={filters.endDate}
                             onChange={(e) => setFilters((f) => ({ ...f, endDate: e.target.value }))}
-                            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 text-sm focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400 outline-none"
+                            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 text-sm focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 outline-none"
                         />
                     </div>
                 </div>
@@ -315,7 +315,7 @@ const GameHistory = () => {
                     <button
                         type="button"
                         onClick={handleApplyFilters}
-                        className="px-5 py-2 bg-orange-500 text-white rounded-lg font-semibold text-sm hover:bg-orange-600 transition-colors"
+                        className="px-5 py-2 bg-blue-500 text-white rounded-lg font-semibold text-sm hover:bg-blue-600 transition-colors"
                     >
                         {t('gh_apply')}
                     </button>
@@ -329,7 +329,7 @@ const GameHistory = () => {
                     <button
                         type="button"
                         onClick={() => fetchEntries(page, appliedFilters, activeGame)}
-                        className="inline-flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-orange-600 text-sm font-medium"
+                        className="inline-flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-blue-600 text-sm font-medium"
                     >
                         <FaRedo className="w-3.5 h-3.5" />
                         Refresh
@@ -369,7 +369,7 @@ const GameHistory = () => {
                             label: t('gh_winRate'),
                             value: `${summary.winRate}%`,
                             sub: `${summary.wins}W / ${summary.losses}L`,
-                            className: 'bg-orange-50 border-orange-200 text-orange-800',
+                            className: 'bg-blue-50 border-blue-200 text-blue-800',
                         },
                     ].map((c) => (
                         <div key={c.label} className={`rounded-xl border p-3 sm:p-4 ${c.className}`}>
@@ -437,7 +437,7 @@ const GameHistory = () => {
                                     const won = !pending && (entry.status === 'won' || payout > 0);
                                     const player = entry.user;
                                     return (
-                                        <tr key={entry.id || i} className="hover:bg-orange-50/30 transition-colors">
+                                        <tr key={entry.id || i} className="hover:bg-blue-50/30 transition-colors">
                                             <td className="px-3 py-2.5 text-gray-400 text-xs">
                                                 {(page - 1) * LIMIT + i + 1}
                                             </td>
@@ -452,7 +452,7 @@ const GameHistory = () => {
                                                 )}
                                             </td>
                                             <td className="px-3 py-2.5">
-                                                <span className="inline-flex px-2 py-0.5 rounded-md bg-orange-50 text-orange-700 text-xs font-semibold">
+                                                <span className="inline-flex px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 text-xs font-semibold">
                                                     {entry.gameName || entry.gameCode || '—'}
                                                 </span>
                                             </td>
@@ -514,7 +514,7 @@ const GameHistory = () => {
                                     type="button"
                                     disabled={page >= totalPages}
                                     onClick={() => setPage((p) => p + 1)}
-                                    className="inline-flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-semibold bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-40 disabled:cursor-not-allowed"
+                                    className="inline-flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed"
                                 >
                                     Next
                                     <FaChevronRight className="w-3 h-3" />

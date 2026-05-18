@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMarketBetContextTitle } from '../../../hooks/useMarketBetContextTitle';
+import { useBidI18n } from '../useBidI18n';
 import BidLayout from '../BidLayout';
 import BidReviewModal from './BidReviewModal';
 import { placeBet, updateUserBalance } from '../../../api/bets';
@@ -10,6 +11,7 @@ const QUICK_POINT_OPTIONS = [10, 20, 30, 40, 50];
 const sanitizePoints = (v) => (v ?? '').toString().replace(/\D/g, '').slice(0, 6);
 
 const JodiBulkBid = ({ market, title }) => {
+    const bid = useBidI18n();
     const cellRefs = useRef({});
     const pendingFocusRef = useRef(null);
 
@@ -222,7 +224,7 @@ const JodiBulkBid = ({ market, title }) => {
     const applyRow = (r, pts) => {
         const p = Number(pts);
         if (!p || p <= 0) {
-            showWarning('Please enter points.');
+            showWarning(bid.pleaseEnterPoints);
             return;
         }
         setCells((prev) => {
@@ -240,7 +242,7 @@ const JodiBulkBid = ({ market, title }) => {
     const applyCol = (c, pts) => {
         const p = Number(pts);
         if (!p || p <= 0) {
-            showWarning('Please enter points.');
+            showWarning(bid.pleaseEnterPoints);
             return;
         }
         setCells((prev) => {
@@ -311,7 +313,7 @@ const JodiBulkBid = ({ market, title }) => {
 
     const handleSubmitBet = () => {
         if (!rows.length) {
-            showWarning('Please enter points for at least one Jodi.');
+            showWarning(bid.atLeastOneJodi);
             return;
         }
         setIsReviewOpen(true);
@@ -373,7 +375,7 @@ const JodiBulkBid = ({ market, title }) => {
                             : 'bg-gradient-to-r bg-gray-400 text-white opacity-50 cursor-not-allowed'
                     }`}
                 >
-                    Submit Bet
+                    {bid.submitBet}
                 </button>
             }
             walletBalance={walletBefore}
@@ -388,11 +390,11 @@ const JodiBulkBid = ({ market, title }) => {
                 )}
                 <div className="grid grid-cols-2 gap-1.5 md:gap-2 px-1 mb-3">
                     <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
-                        <div className="text-[11px] text-gray-300 font-medium">Count</div>
+                        <div className="text-[11px] text-gray-300 font-medium">{bid.count}</div>
                         <div className="text-base font-bold text-white leading-tight">{rows.length}</div>
                     </div>
                     <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
-                        <div className="text-[11px] text-gray-300 font-medium">Bet Amount</div>
+                        <div className="text-[11px] text-gray-300 font-medium">{bid.betAmount}</div>
                         <div className="text-base font-bold text-white leading-tight">{totalPoints}</div>
                     </div>
                 </div>
@@ -455,7 +457,7 @@ const JodiBulkBid = ({ market, title }) => {
                                     <br />
                                     Points
                                 </span>
-                                <span className="hidden md:inline">Enter Points</span>
+                                <span className="hidden md:inline">{bid.jodiBulkEnterPoints}</span>
                             </div>
                             <div className="h-6 md:h-7" />
                             {visibleDigits.map((c) => (
@@ -562,7 +564,7 @@ const JodiBulkBid = ({ market, title }) => {
                                 : 'bg-gradient-to-r bg-gray-400 text-white opacity-50 cursor-not-allowed'
                         }`}
                     >
-                        Submit Bet
+                        {bid.submitBet}
                     </button>
                 </div>
             </div>

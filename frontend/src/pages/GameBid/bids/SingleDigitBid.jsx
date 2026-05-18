@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useMarketBetContextTitle } from '../../../hooks/useMarketBetContextTitle';
+import { useBidI18n } from '../useBidI18n';
 import BidLayout from '../BidLayout';
 import BidReviewModal from './BidReviewModal';
 import { placeBet, updateUserBalance } from '../../../api/bets';
 
 const SingleDigitBid = ({ market, title }) => {
+    const bid = useBidI18n();
     // Single Digit: show Special Mode first (per requirement)
     const [activeTab, setActiveTab] = useState('special');
     const [session, setSession] = useState(() => (market?.status === 'running' ? 'CLOSE' : 'OPEN'));
@@ -70,16 +72,16 @@ const SingleDigitBid = ({ market, title }) => {
     const handleAddBid = () => {
         const pts = Number(inputPoints);
         if (!pts || pts <= 0) {
-            showWarning('Please enter points.');
+            showWarning(bid.pleaseEnterPoints);
             return;
         }
         const n = inputNumber.toString().trim();
         if (!n) {
-            showWarning('Please enter digit (0-9).');
+            showWarning(bid.pleaseEnterDigit09);
             return;
         }
         if (!/^[0-9]$/.test(n)) {
-            showWarning('Invalid digit. Use 0-9.');
+            showWarning(bid.invalidDigit09);
             return;
         }
         const next = [...bids, { id: Date.now(), number: n, points: inputPoints, type: session }];
@@ -105,7 +107,7 @@ const SingleDigitBid = ({ market, title }) => {
             .filter(([, pts]) => Number(pts) > 0)
             .map(([num, pts]) => ({ id: Date.now() + parseInt(num, 10), number: num, points: String(pts), type: session }));
         if (toAdd.length === 0) {
-            showWarning('Please enter points for at least one digit (0-9).');
+            showWarning(bid.atLeastOneDigit09);
             return;
         }
         const next = [...bids, ...toAdd];
@@ -165,13 +167,13 @@ const SingleDigitBid = ({ market, title }) => {
                 onClick={() => setActiveTab('special')}
                 className={`min-h-[44px] py-3 rounded-lg font-bold text-sm shadow-sm border-2 active:scale-[0.98] transition-colors ${activeTab === 'special' ? 'bg-[#1a74e5] text-white border-[#1a74e5]' : 'bg-[#111827] text-gray-300 border-[#374151] hover:border-[#4b5563]'}`}
             >
-                SPECIAL MODE
+                {bid.specialMode}
             </button>
             <button
                 onClick={() => setActiveTab('easy')}
                 className={`min-h-[44px] py-3 rounded-lg font-bold text-sm shadow-sm border-2 active:scale-[0.98] transition-colors ${activeTab === 'easy' ? 'bg-[#1a74e5] text-white border-[#1a74e5]' : 'bg-[#111827] text-gray-300 border-[#374151] hover:border-[#4b5563]'}`}
             >
-                EASY MODE
+                {bid.easyMode}
             </button>
         </div>
     );
@@ -186,11 +188,11 @@ const SingleDigitBid = ({ market, title }) => {
             {modeTabs}
             <div className="grid grid-cols-2 gap-1.5 md:gap-2 px-1">
                 <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
-                    <div className="text-[11px] text-gray-300 font-medium">Count</div>
+                    <div className="text-[11px] text-gray-300 font-medium">{bid.count}</div>
                     <div className="text-base font-bold text-white leading-tight">{displayCount}</div>
                 </div>
                 <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
-                    <div className="text-[11px] text-gray-300 font-medium">Bet Amount</div>
+                    <div className="text-[11px] text-gray-300 font-medium">{bid.betAmount}</div>
                     <div className="text-base font-bold text-white leading-tight">{displayBetAmount}</div>
                 </div>
             </div>
@@ -206,7 +208,7 @@ const SingleDigitBid = ({ market, title }) => {
                             <input type="text" inputMode="numeric" value={inputNumber} onChange={handleNumberInputChange} placeholder="Digit" maxLength={1} className="flex-1 min-w-0 bg-[#111827] border-2 border-[#374151] text-white placeholder-gray-400 rounded-full py-2.5 min-h-[40px] px-4 text-center text-sm focus:ring-2 focus:ring-[#1B3150] focus:border-[#1a74e5] focus:outline-none" />
                         </div>
                         <div className="flex flex-row items-center gap-2">
-                            <label className="text-gray-200 text-sm font-medium shrink-0 w-32">Enter Points:</label>
+                            <label className="text-gray-200 text-sm font-medium shrink-0 w-32">{bid.enterPointsColon}</label>
                             <input
                                 ref={pointsInputRef}
                                 type="text"
@@ -218,7 +220,7 @@ const SingleDigitBid = ({ market, title }) => {
                             />
                         </div>
                     </div>
-                    <button onClick={handleAddBid} className="w-full bg-[#1a74e5] text-white font-bold py-3.5 min-h-[48px] rounded-lg shadow-md hover:bg-[#152842] transition-all active:scale-[0.98]">Submit Bet</button>
+                    <button onClick={handleAddBid} className="w-full bg-[#1a74e5] text-white font-bold py-3.5 min-h-[48px] rounded-lg shadow-md hover:bg-[#152842] transition-all active:scale-[0.98]">{bid.submitBet}</button>
                 </>
             ) : (
                 <>
@@ -230,7 +232,7 @@ const SingleDigitBid = ({ market, title }) => {
                             </div>
                         ))}
                     </div>
-                    <button onClick={handleAddSpecialModeBids} className="w-full bg-[#1a74e5] text-white font-bold py-3 rounded-md shadow-md hover:bg-[#152842] transition-all">Submit Bet</button>
+                    <button onClick={handleAddSpecialModeBids} className="w-full bg-[#1a74e5] text-white font-bold py-3 rounded-md shadow-md hover:bg-[#152842] transition-all">{bid.submitBet}</button>
                 </>
             )}
 

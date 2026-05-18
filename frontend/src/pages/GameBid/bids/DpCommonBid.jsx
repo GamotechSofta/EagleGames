@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useMarketBetContextTitle } from '../../../hooks/useMarketBetContextTitle';
+import { useBidI18n } from '../useBidI18n';
 import BidLayout from '../BidLayout';
 import BidReviewModal from './BidReviewModal';
 import { useBettingWindow } from '../BettingWindowContext';
@@ -7,6 +8,7 @@ import { placeBet, updateUserBalance } from '../../../api/bets';
 import { generateDPCommon } from './dpCommonGenerator';
 
 const DpCommonBid = ({ market, title }) => {
+    const bid = useBidI18n();
     const [session, setSession] = useState(() => (market?.status === 'running' ? 'CLOSE' : 'OPEN'));
     const [warning, setWarning] = useState('');
     const [selectedDate, setSelectedDate] = useState(() => {
@@ -223,11 +225,11 @@ const DpCommonBid = ({ market, title }) => {
                 <div className="py-1 flex justify-end px-3 md:pr-12 md:pl-1 md:px-0">
                     <div className="grid grid-cols-2 gap-1.5 md:gap-2 w-full md:max-w-[320px]">
                         <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
-                            <div className="text-[11px] text-gray-300 font-medium">Count</div>
+                            <div className="text-[11px] text-gray-300 font-medium">{bid.count}</div>
                             <div className="text-base font-bold text-white leading-tight">{bidsCount}</div>
                         </div>
                         <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
-                            <div className="text-[11px] text-gray-300 font-medium">Bet Amount</div>
+                            <div className="text-[11px] text-gray-300 font-medium">{bid.betAmount}</div>
                             <div className="text-base font-bold text-white leading-tight">{totalPoints}</div>
                         </div>
                     </div>
@@ -279,7 +281,7 @@ const DpCommonBid = ({ market, title }) => {
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
-                            <label className="shrink-0 w-24 text-xs sm:text-sm font-semibold text-gray-300">Enter Points</label>
+                            <label className="shrink-0 w-24 text-xs sm:text-sm font-semibold text-gray-300">{bid.enterPoints}</label>
                             <input
                                 type="text"
                                 inputMode="numeric"
@@ -297,7 +299,7 @@ const DpCommonBid = ({ market, title }) => {
                             </button>
                         </div>
                         <div className="flex items-center gap-2">
-                            <label className="shrink-0 w-24 text-xs sm:text-sm font-semibold text-gray-300">Quick Points</label>
+                            <label className="shrink-0 w-24 text-xs sm:text-sm font-semibold text-gray-300">{bid.quickPoints}</label>
                             <div className="flex-1 min-w-0 grid grid-cols-5 gap-2">
                                 {[10, 20, 30, 40, 50].map((pts) => {
                                     const selected = String(pointsInput || '') === String(pts);
@@ -334,7 +336,7 @@ const DpCommonBid = ({ market, title }) => {
                                     !bidsCount || !bettingAllowed ? 'opacity-50 cursor-not-allowed' : ''
                                 }`}
                             >
-                                Submit Bet {bidsCount > 0 && `(${bidsCount})`}
+                                {bid.submitBet}{bidsCount > 0 ? ` (${bidsCount})` : ''}
                             </button>
                         </div>
                     </div>

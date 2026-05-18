@@ -1,5 +1,6 @@
 import React from 'react';
 import EasyModeBid from './EasyModeBid';
+import { useBidI18n } from '../useBidI18n';
 
 // Valid Single Panna set (as per chart/screenshots)
 const VALID_SINGLE_PANAS = new Set([
@@ -31,20 +32,23 @@ const validateSinglePana = (n) => {
     return VALID_SINGLE_PANAS.has(s);
 };
 
-const SinglePanaBid = (props) => (
-    <EasyModeBid
-        {...props}
-        label="Enter Pana"
-        maxLength={3}
-        validateInput={validateSinglePana}
-        specialModeType="singlePana"
-        validSinglePanas={Array.from(VALID_SINGLE_PANAS)}
-        showBidsList
-        openReviewOnAdd={false}
-        showInlineSubmit
-        showModeTabs
-        desktopSplit
-    />
-);
+const SinglePanaBid = (props) => {
+    const bid = useBidI18n();
+    return (
+        <EasyModeBid
+            {...props}
+            label={bid.enterPana}
+            maxLength={3}
+            validateInput={validateSinglePana}
+            specialModeType="singlePana"
+            validSinglePanas={Array.from(VALID_SINGLE_PANAS)}
+            showBidsList
+            openReviewOnAdd={false}
+            showInlineSubmit
+            showModeTabs
+            desktopSplit
+        />
+    );
+};
 
 export default SinglePanaBid;

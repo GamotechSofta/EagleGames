@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useBettingWindow } from './BettingWindowContext';
 import { useMarketBetContextTitle } from '../../hooks/useMarketBetContextTitle';
+import { useLanguage } from '../../context/LanguageContext';
+import { getBetTypeDisplayTitle } from '../../utils/betTypeTitle';
 
 const getWalletFromStorage = () => {
     try {
@@ -43,14 +45,17 @@ const BidLayout = ({
     walletBalance,
     onSubmit = () => {},
     showFooterStats = true,
-    submitLabel = 'Submit Bets',
+    submitLabel,
     contentPaddingClass,
     selectedDate = null,
     setSelectedDate = null,
 }) => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { t } = useLanguage();
     const marketSubtitle = useMarketBetContextTitle(market, '');
+    const displayTitle = getBetTypeDisplayTitle(t, title);
+    const footerSubmitLabel = submitLabel ?? t('bid_submitBets');
     const contentRef = useRef(null);
     const dateInputRef = React.useRef(null);
     const { allowed: bettingAllowed, closeOnly: bettingCloseOnly, message: bettingMessage } = useBettingWindow();
@@ -162,19 +167,19 @@ const BidLayout = ({
                 <button
                     onClick={() => market ? navigate('/bidoptions', { state: { market } }) : navigate(-1)}
                     className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center text-white hover:opacity-80 active:scale-95 transition touch-manipulation"
-                    aria-label="Back"
+                    aria-label={t('bid_backAria')}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                 </button>
                 <h1 className="text-xs sm:text-sm md:text-base font-bold uppercase tracking-wide truncate flex-1 text-center mx-1 text-white min-w-0">
-                    {marketSubtitle ? `${marketSubtitle} - ${title}` : title}
+                    {marketSubtitle ? `${marketSubtitle} - ${displayTitle}` : displayTitle}
                 </h1>
                 <div className="bg-[#4b5563] text-white px-2 sm:px-2.5 py-0.5 rounded-full flex items-center gap-1.5 text-[11px] sm:text-sm font-bold shadow-md shrink-0 border-2 border-[#374151]">
                     <img
                         src="https://res.cloudinary.com/dnyp5jknp/image/upload/v1771394532/wallet_n1oyef.png"
-                        alt="Wallet"
+                        alt={t('bid_walletAlt')}
                         className="w-5 h-5 sm:w-5 sm:h-5 object-contain"
                     />
                     ₹{wallet.toFixed(1)}
@@ -206,7 +211,7 @@ const BidLayout = ({
                             readOnly
                             className={`w-full pl-8 pr-2.5 py-1.5 min-h-[40px] h-[40px] sm:pl-10 sm:pr-3 sm:py-2.5 sm:min-h-[44px] sm:h-[44px] bg-[#111827] border-2 border-[#374151] text-white rounded-full text-xs sm:text-sm font-bold text-center focus:outline-none focus:border-[#1a74e5] cursor-pointer truncate ${dateSessionControlClassName}`}
                             style={{ colorScheme: 'light' }}
-                            title="Current date"
+                            title={t('bid_currentDateTitle')}
                         />
                     </div>
 
@@ -218,7 +223,9 @@ const BidLayout = ({
                             className={`w-full appearance-none bg-[#111827] border-2 border-[#374151] text-white font-bold text-xs sm:text-sm py-1.5 min-h-[40px] h-[40px] px-3 pr-7 sm:py-2.5 sm:min-h-[44px] sm:h-[44px] sm:px-4 sm:pr-8 rounded-full text-center focus:outline-none focus:border-[#1a74e5] ${(lockSessionSelect || (isToday && isRunning)) ? 'opacity-60 cursor-not-allowed bg-[#374151]' : ''} ${dateSessionControlClassName}`}
                         >
                             {sessionOptions.map((opt) => (
-                                <option key={opt} value={opt}>{opt}</option>
+                                <option key={opt} value={opt}>
+                                    {opt === 'OPEN' ? t('bid_sessionOpen') : t('bid_sessionClose')}
+                                </option>
                             ))}
                         </select>
                         {!hideSessionSelectCaret && (
@@ -265,11 +272,11 @@ const BidLayout = ({
                             {showFooterStats && (
                                 <div className="flex items-center gap-4 shrink-0 border-r border-[#374151] pr-4">
                                     <div className="text-center">
-                                        <div className="text-[9px] text-gray-400 uppercase tracking-wider">Bets</div>
+                                        <div className="text-[9px] text-gray-400 uppercase tracking-wider">{t('bid_footerBets')}</div>
                                         <div className="text-sm font-bold text-[#1a74e5]">{bidsCount}</div>
                                     </div>
                                     <div className="text-center">
-                                        <div className="text-[9px] text-gray-400 uppercase tracking-wider">Points</div>
+                                        <div className="text-[9px] text-gray-400 uppercase tracking-wider">{t('bid_footerPoints')}</div>
                                         <div className="text-sm font-bold text-[#1a74e5]">{totalPoints}</div>
                                     </div>
                                 </div>
@@ -284,7 +291,7 @@ const BidLayout = ({
                                         : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                                 }`}
                             >
-                                {submitLabel}
+                                {footerSubmitLabel}
                             </button>
                         </div>
                     </div>

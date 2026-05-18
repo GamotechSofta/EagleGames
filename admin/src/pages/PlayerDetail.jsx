@@ -521,7 +521,7 @@ const PlayerDetail = () => {
             <AdminLayout onLogout={handleLogout} title="Player">
                 <div className="flex flex-col items-center justify-center min-h-[40vh]">
                     <p className="text-red-500 mb-4">{error || 'Player not found'}</p>
-                    <Link to="/all-users" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 text-gray-800 font-semibold">
+                    <Link to="/all-users" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500 text-gray-800 font-semibold">
                         <FaArrowLeft /> Back to All Players
                     </Link>
                 </div>
@@ -534,7 +534,7 @@ const PlayerDetail = () => {
             <div className="min-w-0 max-w-full">
             {/* Breadcrumb */}
             <div className="mb-4">
-                <Link to="/all-users" className="text-gray-400 hover:text-orange-500 text-sm inline-flex items-center gap-1 mb-2">
+                <Link to="/all-users" className="text-gray-400 hover:text-blue-500 text-sm inline-flex items-center gap-1 mb-2">
                     <FaArrowLeft className="w-4 h-4" /> All Players
                 </Link>
                 <h1 className="text-2xl sm:text-3xl font-bold">Player <span className="text-gray-400 font-normal">» {player.username}</span></h1>
@@ -543,7 +543,7 @@ const PlayerDetail = () => {
             {/* Player info card - responsive, no overflow */}
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden mb-6 min-w-0">
                 <div className="px-4 sm:px-6 py-4 border-b border-gray-200 flex flex-wrap items-center justify-between gap-3">
-                    <h2 className="text-lg font-semibold text-orange-500">Player Information</h2>
+                    <h2 className="text-lg font-semibold text-blue-500">Player Information</h2>
                     <div className="flex flex-wrap items-center gap-3">
                         <button
                             type="button"
@@ -593,7 +593,7 @@ const PlayerDetail = () => {
                             className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
                                 Array.isArray(player.loginDevices) && player.loginDevices.length > 1
                                     ? 'bg-red-50 border border-red-600 text-red-600 hover:bg-red-800 hover:border-red-500 hover:text-red-100'
-                                    : 'bg-gray-100 border border-gray-200 text-gray-600 hover:bg-gray-200 hover:border-orange-300 hover:text-orange-500'
+                                    : 'bg-gray-100 border border-gray-200 text-gray-600 hover:bg-gray-200 hover:border-blue-300 hover:text-blue-500'
                             }`}
                             title="Devices used"
                         >
@@ -686,7 +686,7 @@ const PlayerDetail = () => {
                             onClick={() => setCalendarOpen((o) => !o)}
                             className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-100 border border-gray-200 text-sm text-gray-600"
                         >
-                            <FaCalendarAlt className="w-4 h-4 text-orange-500" />
+                            <FaCalendarAlt className="w-4 h-4 text-blue-500" />
                             {statementFrom && statementTo ? formatDateRange(statementFrom, statementTo) : 'Select Date'}
                         </button>
                         {calendarOpen && (
@@ -699,7 +699,7 @@ const PlayerDetail = () => {
                                             onClick={() => handlePresetSelect(p.id)}
                                             className="w-full text-left px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-100 flex items-center gap-2"
                                         >
-                                            {statementPreset === p.id ? <span className="text-orange-500">●</span> : <span className="w-2" />}
+                                            {statementPreset === p.id ? <span className="text-blue-500">●</span> : <span className="w-2" />}
                                             {p.label}
                                         </button>
                                     ))}
@@ -715,7 +715,7 @@ const PlayerDetail = () => {
                                             <label className="block text-xs text-gray-400 mb-1">To</label>
                                             <input type="date" value={statementTo} onChange={(e) => setStatementTo(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-gray-100 border border-gray-200 text-sm text-gray-800" />
                                         </div>
-                                        <button type="button" onClick={handleDateApply} className="w-full py-2 rounded-lg bg-orange-500 text-gray-800 font-semibold text-sm">
+                                        <button type="button" onClick={handleDateApply} className="w-full py-2 rounded-lg bg-blue-500 text-gray-800 font-semibold text-sm">
                                             Apply
                                         </button>
                                     </div>
@@ -731,7 +731,7 @@ const PlayerDetail = () => {
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${activeTab === tab.id ? 'bg-orange-500 text-gray-800' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                        className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${activeTab === tab.id ? 'bg-blue-500 text-gray-800' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
                     >
                         {tab.label}
                     </button>
@@ -752,7 +752,7 @@ const PlayerDetail = () => {
                                 <div className="mb-4 print:hidden flex justify-end">
                                     <button
                                         onClick={() => window.print()}
-                                        className="flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition-colors"
+                                        className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
                                     >
                                         <FaPrint className="w-4 h-4" />
                                         Print Statement
@@ -809,7 +809,7 @@ const PlayerDetail = () => {
                                                 {summary.bets.totalPending > 0 && (
                                                     <div className="flex justify-between">
                                                         <span className="text-gray-600">Pending Bets</span>
-                                                        <span className="font-mono font-semibold text-orange-600">₹{Number(summary.bets.totalPending || 0).toLocaleString('en-IN')}</span>
+                                                        <span className="font-mono font-semibold text-blue-600">₹{Number(summary.bets.totalPending || 0).toLocaleString('en-IN')}</span>
                                                     </div>
                                                 )}
                                             </div>
@@ -919,7 +919,7 @@ const PlayerDetail = () => {
                                 {bets.map((b) => (
                                     <div key={b._id} className="p-4 hover:bg-gray-100/20">
                                         <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                                            <span className="text-orange-500 font-mono font-medium">{b.betNumber}</span>
+                                            <span className="text-blue-500 font-mono font-medium">{b.betNumber}</span>
                                             <span className={`px-2 py-0.5 rounded text-xs font-medium ${b.status === 'won' ? 'bg-green-900/50 text-green-600' : b.status === 'lost' ? 'bg-red-50 text-red-500' : 'bg-gray-200 text-gray-600'}`}>{b.status}</span>
                                         </div>
                                         <p className="text-gray-400 text-xs mb-2">{b.marketId?.marketName || '—'} · {b.betType || '—'}</p>
@@ -955,7 +955,7 @@ const PlayerDetail = () => {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/30">
                     <div className="bg-white rounded-xl border border-gray-200 shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
                         <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-                            <h3 className="text-base sm:text-lg font-semibold text-orange-500">Edit Wallet</h3>
+                            <h3 className="text-base sm:text-lg font-semibold text-blue-500">Edit Wallet</h3>
                             <button type="button" onClick={closeWalletModal} className="text-gray-400 hover:text-gray-800 p-1">×</button>
                         </div>
                         <div className="p-4 space-y-4">
@@ -1009,7 +1009,7 @@ const PlayerDetail = () => {
                                             type="password"
                                             value={newPlayerPassword}
                                             onChange={(e) => setNewPlayerPassword(e.target.value)}
-                                            className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                            className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                             placeholder="Minimum 6 characters"
                                             autoFocus
                                         />
@@ -1020,7 +1020,7 @@ const PlayerDetail = () => {
                                             type="password"
                                             value={confirmPlayerPassword}
                                             onChange={(e) => setConfirmPlayerPassword(e.target.value)}
-                                            className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                            className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                             placeholder="Re-enter password"
                                         />
                                     </div>
@@ -1028,7 +1028,7 @@ const PlayerDetail = () => {
                                         type="button"
                                         onClick={handlePlayerPasswordSubmit}
                                         disabled={playerPasswordLoading || !newPlayerPassword || !confirmPlayerPassword}
-                                        className="w-full font-bold py-3 rounded-lg bg-orange-500 hover:bg-orange-600 text-white transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                                        className="w-full font-bold py-3 rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                                     >
                                         {playerPasswordLoading ? (
                                             <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -1048,7 +1048,7 @@ const PlayerDetail = () => {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/30">
                     <div className="bg-white rounded-xl border border-gray-200 shadow-xl w-full max-w-md">
                         <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-                            <h3 className="text-lg font-semibold text-orange-500">
+                            <h3 className="text-lg font-semibold text-blue-500">
                                 {pendingAction === 'suspend' ? 'Confirm Suspend/Unsuspend' : 'Confirm Delete'}
                             </h3>
                             <button type="button" onClick={closeSecretModal} className="text-gray-400 hover:text-gray-800 p-1">×</button>
@@ -1070,7 +1070,7 @@ const PlayerDetail = () => {
                             )}
                             <div className="flex gap-2 justify-end">
                                 <button type="button" onClick={closeSecretModal} className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-500 text-gray-800 font-semibold">Cancel</button>
-                                <button type="submit" disabled={togglingStatus || deletingPlayer} className="px-4 py-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-gray-800 font-semibold disabled:opacity-50">
+                                <button type="submit" disabled={togglingStatus || deletingPlayer} className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-gray-800 font-semibold disabled:opacity-50">
                                     {togglingStatus || deletingPlayer ? <span className="animate-spin">⏳</span> : 'Confirm'}
                                 </button>
                             </div>

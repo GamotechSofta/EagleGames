@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useMarketBetContextTitle } from '../../../hooks/useMarketBetContextTitle';
+import { useBidI18n } from '../useBidI18n';
 import BidLayout from '../BidLayout';
 import BidReviewModal from './BidReviewModal';
 import { isValidAnyPana } from './panaRules';
@@ -15,6 +16,7 @@ const emptyAnkPts = () =>
 
 // Half Sangam — UI aligned with Triple Pana / Double Pana easy layout
 const HalfSangamBid = ({ market, title }) => {
+    const bid = useBidI18n();
     const [flipped, setFlipped] = useState(false);
     const [session, setSession] = useState(() => (market?.status === 'running' ? 'CLOSE' : 'OPEN'));
     const [bids, setBids] = useState([]);
@@ -173,11 +175,11 @@ const HalfSangamBid = ({ market, title }) => {
     const modeTabs = (
         <div className="grid grid-cols-2 gap-1.5 md:gap-2 px-1">
             <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
-                <div className="text-[11px] text-gray-300 font-medium">Count</div>
+                <div className="text-[11px] text-gray-300 font-medium">{bid.count}</div>
                 <div className="text-base font-bold text-white leading-tight">{bids.length}</div>
             </div>
             <div className="rounded-xl border border-[#374151] bg-[#111827] px-2 py-1.5 md:px-3 md:py-2 text-center">
-                <div className="text-[11px] text-gray-300 font-medium">Bet Amount</div>
+                <div className="text-[11px] text-gray-300 font-medium">{bid.betAmount}</div>
                 <div className="text-base font-bold text-white leading-tight">{totalPoints}</div>
             </div>
         </div>
@@ -317,7 +319,7 @@ function HalfSangamEasyForm({
     const handleAdd = () => {
         const pts = Number(points);
         if (!pts || pts <= 0) {
-            showWarning('Please enter points.');
+            showWarning(bid.pleaseEnterPoints);
             return;
         }
         const pana = flipped ? second : first;
@@ -328,7 +330,7 @@ function HalfSangamEasyForm({
         }
         const ankStr = (ank ?? '').toString().trim();
         if (!/^[0-9]$/.test(ankStr)) {
-            showWarning(flipped ? 'Please enter a valid Open Ank (0-9).' : 'Please enter a valid Close Ank (0-9).');
+            showWarning(flipped ? bid.pleaseEnterOpenAnk : bid.pleaseEnterCloseAnk);
             return;
         }
         const numberKey = flipped ? `${ankStr}-${pana}` : `${pana}-${ankStr}`;
@@ -424,7 +426,7 @@ function HalfSangamEasyForm({
                 />
             </div>
             <div className="flex flex-row items-center gap-2">
-                <label className="text-gray-200 text-sm font-medium shrink-0 w-28">Enter Points</label>
+                <label className="text-gray-200 text-sm font-medium shrink-0 w-28">{bid.enterPoints}</label>
                 <div className="flex-1 min-w-0 grid grid-cols-[1fr_auto] gap-2">
                     <input
                         ref={pointsInputRef}
@@ -445,7 +447,7 @@ function HalfSangamEasyForm({
                 </div>
             </div>
             <div className="flex flex-row items-center gap-2">
-                <label className="text-gray-200 text-sm font-medium shrink-0 w-28">Quick Points</label>
+                <label className="text-gray-200 text-sm font-medium shrink-0 w-28">{bid.quickPoints}</label>
                 <div className="flex-1 min-w-0 grid grid-cols-5 gap-2">
                     {quickPointValues.map((pts) => (
                         <button
@@ -468,7 +470,7 @@ function HalfSangamEasyForm({
                     Add to List
                 </button>
                 <button type="button" disabled={!bidsLength} onClick={onSubmitClick} className={submitBtnClass(!!bidsLength)}>
-                    Submit Bet
+                    {bid.submitBet}
                 </button>
             </div>
         </div>

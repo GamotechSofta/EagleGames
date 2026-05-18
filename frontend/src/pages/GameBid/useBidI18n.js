@@ -1,0 +1,63 @@
+import { useMemo } from 'react';
+import { useLanguage } from '../../context/LanguageContext';
+
+/** Shared translated strings for all game-bid screens. */
+export function useBidI18n() {
+    const { t } = useLanguage();
+    return useMemo(
+        () => ({
+            t,
+            submitBet: t('bid_submitBet'),
+            submitBets: t('bid_submitBets'),
+            enterPoints: t('bid_enterPoints'),
+            enterPointsColon: t('bid_enterPointsColon'),
+            quickPoints: t('bid_quickPoints'),
+            quickPointsColon: t('bid_quickPointsColon'),
+            clear: t('bid_clear'),
+            clearGroup: t('bid_clearGroup'),
+            easyMode: t('bid_easyMode'),
+            specialMode: t('bid_specialMode'),
+            selectSum: t('bid_selectSum'),
+            count: t('bid_count'),
+            betAmount: t('bid_betAmount'),
+            point: t('bid_point'),
+            points: t('bid_points'),
+            type: t('bid_type'),
+            delete: t('bid_delete'),
+            pleaseEnterPoints: t('bid_pleaseEnterPoints'),
+            pleaseEnterDigit: t('bid_pleaseEnterDigit'),
+            pleaseEnterDigit09: t('bid_pleaseEnterDigit09'),
+            pleaseEnter2Digit: t('bid_pleaseEnter2Digit'),
+            invalidDigit: t('bid_invalidDigit'),
+            invalidDigit09: t('bid_invalidDigit09'),
+            invalidNumber: t('bid_invalidNumber'),
+            atLeastOneJodi: t('bid_atLeastOneJodi'),
+            atLeastOneDoublePana: t('bid_atLeastOneDoublePana'),
+            atLeastOneSinglePana: t('bid_atLeastOneSinglePana'),
+            atLeastOneSinglePanna: t('bid_pleaseEnterSinglePanna'),
+            atLeastOneDigit09: t('bid_pleaseEnterAtLeastOneDigit09'),
+            pleaseEnterTriplePana: t('bid_pleaseEnterTriplePana'),
+            pleaseEnterTriplePanaList: t('bid_pleaseEnterTriplePanaList'),
+            pleaseEnterTriplePanaValid: t('bid_pleaseEnterTriplePanaValid'),
+            pleaseEnterOpenAnk: t('bid_pleaseEnterOpenAnk'),
+            pleaseEnterCloseAnk: t('bid_pleaseEnterCloseAnk'),
+            jodiBulkEnterPoints: t('bid_jodiBulkEnterPoints'),
+            enterJodi: t('bid_enterJodi'),
+            enterPana: t('bid_enterPana'),
+            enterMin3Digits: t('bid_enterMin3Digits'),
+            sessionOpen: t('bid_sessionOpen'),
+            sessionClose: t('bid_sessionClose'),
+            apply: t('bid_apply'),
+            applyGroupTitle: t('bid_applyGroupTitle'),
+            allPts: t('bid_allPts'),
+            pts: t('bid_pts'),
+            quickWord: t('bid_quickWord'),
+            pointsColonLine: t('bid_pointsColonLine'),
+            columnPana: t('bid_columnPana'),
+            columnDigit: t('bid_columnDigit'),
+            columnJodi: t('bid_columnJodi'),
+            columnSangam: t('bid_columnSangam'),
+        }),
+        [t]
+    );
+}

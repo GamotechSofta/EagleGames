@@ -163,7 +163,7 @@ const BetHistory = () => {
                                 onClick={() => setPlacedByFilter('all')}
                                 className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold border transition-colors ${
                                     placedByFilter === 'all'
-                                        ? 'bg-orange-500 text-white border-orange-500'
+                                        ? 'bg-blue-500 text-white border-blue-500'
                                         : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
                                 }`}
                             >
@@ -174,7 +174,7 @@ const BetHistory = () => {
                                 onClick={() => setPlacedByFilter('player')}
                                 className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold border transition-colors ${
                                     placedByFilter === 'player'
-                                        ? 'bg-orange-500 text-white border-orange-500'
+                                        ? 'bg-blue-500 text-white border-blue-500'
                                         : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
                                 }`}
                             >
@@ -185,7 +185,7 @@ const BetHistory = () => {
                                 onClick={() => setPlacedByFilter('bookie')}
                                 className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold border transition-colors ${
                                     placedByFilter === 'bookie'
-                                        ? 'bg-orange-500 text-white border-orange-500'
+                                        ? 'bg-blue-500 text-white border-blue-500'
                                         : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
                                 }`}
                             >
@@ -208,7 +208,7 @@ const BetHistory = () => {
                             {betsByMarket.map((marketData) => (
                                 <div key={marketData.marketId} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                                     {/* Market Header */}
-                                    <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-4 border-b border-orange-300">
+                                    <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4 border-b border-blue-300">
                                         <div className="flex items-center justify-between">
                                             <h2 className="text-xl font-bold text-white">{marketData.marketName}</h2>
                                             <div className="text-right text-white/90">
@@ -222,7 +222,7 @@ const BetHistory = () => {
                                         {/* Opening Bets Section */}
                                         <div>
                                             <div className="flex items-center justify-between mb-4">
-                                                <h3 className="text-lg font-bold text-orange-600 flex items-center gap-2">
+                                                <h3 className="text-lg font-bold text-blue-600 flex items-center gap-2">
                                                     <span className="w-2 h-2 rounded-full bg-green-500"></span>
                                                     Opening Bets ({marketData.totalOpen})
                                                 </h3>
@@ -260,7 +260,7 @@ const BetHistory = () => {
                                                                             {getBetTypeLabel(bet.betType)}
                                                                         </span>
                                                                     </td>
-                                                                    <td className="px-3 py-2 text-center font-mono font-bold text-orange-600">{bet.betNumber || '—'}</td>
+                                                                    <td className="px-3 py-2 text-center font-mono font-bold text-blue-600">{bet.betNumber || '—'}</td>
                                                                     <td className="px-3 py-2 text-right font-semibold text-gray-800">₹{formatNum(bet.amount)}</td>
                                                                     <td className="px-3 py-2 text-center">
                                                                         <span className={`px-2 py-1 rounded text-xs font-semibold ${
@@ -285,7 +285,7 @@ const BetHistory = () => {
                                         {/* Closing Bets Section */}
                                         <div className="pt-6 border-t border-gray-200">
                                             <div className="flex items-center justify-between mb-4">
-                                                <h3 className="text-lg font-bold text-orange-600 flex items-center gap-2">
+                                                <h3 className="text-lg font-bold text-blue-600 flex items-center gap-2">
                                                     <span className="w-2 h-2 rounded-full bg-red-500"></span>
                                                     Closing Bets ({marketData.totalClose})
                                                 </h3>
@@ -323,7 +323,7 @@ const BetHistory = () => {
                                                                             {getBetTypeLabel(bet.betType)}
                                                                         </span>
                                                                     </td>
-                                                                    <td className="px-3 py-2 text-center font-mono font-bold text-orange-600">{bet.betNumber || '—'}</td>
+                                                                    <td className="px-3 py-2 text-center font-mono font-bold text-blue-600">{bet.betNumber || '—'}</td>
                                                                     <td className="px-3 py-2 text-right font-semibold text-gray-800">₹{formatNum(bet.amount)}</td>
                                                                     <td className="px-3 py-2 text-center">
                                                                         <span className={`px-2 py-1 rounded text-xs font-semibold ${
