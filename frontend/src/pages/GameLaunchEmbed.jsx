@@ -32,6 +32,11 @@ const GameLaunchEmbed = () => {
     navigate('/games', { replace: true });
   };
 
+  const openGameInNewTab = () => {
+    if (!launchUrl) return;
+    window.open(launchUrl.trim(), '_blank', 'noopener,noreferrer');
+  };
+
   const applyLaunchPayload = (url, name, embedAllowedFromApi) => {
     if (!isHttpUrl(url)) return;
     const trimmed = url.trim();

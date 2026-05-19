@@ -32,8 +32,12 @@ export function validateProductionEnv() {
     if (!String(process.env.MONGODB_URI || process.env.MONGO_URI || '').trim()) {
         missing.push('MONGODB_URI');
     }
-    if (!String(process.env.USER_JWT_SECRET || process.env.JWT_SECRET || '').trim()) {
-        missing.push('USER_JWT_SECRET or JWT_SECRET');
+    const jwtSecret =
+        process.env.USER_JWT_SECRET ||
+        process.env.ADMIN_JWT_SECRET ||
+        process.env.JWT_SECRET;
+    if (!String(jwtSecret || '').trim()) {
+        missing.push('USER_JWT_SECRET, ADMIN_JWT_SECRET, or JWT_SECRET');
     }
     if (!String(process.env.ALLOWED_ORIGINS || '').trim()) {
         missing.push('ALLOWED_ORIGINS');
