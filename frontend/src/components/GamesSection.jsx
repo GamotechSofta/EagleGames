@@ -56,9 +56,7 @@ const GamesSection = () => {
         gameCode,
         gameName,
         launchUrl: result.launchUrl,
-        playableUrl: result.playableUrl,
         embedAllowed: result.embedAllowed,
-        useEmbedProxy: result.useEmbedProxy,
       });
       setLaunchingCode(null);
     },

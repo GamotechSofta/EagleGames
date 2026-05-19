@@ -1,7 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import connectDB from './config/db_Connection.js';
-import { validateProductionEnv } from './config/validateEnv.js';
 import marketRoutes from './routes/market/marketRoutes.js';
 import adminRoutes from './routes/admin/adminRoutes.js';
 import bookieRoutes from './routes/bookie/bookieRoutes.js';
@@ -33,12 +32,23 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.join(__dirname, '.env') });
-validateProductionEnv();
-
 const app = express();
 const PORT = process.env.PORT || 3010;
 
 app.set('trust proxy', 1);
+
+const allowedOriginsForFrame = (process.env.ALLOWED_ORIGINS || '')
+    .split(',')
+    .map((o) => o.trim())
+    .filter((o) => o && o.startsWith('http'));
+
+// In-house mini-games — allow iframe embed from frontend origins (www.eaglegames.fun → api host)
+app.use('/games-static', (req, res, next) => {
+    const ancestors = ["'self'", ...allowedOriginsForFrame, 'http://localhost:5173', 'http://127.0.0.1:5173'];
+    res.setHeader('Content-Security-Policy', `frame-ancestors ${ancestors.join(' ')}`);
+    res.removeHeader('X-Frame-Options');
+    next();
+}, express.static(path.join(__dirname, 'public/games')));
 
 app.use(helmet());
 

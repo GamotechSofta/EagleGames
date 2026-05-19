@@ -1,17 +1,22 @@
+import User from '../../models/user/user.js';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+import { Wallet, WalletTransaction } from '../../models/wallet/wallet.js';
 import {
-    ensureWalletForPlayer,
-    executeGenericDebit,
-    executeGenericCredit,
-} from '../../services/genericWalletService.js';
+    recordPartnerGameDebit,
+    recordPartnerGameCredit,
+} from '../../services/gameBetHistoryRecordService.js';
+import { isPartnerTokenValid } from '../../utils/partnerToken.js';
 
 dotenv.config();
 
-const DEFAULT_PARTNER_TOKEN = 'partner-token';
 const DEFAULT_CURRENCY = 'INR';
+const DEFAULT_START_BALANCE = 10000;
 
-const getPartnerToken = () =>
-    String(process.env.PARTNER_TOKEN || DEFAULT_PARTNER_TOKEN).trim();
+const isAutoCreateUsersEnabled = () => {
+    const raw = String(process.env.AUTO_CREATE_USERS ?? 'true').trim().toLowerCase();
+    return ['1', 'true', 'yes', 'y', 'on'].includes(raw);
+};
 
 const parseBearerToken = (authorizationHeader) => {
     if (!authorizationHeader || !authorizationHeader.startsWith('Bearer ')) {
@@ -36,10 +41,47 @@ const readPlayerIdFromRequest = (req) => {
     return String(raw).trim();
 };
 
+const sanitizeEmailPart = (value) => value.toLowerCase().replace(/[^a-z0-9._-]/g, '-');
+
+const ensureWalletForPlayer = async (playerId, { autoCreate = isAutoCreateUsersEnabled() } = {}) => {
+    const isObjectId = mongoose.Types.ObjectId.isValid(playerId);
+    let user = null;
+
+    if (isObjectId) {
+        user = await User.findById(playerId);
+    } else {
+        user = await User.findOne({ username: playerId });
+    }
+
+    if (!user && !autoCreate) {
+        return { user: null, wallet: null };
+    }
+
+    if (!user) {
+        const safeId = sanitizeEmailPart(playerId) || 'player';
+        const uniqueEmail = `${safeId}-${Date.now()}@mock-wallet.local`;
+        user = await User.create({
+            username: playerId,
+            email: uniqueEmail,
+            password: `mock-${Date.now()}-${Math.random().toString(16).slice(2, 10)}`,
+            role: 'user',
+        });
+    }
+
+    let wallet = await Wallet.findOne({ userId: user._id });
+    if (!wallet) {
+        wallet = await Wallet.create({
+            userId: user._id,
+            balance: DEFAULT_START_BALANCE,
+        });
+    }
+
+    return { user, wallet };
+};
+
 export const verifyGenericPartnerAuth = (req, res, next) => {
-    const expected = getPartnerToken();
     const token = parseBearerToken(req.headers.authorization);
-    if (!token || token !== expected) {
+    if (!isPartnerTokenValid(token)) {
         const body = { success: false, error: 'Unauthorized' };
         if (process.env.NODE_ENV !== 'production') {
             body.hint =
@@ -98,15 +140,73 @@ export const genericWalletDebit = async (req, res) => {
             });
         }
 
-        const result = await executeGenericDebit({
-            playerId,
+        const normalizedTransactionId = String(transactionId).trim();
+        const { user, wallet } = await ensureWalletForPlayer(playerId);
+
+        if (!user || !wallet) {
+            return res.status(404).json({
+                success: false,
+                error: 'User not found',
+            });
+        }
+
+        const duplicateTxn = await WalletTransaction.findOne({
+            userId: user._id,
+            type: 'debit',
+            referenceId: normalizedTransactionId,
+        }).lean();
+
+        if (duplicateTxn) {
+            return res.status(200).json({
+                success: true,
+                duplicate: true,
+                data: {
+                    playerId,
+                    balance: wallet.balance,
+                    transactionId: normalizedTransactionId,
+                },
+            });
+        }
+
+        if (wallet.balance < validAmount) {
+            return res.status(400).json({
+                success: false,
+                error: 'Insufficient balance',
+                data: {
+                    playerId,
+                    balance: wallet.balance,
+                },
+            });
+        }
+
+        wallet.balance -= validAmount;
+        await wallet.save();
+
+        await WalletTransaction.create({
+            userId: user._id,
+            type: 'debit',
             amount: validAmount,
-            transactionId,
-            roundId,
-            game,
-            betNumber,
+            referenceId: normalizedTransactionId,
+            description: `Generic debit | roundId=${roundId || ''} | game=${game || ''} | betNumber=${betNumber || ''}`,
         });
-        return res.status(result.status).json(result.body);
+
+        await recordPartnerGameDebit({
+            userId: user._id,
+            roundId: roundId || normalizedTransactionId,
+            gameCode: game,
+            betNumber,
+            betAmount: validAmount,
+            debitTransactionId: normalizedTransactionId,
+        });
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                playerId,
+                balance: wallet.balance,
+                transactionId: normalizedTransactionId,
+            },
+        });
     } catch (error) {
         return res.status(500).json({
             success: false,
@@ -128,13 +228,60 @@ export const genericWalletCredit = async (req, res) => {
             });
         }
 
-        const result = await executeGenericCredit({
-            playerId,
+        const normalizedTransactionId = String(transactionId).trim();
+        const { user, wallet } = await ensureWalletForPlayer(playerId);
+
+        if (!user || !wallet) {
+            return res.status(404).json({
+                success: false,
+                error: 'User not found',
+            });
+        }
+
+        const duplicateTxn = await WalletTransaction.findOne({
+            userId: user._id,
+            type: 'credit',
+            referenceId: normalizedTransactionId,
+        }).lean();
+
+        if (duplicateTxn) {
+            return res.status(200).json({
+                success: true,
+                duplicate: true,
+                data: {
+                    playerId,
+                    balance: wallet.balance,
+                    transactionId: normalizedTransactionId,
+                },
+            });
+        }
+
+        wallet.balance += validAmount;
+        await wallet.save();
+
+        await WalletTransaction.create({
+            userId: user._id,
+            type: 'credit',
             amount: validAmount,
-            transactionId,
-            roundId,
+            referenceId: normalizedTransactionId,
+            description: `Generic credit | roundId=${roundId || ''}`,
         });
-        return res.status(result.status).json(result.body);
+
+        await recordPartnerGameCredit({
+            userId: user._id,
+            roundId,
+            payout: validAmount,
+            creditTransactionId: normalizedTransactionId,
+        });
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                playerId,
+                balance: wallet.balance,
+                transactionId: normalizedTransactionId,
+            },
+        });
     } catch (error) {
         return res.status(500).json({
             success: false,

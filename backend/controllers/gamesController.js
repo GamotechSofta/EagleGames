@@ -2,12 +2,16 @@ import Game from '../models/games/games.js';
 import axios from 'axios';
 import dotenv from 'dotenv';
 import { getPlayerGameBetHistory, getAdminGameBetHistory } from '../services/gameBetHistoryService.js';
-import { isHttpUrl, resolveDefaultGameReturnUrl } from '../utils/gameLaunchUrl.js';
 import {
-    hostRequiresEmbedProxy,
-    signEmbedSessionToken,
-    buildEmbedProxyPath,
-} from '../utils/gameEmbedFrame.js';
+    isHttpUrl,
+    renderLaunchUrlTemplate,
+    resolveDefaultGameReturnUrl,
+    resolveDirectLaunchTemplate,
+} from '../utils/gameLaunchUrl.js';
+import { getOperatorWalletBaseUrl, getOperatorWalletEndpoints } from '../utils/operatorWalletUrl.js';
+import { getPartnerToken } from '../utils/partnerToken.js';
+import User from '../models/user/user.js';
+import { Wallet } from '../models/wallet/wallet.js';
 
 dotenv.config();
 
@@ -143,11 +147,12 @@ export const getGames = async (req, res) => {
             query.isActive = { $ne: false };
         }
 
-        const games = await Game.find(query)
-            .select('-launchUrl')
-            .sort({ order: 1, name: 1 })
-            .lean();
-        return res.status(200).json({ success: true, data: games });
+        const games = await Game.find(query).sort({ order: 1, name: 1 }).lean();
+        const data = games.map((g) => ({
+            ...g,
+            launchUrl: resolveDirectLaunchTemplate(g.gameCode, g.launchUrl),
+        }));
+        return res.status(200).json({ success: true, data });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
     }
@@ -173,15 +178,17 @@ export const getGameByCode = async (req, res) => {
         const query = includeInactive
             ? { gameCode }
             : { gameCode, isActive: { $ne: false } };
-        const game = await Game.findOne(query).select('-launchUrl').lean();
+        const game = await Game.findOne(query).lean();
         if (!game) {
             return res.status(404).json({ success: false, message: 'Game not found' });
         }
 
-        const publicGame = game;
         return res.status(200).json({
             success: true,
-            data: publicGame,
+            data: {
+                ...game,
+                launchUrl: resolveDirectLaunchTemplate(game.gameCode, game.launchUrl),
+            },
         });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
@@ -260,7 +267,11 @@ export const deleteGame = async (req, res) => {
 export const launchGame = async (req, res) => {
     const routeGameCode = String(req.params.gameCode || '').trim().toUpperCase();
     try {
-        /** Partner session launch via GAME_LAUNCH_URL (all catalog games). */
+        /**
+         * 1) Direct `launchUrl` on Game (or env fallback for ROULETTE/FUNTIMER/AVIATOR)
+         * 2) CraftDigital partner session launch when credentials are configured
+         * 3) 400 GAME_LAUNCH_NOT_CONFIGURED
+         */
         const fromParams = routeGameCode;
         const fromBody =
             req.body?.gameCode != null ? String(req.body.gameCode).trim().toUpperCase() : '';
@@ -289,6 +300,15 @@ export const launchGame = async (req, res) => {
         }
         const externalPlayerId = String(req.userId).trim();
 
+        const user = await User.findById(externalPlayerId).select('_id').lean();
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Player not found' });
+        }
+        let wallet = await Wallet.findOne({ userId: externalPlayerId });
+        if (!wallet) {
+            wallet = await Wallet.create({ userId: externalPlayerId, balance: 0 });
+        }
+
         if (!gameCode) {
             return res.status(400).json({ success: false, message: 'gameCode is required' });
         }
@@ -312,34 +332,67 @@ export const launchGame = async (req, res) => {
                 ? String(req.body.returnUrl).trim()
                 : resolveDefaultGameReturnUrl();
 
+        const templateReplacements = {
+            playerId: externalPlayerId,
+            externalPlayerId,
+            gameCode: String(game.gameCode),
+            partnerCode: String(partnerGameCode),
+            currency,
+            locale,
+            returnUrl,
+        };
+
+        const directTemplate = resolveDirectLaunchTemplate(game.gameCode, game.launchUrl)?.trim();
+        if (directTemplate) {
+            const launchUrl = renderLaunchUrlTemplate(directTemplate, templateReplacements);
+            if (!isHttpUrl(launchUrl)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Configured launchUrl must resolve to an http(s) URL after placeholders',
+                });
+            }
+            return res.status(200).json({
+                success: true,
+                gameCode: game.gameCode,
+                gameName: game.name,
+                launchUrl: launchUrl.trim(),
+                source: 'direct',
+                embedAllowed,
+            });
+        }
+
         const { apiKey, apiSecret } = getLaunchApiCredentials();
         if (!apiKey || !apiSecret) {
             return res.status(400).json({
                 success: false,
                 code: 'GAME_LAUNCH_NOT_CONFIGURED',
                 message:
-                    'Partner game launch is not configured. Set GAME_LAUNCH_URL, GAME_LAUNCH_API_KEY, and GAME_LAUNCH_API_SECRET in backend/.env.',
+                    'This game has no launchUrl. Set launchUrl on the Game document, or configure GAME_LAUNCH_API_KEY and GAME_LAUNCH_API_SECRET for partner launch.',
             });
         }
 
+        const walletApi = getOperatorWalletEndpoints();
         const payload = {
             gameCode: partnerGameCode,
             externalPlayerId,
             currency,
             locale,
             returnUrl,
+            walletUrl: walletApi.base,
+            walletApiUrl: walletApi.base,
+            operatorWalletUrl: walletApi.base,
+            walletBaseUrl: walletApi.base,
         };
 
         const launchUrlResolved = resolveGameLaunchUrl();
+        const partnerToken = getPartnerToken();
         const headers = {
             'Content-Type': 'application/json',
             'x-api-key': apiKey,
             'x-api-secret': apiSecret,
         };
-        if (String(process.env.GAME_LAUNCH_BEARER || '').trim() === '1') {
-            const rawToken = String(process.env.PARTNER_TOKEN || '').trim();
-            const partnerToken = rawToken.includes(',') ? rawToken.split(',')[0].trim() : rawToken;
-            if (partnerToken) headers.Authorization = `Bearer ${partnerToken}`;
+        if (partnerToken) {
+            headers.Authorization = `Bearer ${partnerToken}`;
         }
 
         const response = await axios.post(launchUrlResolved, payload, {
@@ -359,7 +412,7 @@ export const launchGame = async (req, res) => {
         }
 
         const launchUrl = extractLaunchUrl(partnerBody);
-        if (!launchUrl || !isHttpUrl(launchUrl)) {
+        if (!launchUrl) {
             return res.status(502).json({
                 success: false,
                 message:
@@ -372,46 +425,48 @@ export const launchGame = async (req, res) => {
             });
         }
 
-        const trimmedLaunch = String(launchUrl).trim();
-        const partnerEmbedAllowed = deriveEmbedAllowed(partnerBody);
-        const useEmbedProxy = hostRequiresEmbedProxy(trimmedLaunch);
-        let embedUrl = trimmedLaunch;
-        let embedSessionToken = null;
-
-        if (useEmbedProxy) {
-            embedSessionToken = signEmbedSessionToken(externalPlayerId, trimmedLaunch);
-            embedUrl = buildEmbedProxyPath(trimmedLaunch, embedSessionToken);
-        }
-
         return res.status(200).json({
             success: true,
             gameCode,
             gameName: game.name,
-            launchUrl: trimmedLaunch,
-            embedUrl,
-            useEmbedProxy,
-            embedSessionToken,
+            launchUrl,
             source: 'partner',
-            embedAllowed: useEmbedProxy ? true : partnerEmbedAllowed,
+            embedAllowed: deriveEmbedAllowed(partnerBody),
             data: partnerBody,
         });
     } catch (error) {
         const partnerError = error?.response?.data;
         const partnerStatus = error?.response?.status;
-        const status =
-            partnerStatus === 401 || partnerStatus === 403
-                ? 502
-                : partnerStatus && partnerStatus >= 400 && partnerStatus < 600
-                  ? partnerStatus
-                  : 500;
+        const partnerPayload =
+            typeof partnerError === 'string'
+                ? partnerError
+                : JSON.stringify(partnerError || '');
+        const walletUnreachable =
+            /player validation failed/i.test(partnerPayload) &&
+            (/502 Bad Gateway/i.test(partnerPayload) || /<html/i.test(partnerPayload));
 
+        const status =
+            walletUnreachable
+                ? 502
+                : partnerStatus === 401 || partnerStatus === 403
+                  ? 502
+                  : partnerStatus && partnerStatus >= 400 && partnerStatus < 600
+                    ? partnerStatus
+                    : 500;
+
+        const walletBase = getOperatorWalletBaseUrl();
         let message = partnerError?.message || error.message || 'Game launch failed';
-        if (partnerStatus === 401) {
+        if (walletUnreachable) {
+            message =
+                `Partner could not reach your wallet API (502). Ensure ${walletBase} is online, nginx proxies to Node, and CraftDigital dashboard wallet URL matches. Test: GET ${walletBase}/health`;
+        } else if (partnerStatus === 401) {
             message =
                 'Partner API authentication failed (401). Check GAME_LAUNCH_API_KEY and GAME_LAUNCH_API_SECRET in backend/.env.';
         } else if (partnerStatus === 403) {
             message =
                 'Partner API denied access (403). Verify your tenant is allowed to launch this game code.';
+        } else if (partnerStatus === 400 && typeof partnerError === 'object' && partnerError?.error) {
+            message = String(partnerError.error).replace(/<[^>]+>/g, ' ').slice(0, 280);
         }
 
         console.error('[games:launch] failed', {

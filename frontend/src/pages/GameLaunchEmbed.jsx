@@ -95,8 +95,7 @@ const GameLaunchEmbed = () => {
         return;
       }
 
-      const playUrl = result.playableUrl || result.launchUrl;
-      applyLaunchPayload(playUrl, result.data?.gameName || gameCode, result.embedAllowed);
+      applyLaunchPayload(result.launchUrl, result.data?.gameName || gameCode, result.embedAllowed);
       try {
         window.history.replaceState({}, '', `/games/play/${encodeURIComponent(gameCode)}`);
       } catch (_) {}
@@ -111,12 +110,10 @@ const GameLaunchEmbed = () => {
 
   useEffect(() => {
     if (phase !== 'ready' || !launchUrl || useIframe) return;
-    const partnerUrl = location.state?.partnerLaunchUrl;
-    if (location.state?.useEmbedProxy) return;
     if (topLevelRedirectRef.current) return;
     topLevelRedirectRef.current = true;
-    window.location.assign(String(partnerUrl || launchUrl).trim());
-  }, [phase, launchUrl, useIframe, location.state]);
+    window.location.assign(launchUrl.trim());
+  }, [phase, launchUrl, useIframe]);
 
   const iframeProps = useMemo(
     () => ({
@@ -124,7 +121,6 @@ const GameLaunchEmbed = () => {
       src: launchUrl,
       className: 'min-h-0 w-full flex-1 border-0 bg-black',
       allow: 'fullscreen; autoplay; camera; microphone; payment; clipboard-write',
-      referrerPolicy: 'no-referrer',
     }),
     [launchUrl, gameName]
   );

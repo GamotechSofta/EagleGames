@@ -8,6 +8,15 @@ import {
 
 const genericRouter = express.Router();
 
+/** Public — CraftDigital / nginx can verify this URL is reachable (no auth). */
+genericRouter.get('/health', (_req, res) => {
+    res.status(200).json({
+        success: true,
+        service: 'eaglegames-generics-wallet',
+        walletBalancePath: '/api/v1/generics/wallet/balance',
+    });
+});
+
 genericRouter.use(verifyGenericPartnerAuth);
 
 genericRouter.post('/wallet/balance', getGenericWalletBalance);

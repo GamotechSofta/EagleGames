@@ -86,38 +86,15 @@ export async function requestGameLaunch(gameCode) {
   const launchUrl = parseLaunchResponse(data);
   const success = res.ok && data?.success !== false && isHttpUrl(launchUrl);
 
-  const useEmbedProxy = Boolean(data?.useEmbedProxy);
-  const embedUrlRaw = data?.embedUrl || '';
-  const playableUrl = success
-    ? useEmbedProxy && embedUrlRaw
-      ? resolveFullApiPath(embedUrlRaw)
-      : launchUrl
-    : '';
-
   return {
     ok: success,
     data,
     launchUrl: success ? launchUrl : '',
-    playableUrl: success ? playableUrl : '',
-    embedUrl: embedUrlRaw,
-    useEmbedProxy,
     embedAllowed: data?.embedAllowed !== false,
     errorMessage: success ? '' : data?.message || 'Could not start the game.',
     code: data?.code,
     partnerStatus: data?.partnerStatus,
   };
-}
-
-/** Turn `/api/v1/games/embed/frame?...` into a full URL for iframe src. */
-export function resolveFullApiPath(pathOrUrl) {
-  const s = String(pathOrUrl || '').trim();
-  if (!s) return '';
-  if (/^https?:\/\//i.test(s)) return s;
-  if (typeof window !== 'undefined' && window.location?.origin) {
-    return `${window.location.origin}${s.startsWith('/') ? s : `/${s}`}`;
-  }
-  const base = String(API_BASE_URL || '').replace(/\/api\/v1\/?$/i, '');
-  return `${base}${s.startsWith('/') ? s : `/${s}`}`;
 }
 
 export function storeLaunchSession(gameCode, launchUrl, gameName, embedAllowed) {
