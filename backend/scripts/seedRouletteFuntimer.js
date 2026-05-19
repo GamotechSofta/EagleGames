@@ -1,5 +1,5 @@
 /**
- * Upsert ROULETTE + FUNTIMER with in-house static launch URLs.
+ * Upsert ROULETTE + FUNTIMER catalog entries (partner launch via GAME_LAUNCH_URL only).
  * Run: node backend/scripts/seedRouletteFuntimer.js
  */
 import mongoose from 'mongoose';
@@ -7,13 +7,11 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import Game from '../models/games/games.js';
-import { getPublicGameBaseUrl } from '../utils/gameLaunchUrl.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 const MONGODB_URI = process.env.MONGODB_URI || process.env.MONGO_URI;
-const base = getPublicGameBaseUrl();
 
 const ROULETTE_IMG =
     'https://res.cloudinary.com/dzd47mpdo/image/upload/v1776326983/FUN_TIMER_5_xn87ir.png';
@@ -27,7 +25,6 @@ async function main() {
     }
     await mongoose.connect(MONGODB_URI);
     console.log('MongoDB connected');
-    console.log('Launch base:', base);
 
     const games = [
         {
@@ -35,8 +32,8 @@ async function main() {
             name: 'Roulette',
             image: ROULETTE_IMG,
             category: 'casino',
-            provider: 'in-house',
-            launchUrl: `${base}/games-static/roulette/index.html?player={playerId}`,
+            provider: 'partner',
+            launchUrl: '',
             embedAllowed: true,
             isActive: true,
             order: 10,
@@ -46,8 +43,8 @@ async function main() {
             name: 'Fun Timer',
             image: FUNTIMER_IMG,
             category: 'arcade',
-            provider: 'in-house',
-            launchUrl: `${base}/games-static/funtimer/index.html?player={playerId}`,
+            provider: 'partner',
+            launchUrl: '',
             embedAllowed: true,
             isActive: true,
             order: 11,
@@ -58,17 +55,19 @@ async function main() {
     let updated = 0;
 
     for (const doc of games) {
-        const existing = await Game.findOne({ gameCode: doc.gameCode }).lean();
-        await Game.findOneAndUpdate(
+        const res = await Game.findOneAndUpdate(
             { gameCode: doc.gameCode },
-            { $set: doc },
-            { upsert: true, new: true, runValidators: true, setDefaultsOnInsert: true }
+            { $set: doc, $unset: { launchUrl: '' } },
+            { upsert: true, new: true, setDefaultsOnInsert: true }
         );
-        if (existing) updated += 1;
-        else inserted += 1;
+        if (res) {
+            const wasNew = res.createdAt?.getTime() === res.updatedAt?.getTime();
+            if (wasNew) inserted += 1;
+            else updated += 1;
+        }
     }
 
-    console.log(`Done. Upserts — inserted: ${inserted}, updated: ${updated}`);
+    console.log(`Done. inserted≈${inserted}, updated≈${updated}`);
     await mongoose.disconnect();
 }
 

@@ -1,29 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { API_BASE_URL, fetchWithAuth } from '../config/api';
 import { useLanguage } from '../context/LanguageContext';
+import { requestGameLaunch } from '../api/games';
+import { clearStoredLaunch, readStoredLaunch } from '../utils/gameLaunchFlow';
 import { partnerRequiresTopLevelNavigation } from '../utils/partnerGameEmbed';
 
-/** Session keys for handoff from `POST /api/v1/games/launch/:gameCode` to `/games/play/:gameCode`. */
-function gameLaunchSessionKeys(gameCode) {
-  const c = String(gameCode || '').trim().toUpperCase();
-  return {
-    url: `eagleGames:v1:gameLaunch:url:${c}`,
-    name: `eagleGames:v1:gameLaunch:name:${c}`,
-    embed: `eagleGames:v1:gameLaunch:embed:${c}`,
-  };
-}
-
 const isHttpUrl = (value) => typeof value === 'string' && /^https?:\/\//i.test(value.trim());
-
-const getPlayerId = () => {
-  try {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    return String(user?._id || user?.id || '').trim();
-  } catch {
-    return '';
-  }
-};
 
 const GameLaunchEmbed = () => {
   const navigate = useNavigate();
@@ -40,32 +22,18 @@ const GameLaunchEmbed = () => {
 
   const [launchUrl, setLaunchUrl] = useState('');
   const [gameName, setGameName] = useState('Game');
-  const [phase, setPhase] = useState('loading'); // loading | ready | error
-  /** When false, partner URL must open at top level (not iframe); we redirect with location.assign. */
+  const [phase, setPhase] = useState('loading');
+  const [errorMessage, setErrorMessage] = useState('');
   const [useIframe, setUseIframe] = useState(true);
   const topLevelRedirectRef = useRef(false);
 
-  const clearStoredLaunch = () => {
-    try {
-      const k = gameLaunchSessionKeys(gameCode);
-      sessionStorage.removeItem(k.url);
-      sessionStorage.removeItem(k.name);
-      sessionStorage.removeItem(k.embed);
-    } catch (_) {}
-  };
-
   const handleBack = () => {
-    clearStoredLaunch();
+    clearStoredLaunch(gameCode);
     navigate('/games', { replace: true });
   };
 
-  const openGameInNewTab = () => {
-    if (!launchUrl) return;
-    window.open(launchUrl.trim(), '_blank', 'noopener,noreferrer');
-  };
-
-  const applyLaunchPayload = (url, name, embedAllowedFromApi, cancelled) => {
-    if (cancelled || !isHttpUrl(url)) return;
+  const applyLaunchPayload = (url, name, embedAllowedFromApi) => {
+    if (!isHttpUrl(url)) return;
     const trimmed = url.trim();
     setLaunchUrl(trimmed);
     if (typeof name === 'string' && name.trim()) setGameName(name.trim());
@@ -74,60 +42,36 @@ const GameLaunchEmbed = () => {
     if (typeof embedAllowedFromApi === 'boolean') {
       partnerAllowsEmbed = embedAllowedFromApi;
     } else {
-      try {
-        const st = sessionStorage.getItem(gameLaunchSessionKeys(gameCode).embed);
-        if (st === '0') partnerAllowsEmbed = false;
-      } catch (_) {}
+      const stored = readStoredLaunch(gameCode);
+      partnerAllowsEmbed = stored.embedAllowed;
     }
 
     const needsTopLevel = partnerRequiresTopLevelNavigation(trimmed, gameCode, partnerAllowsEmbed);
-    const iframe = !needsTopLevel;
-    setUseIframe(iframe);
-
-    try {
-      const k = gameLaunchSessionKeys(gameCode);
-      sessionStorage.setItem(k.url, trimmed);
-      if (typeof name === 'string' && name.trim()) {
-        sessionStorage.setItem(k.name, name.trim());
-      }
-      sessionStorage.setItem(k.embed, iframe ? '1' : '0');
-    } catch (_) {}
+    setUseIframe(!needsTopLevel);
   };
 
   useEffect(() => {
     let cancelled = false;
 
     const resolveOnce = async () => {
-      let resolvedUrl = '';
-      let resolvedName = '';
-      let resolvedEmbedAllowed;
-
       const stateUrl = location.state?.launchUrl;
       const stateName = location.state?.gameName;
       const stateEmb = location.state?.embedAllowed;
-      if (isHttpUrl(stateUrl)) resolvedUrl = stateUrl.trim();
-      if (typeof stateName === 'string' && stateName.trim()) resolvedName = stateName.trim();
-      if (typeof stateEmb === 'boolean') resolvedEmbedAllowed = stateEmb;
 
-      try {
-        if (!resolvedUrl) {
-          const stored = sessionStorage.getItem(gameLaunchSessionKeys(gameCode).url);
-          if (isHttpUrl(stored)) resolvedUrl = stored.trim();
-        }
-        if (!resolvedName) {
-          const storedName = sessionStorage.getItem(gameLaunchSessionKeys(gameCode).name);
-          if (typeof storedName === 'string' && storedName.trim()) resolvedName = storedName.trim();
-        }
-      } catch (_) {}
-
-      if (resolvedUrl && gameCode) {
+      if (isHttpUrl(stateUrl)) {
         if (cancelled) return;
-        applyLaunchPayload(resolvedUrl, resolvedName, resolvedEmbedAllowed, cancelled);
-        if (location.state) {
-          try {
-            window.history.replaceState({}, '', `/games/play/${encodeURIComponent(gameCode)}`);
-          } catch (_) {}
-        }
+        applyLaunchPayload(stateUrl, stateName, stateEmb);
+        try {
+          window.history.replaceState({}, '', `/games/play/${encodeURIComponent(gameCode)}`);
+        } catch (_) {}
+        setPhase('ready');
+        return;
+      }
+
+      const stored = readStoredLaunch(gameCode);
+      if (isHttpUrl(stored.launchUrl)) {
+        if (cancelled) return;
+        applyLaunchPayload(stored.launchUrl, stored.gameName, stored.embedAllowed);
         setPhase('ready');
         return;
       }
@@ -137,72 +81,37 @@ const GameLaunchEmbed = () => {
         return;
       }
 
-      const externalPlayerId = getPlayerId();
-      if (!externalPlayerId) {
-        if (!cancelled) navigate('/games', { replace: true });
+      const result = await requestGameLaunch(gameCode);
+      if (cancelled) return;
+
+      if (!result.ok) {
+        setErrorMessage(result.errorMessage || t('games_launchError'));
+        setPhase('error');
         return;
       }
 
+      const playUrl = result.playableUrl || result.launchUrl;
+      applyLaunchPayload(playUrl, result.data?.gameName || gameCode, result.embedAllowed);
       try {
-        const payload = {
-          gameCode,
-          externalPlayerId,
-          currency: 'INR',
-          locale: 'en',
-          returnUrl: '',
-        };
-        const res = await fetchWithAuth(
-          `${API_BASE_URL}/games/launch/${encodeURIComponent(gameCode)}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-            logoutOn401: false,
-          }
-        );
-        if (res.status === 401) {
-          if (!cancelled) setPhase('error');
-          return;
-        }
-        const data = await res.json().catch(() => ({}));
-        if (cancelled) return;
-        const url =
-          data?.launchUrl ||
-          data?.data?.launchUrl ||
-          data?.data?.data?.launchUrl ||
-          data?.data?.url ||
-          data?.data?.gameUrl ||
-          data?.data?.sessionUrl ||
-          data?.data?.redirectUrl ||
-          '';
-        if (res.ok && isHttpUrl(url) && data?.success !== false) {
-          const emb = data?.embedAllowed !== false;
-          applyLaunchPayload(url, data?.gameName || resolvedName || gameCode, emb, cancelled);
-          try {
-            window.history.replaceState({}, '', `/games/play/${encodeURIComponent(gameCode)}`);
-          } catch (_) {}
-          setPhase('ready');
-        } else {
-          setPhase('error');
-        }
-      } catch {
-        if (!cancelled) setPhase('error');
-      }
+        window.history.replaceState({}, '', `/games/play/${encodeURIComponent(gameCode)}`);
+      } catch (_) {}
+      setPhase('ready');
     };
 
     resolveOnce();
     return () => {
       cancelled = true;
     };
-  }, [gameCode, location.state, navigate]);
+  }, [gameCode, location.state, navigate, t]);
 
-  /** Roulette and some partners block iframes; same launch URL works as a full-page navigation. */
   useEffect(() => {
     if (phase !== 'ready' || !launchUrl || useIframe) return;
+    const partnerUrl = location.state?.partnerLaunchUrl;
+    if (location.state?.useEmbedProxy) return;
     if (topLevelRedirectRef.current) return;
     topLevelRedirectRef.current = true;
-    window.location.assign(launchUrl.trim());
-  }, [phase, launchUrl, useIframe]);
+    window.location.assign(String(partnerUrl || launchUrl).trim());
+  }, [phase, launchUrl, useIframe, location.state]);
 
   const iframeProps = useMemo(
     () => ({
@@ -210,6 +119,7 @@ const GameLaunchEmbed = () => {
       src: launchUrl,
       className: 'min-h-0 w-full flex-1 border-0 bg-black',
       allow: 'fullscreen; autoplay; camera; microphone; payment; clipboard-write',
+      referrerPolicy: 'no-referrer',
     }),
     [launchUrl, gameName]
   );
@@ -225,7 +135,7 @@ const GameLaunchEmbed = () => {
   if (phase === 'error' || !launchUrl) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 bg-slate-950 px-4 text-center text-sm text-red-300">
-        <p>{t('games_launchError')}</p>
+        <p>{errorMessage || t('games_launchError')}</p>
         <button
           type="button"
           onClick={handleBack}

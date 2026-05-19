@@ -1,4 +1,5 @@
 import express from 'express';
+import { embedGameFrame } from '../../controllers/gameEmbedController.js';
 import {
     getGames,
     getGameByCode,
@@ -33,7 +34,8 @@ router.delete('/delete-game/:id', verifySuperAdmin, deleteGame);
  * Route order: register `GET /` before `GET /:gameCode` so the list handler runs for the catalog root.
  */
 router.get('/', getGames);
-router.get('/:gameCode', getGameByCode);
+router.get('/embed/frame', embedGameFrame);
 router.post('/launch/:gameCode', verifyUser, launchGame);
+router.get('/:gameCode', getGameByCode);
 
 export default router;

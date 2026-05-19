@@ -1,3 +1,8 @@
+/**
+ * GameBetHistory is a READ CACHE for UI (/games/my-bet-history).
+ * Financial source of truth: Wallet + WalletTransaction (Generic debit|credit).
+ * Do not use GameBetHistory for revenue, payouts, or reconciliation.
+ */
 import GameBetHistory from '../models/gameBetHistory/gameBetHistory.js';
 import Game from '../models/games/games.js';
 
@@ -48,14 +53,17 @@ export const toApiEntry = (doc) => {
 };
 
 /** Partner game bet placed (wallet debit). */
-export async function recordPartnerGameDebit({
-    userId,
-    roundId,
-    gameCode,
-    betNumber,
-    betAmount,
-    debitTransactionId,
-}) {
+export async function recordPartnerGameDebit(
+    {
+        userId,
+        roundId,
+        gameCode,
+        betNumber,
+        betAmount,
+        debitTransactionId,
+    },
+    { session } = {}
+) {
     const roundKey = String(roundId || debitTransactionId || '').trim();
     if (!userId || !roundKey) return null;
 
@@ -82,12 +90,15 @@ export async function recordPartnerGameDebit({
                 status: 'pending',
             },
         },
-        { upsert: true, new: true }
+        { upsert: true, new: true, session: session || undefined }
     ).lean();
 }
 
 /** Partner game settled (wallet credit). */
-export async function recordPartnerGameCredit({ userId, roundId, payout, creditTransactionId }) {
+export async function recordPartnerGameCredit(
+    { userId, roundId, payout, creditTransactionId },
+    { session } = {}
+) {
     const roundKey = String(roundId || '').trim();
     if (!userId || !roundKey) return null;
 
@@ -104,7 +115,7 @@ export async function recordPartnerGameCredit({ userId, roundId, payout, creditT
                 creditTransactionId: creditTransactionId ? String(creditTransactionId).trim() : undefined,
             },
         },
-        { new: true }
+        { new: true, session: session || undefined }
     ).lean();
 
     if (updated) return updated;
@@ -125,7 +136,7 @@ export async function recordPartnerGameCredit({ userId, roundId, payout, creditT
                 creditTransactionId: creditTransactionId ? String(creditTransactionId).trim() : undefined,
             },
         },
-        { upsert: true, new: true }
+        { upsert: true, new: true, session: session || undefined }
     ).lean();
 }
 

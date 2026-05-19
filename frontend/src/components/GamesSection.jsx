@@ -1,31 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE_URL, fetchWithAuth } from '../config/api';
 import { useLanguage } from '../context/LanguageContext';
-import { partnerRequiresTopLevelNavigation } from '../utils/partnerGameEmbed';
+import { fetchGamesCatalog, requestGameLaunch } from '../api/games';
+import { openLaunchedGame } from '../utils/gameLaunchFlow';
 import { getGameDisplayName } from '../utils/gameDisplayName';
-
-function gameLaunchSessionKeys(gameCode) {
-  const c = String(gameCode || '').trim().toUpperCase();
-  return {
-    url: `eagleGames:v1:gameLaunch:url:${c}`,
-    name: `eagleGames:v1:gameLaunch:name:${c}`,
-    embed: `eagleGames:v1:gameLaunch:embed:${c}`,
-  };
-}
 
 const hideScrollbarStyle = {
   msOverflowStyle: 'none',
   scrollbarWidth: 'none',
-};
-
-const getPlayerId = () => {
-  try {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    return String(user?._id || user?.id || '').trim();
-  } catch {
-    return '';
-  }
 };
 
 const GamesSection = () => {
@@ -39,26 +21,17 @@ const GamesSection = () => {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      try {
-        const res = await fetch(`${API_BASE_URL}/games`, { cache: 'no-store' });
-        const json = await res.json().catch(() => ({}));
-        if (!cancelled) {
-          if (json.success && Array.isArray(json.data)) {
-            setGames(json.data);
-          } else {
-            setGames([]);
-          }
-        }
-      } catch {
-        if (!cancelled) setError(t('games_loadError'));
-      } finally {
-        if (!cancelled) setLoading(false);
+      const { ok, games: list } = await fetchGamesCatalog();
+      if (!cancelled) {
+        if (ok) setGames(list);
+        else setError(t('games_loadError'));
+        setLoading(false);
       }
     })();
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- load catalog once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handlePlay = useCallback(
@@ -67,73 +40,27 @@ const GamesSection = () => {
       if (!rawCode) return;
 
       const gameCode = String(rawCode).trim().toUpperCase();
-      const externalPlayerId = getPlayerId();
-      if (!externalPlayerId) {
-        setError(t('games_err_loginPlayer'));
+      setLaunchingCode(gameCode);
+      setError('');
+
+      const result = await requestGameLaunch(gameCode);
+      if (!result.ok) {
+        setError(result.errorMessage || t('games_launchError'));
+        setLaunchingCode(null);
         return;
       }
 
-      setLaunchingCode(gameCode);
-      setError('');
-      try {
-        const payload = {
-          gameCode,
-          externalPlayerId,
-          currency: 'INR',
-          locale: 'en',
-          returnUrl: '',
-        };
-
-        const res = await fetchWithAuth(
-          `${API_BASE_URL}/games/launch/${encodeURIComponent(gameCode)}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-            logoutOn401: false,
-          }
-        );
-        if (res.status === 401) {
-          setError(t('games_err_loginPlayer'));
-          return;
-        }
-        const json = await res.json().catch(() => ({}));
-        const launchUrl =
-          json?.launchUrl ||
-          json?.data?.launchUrl ||
-          json?.data?.data?.launchUrl ||
-          json?.data?.url ||
-          json?.data?.gameUrl ||
-          json?.data?.sessionUrl ||
-          json?.data?.redirectUrl ||
-          '';
-
-        if (!res.ok || !json.success || !launchUrl) {
-          setError(json.message || t('games_launchError'));
-          return;
-        }
-
-        const codeForRoute = encodeURIComponent(gameCode);
-        const gameName = getGameDisplayName(t, game) || gameCode;
-        const embedAllowed = json?.embedAllowed !== false;
-        if (partnerRequiresTopLevelNavigation(launchUrl, gameCode, embedAllowed)) {
-          window.location.assign(String(launchUrl).trim());
-          return;
-        }
-        try {
-          const k = gameLaunchSessionKeys(gameCode);
-          sessionStorage.setItem(k.url, launchUrl);
-          sessionStorage.setItem(k.name, gameName);
-          sessionStorage.setItem(k.embed, embedAllowed ? '1' : '0');
-        } catch (_) {}
-        navigate(`/games/play/${codeForRoute}`, {
-          state: { launchUrl, gameName, embedAllowed },
-        });
-      } catch {
-        setError(t('games_launchError'));
-      } finally {
-        setLaunchingCode(null);
-      }
+      const gameName = getGameDisplayName(t, game) || gameCode;
+      openLaunchedGame({
+        navigate,
+        gameCode,
+        gameName,
+        launchUrl: result.launchUrl,
+        playableUrl: result.playableUrl,
+        embedAllowed: result.embedAllowed,
+        useEmbedProxy: result.useEmbedProxy,
+      });
+      setLaunchingCode(null);
     },
     [navigate, t]
   );

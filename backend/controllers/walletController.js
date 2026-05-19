@@ -162,8 +162,8 @@ export const getTransactions = async (req, res) => {
 
 /**
  * User-facing: get wallet transactions for the authenticated player.
- * Requires verifyUser (JWT). Query/body: { limit? }.
- * Returns latest transactions (most recent first).
+ * Requires verifyUser (JWT). Query/body: { limit?, includeBet? }.
+ * includeBet=1 enriches Matka bets only. For partner games use GET /api/v1/games/my-bet-history.
  */
 export const getMyTransactions = async (req, res) => {
     try {

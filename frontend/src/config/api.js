@@ -26,11 +26,26 @@ export const BACKEND_BASE_URL =
  * For JSON body use: { 'Content-Type': 'application/json', ...getAuthHeaders() }
  * For FormData omit Content-Type (fetch sets multipart boundary).
  */
+export function getStoredUser() {
+  try {
+    return JSON.parse(localStorage.getItem('user') || '{}');
+  } catch {
+    return {};
+  }
+}
+
 export function getAuthHeaders() {
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const token = user?.token;
+  const token = getStoredUser()?.token;
   if (!token) return {};
   return { Authorization: `Bearer ${token}` };
+}
+
+/** Player id + JWT for game launch (body fallback if a proxy strips Authorization). */
+export function getPlayerLaunchContext() {
+  const user = getStoredUser();
+  const token = user?.token ? String(user.token) : '';
+  const externalPlayerId = String(user?.id || user?._id || '').trim();
+  return { token, externalPlayerId };
 }
 
 /** Clear user session and redirect to login. Use on 401 or suspend. */

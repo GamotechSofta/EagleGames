@@ -1,14 +1,11 @@
 import Game from '../models/games/games.js';
-import { getPublicGameBaseUrl } from './gameLaunchUrl.js';
 
 /** Fields removed from old schema; strip only via `node scripts/migrateGamesUnsetLegacyFields.js` (not on startup). */
 export async function unsetLegacyGameSchemaFields() {
     try {
         const res = await Game.collection.updateMany(
             {
-                $or: [
-                    { launchMode: { $exists: true } },
-                ],
+                $or: [{ launchMode: { $exists: true } }],
             },
             { $unset: { launchMode: '' } }
         );
@@ -30,14 +27,6 @@ const ROULETTE_TILE_IMAGE =
 const LEGACY_ROULETTE_TILE_IMAGE =
     'https://res.cloudinary.com/dwwt5xdsz/image/upload/v1775804007/roulletGame_a719um.jpg';
 
-function inHouseLaunchUrls() {
-    const base = getPublicGameBaseUrl();
-    return {
-        ROULETTE: `${base}/games-static/roulette/index.html?player={playerId}`,
-        FUNTIMER: `${base}/games-static/funtimer/index.html?player={playerId}`,
-    };
-}
-
 const DEFAULT_GAMES = [
     {
         name: 'Aviator',
@@ -54,7 +43,7 @@ const DEFAULT_GAMES = [
         gameCode: 'FUNTIMER',
         image: FUNTIMER_TILE_IMAGE,
         category: 'arcade',
-        provider: 'in-house',
+        provider: 'partner',
         launchUrl: '',
         embedAllowed: true,
         isActive: true,
@@ -65,7 +54,7 @@ const DEFAULT_GAMES = [
         gameCode: 'ROULETTE',
         image: ROULETTE_TILE_IMAGE,
         category: 'casino',
-        provider: 'in-house',
+        provider: 'partner',
         launchUrl: '',
         embedAllowed: true,
         isActive: true,
@@ -93,28 +82,18 @@ async function migrateRouletteTileImageIfLegacy() {
     }
 }
 
-/** Ensure ROULETTE / FUNTIMER have in-house launchUrl (partner optional for those titles). */
-async function syncInHouseLaunchUrls() {
-    const urls = inHouseLaunchUrls();
-    for (const [gameCode, launchUrl] of Object.entries(urls)) {
-        const res = await Game.updateOne(
-            { gameCode },
-            {
-                $set: {
-                    launchUrl,
-                    embedAllowed: true,
-                    provider: 'in-house',
-                },
-            }
-        );
-        if (res.matchedCount === 0) {
-            const doc = DEFAULT_GAMES.find((g) => g.gameCode === gameCode);
-            if (doc) {
-                await Game.create({ ...doc, launchUrl });
-            }
+/** Remove in-house static launchUrl; all games launch via GAME_LAUNCH_URL partner API. */
+async function clearInHouseLaunchUrls() {
+    const res = await Game.updateMany(
+        { gameCode: { $in: ['ROULETTE', 'FUNTIMER', 'AVIATOR'] } },
+        {
+            $set: { provider: 'partner' },
+            $unset: { launchUrl: '' },
         }
+    );
+    if (res.modifiedCount > 0) {
+        console.log(`[games] Cleared in-house launchUrl on ${res.modifiedCount} game(s).`);
     }
-    console.log('[games] Synced in-house launchUrl for ROULETTE and FUNTIMER.');
 }
 
 export async function ensureDefaultGames() {
@@ -126,16 +105,14 @@ export async function ensureDefaultGames() {
         for (const doc of DEFAULT_GAMES) {
             const exists = await Game.exists({ gameCode: doc.gameCode });
             if (!exists) {
-                const urls = inHouseLaunchUrls();
-                const launchUrl = urls[doc.gameCode] || doc.launchUrl || '';
-                await Game.create({ ...doc, launchUrl });
+                await Game.create({ ...doc });
                 added += 1;
             }
         }
         if (added > 0) {
             console.log(`[games] Inserted ${added} missing default game(s).`);
         }
-        await syncInHouseLaunchUrls();
+        await clearInHouseLaunchUrls();
         await migrateRouletteTileImageIfLegacy();
         await migrateFunTimerTileImageIfLegacy();
 

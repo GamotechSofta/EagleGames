@@ -1,3 +1,7 @@
+/**
+ * Player game history reads GameBetHistory (UI cache). Backfill rebuilds from WalletTransaction.
+ * Money / revenue: always WalletTransaction — see gameWiseRevenueService.
+ */
 import { WalletTransaction } from '../models/wallet/wallet.js';
 import RouletteGame from '../models/rouletteGame/rouletteGame.js';
 import Game from '../models/games/games.js';
@@ -37,10 +41,16 @@ const resolveGameName = (gameCode, nameMap) => {
     return prettifyGameCode(code) || 'Game';
 };
 
-/** Partner wallet debits/credits (legacy reconstruction). */
+const isFunTimerGame = (gameRaw) => {
+    const g = String(gameRaw || '').toLowerCase().replace(/\s+/g, '');
+    return g.includes('funtimer') || g.includes('fun_timer');
+};
+
+/** Partner wallet debits/credits (legacy reconstruction). FunTimer: one row per roundId. */
 const historyFromWalletTransactions = (transactions, nameMap) => {
     const debits = [];
     const creditsByRound = new Map();
+    const funTimerDebitsByRound = new Map();
 
     for (const tx of transactions || []) {
         const desc = String(tx?.description || '');
@@ -48,14 +58,33 @@ const historyFromWalletTransactions = (transactions, nameMap) => {
         if (descLower.startsWith('generic debit')) {
             const meta = parsePipeKv(desc);
             const roundKey = (meta.roundId || '').trim() || String(tx._id);
-            debits.push({
+            const game = (meta.game || '').trim();
+            const row = {
                 roundKey,
                 amount: Number(tx.amount) || 0,
-                game: (meta.game || '').trim(),
+                game,
                 betNumber: (meta.betNumber || '').trim(),
                 createdAt: tx.createdAt,
                 debitId: String(tx._id),
-            });
+            };
+            if (isFunTimerGame(game)) {
+                const prev = funTimerDebitsByRound.get(roundKey) || {
+                    roundKey,
+                    amount: 0,
+                    game,
+                    betNumbers: [],
+                    createdAt: tx.createdAt,
+                    debitId: String(tx._id),
+                };
+                prev.amount += row.amount;
+                if (row.betNumber) prev.betNumbers.push(row.betNumber);
+                if (new Date(row.createdAt) < new Date(prev.createdAt)) {
+                    prev.createdAt = row.createdAt;
+                }
+                funTimerDebitsByRound.set(roundKey, prev);
+            } else {
+                debits.push(row);
+            }
         } else if (descLower.startsWith('generic credit')) {
             const meta = parsePipeKv(desc);
             const roundKey = (meta.roundId || '').trim();
@@ -65,25 +94,34 @@ const historyFromWalletTransactions = (transactions, nameMap) => {
         }
     }
 
-    return debits.map((d) => {
+    const mapDebitToEntry = (d) => {
         const payout = creditsByRound.get(d.roundKey) || 0;
         const betAmount = d.amount;
         const status = payout > 0 ? 'won' : 'lost';
-        const gameCode = d.game.toUpperCase();
+        const gameCode = String(d.game || '').trim().toUpperCase() || 'GAME';
+        const betNumber =
+            Array.isArray(d.betNumbers) && d.betNumbers.length
+                ? d.betNumbers.join(',')
+                : d.betNumber || null;
         return {
             betId: d.roundKey,
             source: 'partner',
-            gameCode: gameCode || 'GAME',
+            gameCode,
             gameName: resolveGameName(gameCode, nameMap),
             betAmount,
             payout,
             status,
-            betNumber: d.betNumber || null,
+            betNumber,
             roundId: d.roundKey,
             createdAt: d.createdAt,
             debitTransactionId: d.debitId,
         };
-    });
+    };
+
+    return [
+        ...debits.map(mapDebitToEntry),
+        ...[...funTimerDebitsByRound.values()].map(mapDebitToEntry),
+    ];
 };
 
 /** In-house roulette spins (legacy reconstruction). */

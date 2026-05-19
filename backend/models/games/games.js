@@ -21,7 +21,6 @@ const gameSchema = new mongoose.Schema(
             type: String,
             default: '',
             trim: true,
-            uppercase: true,
         },
 
         image: {

@@ -2,11 +2,12 @@ import Game from '../models/games/games.js';
 import axios from 'axios';
 import dotenv from 'dotenv';
 import { getPlayerGameBetHistory, getAdminGameBetHistory } from '../services/gameBetHistoryService.js';
+import { isHttpUrl, resolveDefaultGameReturnUrl } from '../utils/gameLaunchUrl.js';
 import {
-    isHttpUrl,
-    renderLaunchUrlTemplate,
-    resolveDirectLaunchTemplate,
-} from '../utils/gameLaunchUrl.js';
+    hostRequiresEmbedProxy,
+    signEmbedSessionToken,
+    buildEmbedProxyPath,
+} from '../utils/gameEmbedFrame.js';
 
 dotenv.config();
 
@@ -110,8 +111,7 @@ const pickGamePayload = (body = {}) => {
     if (body.launchUrl !== undefined) payload.launchUrl = String(body.launchUrl).trim();
     if (body.embedAllowed !== undefined) payload.embedAllowed = toBoolean(body.embedAllowed);
     if (body.partnerGameCode !== undefined) {
-        const v = String(body.partnerGameCode).trim().toUpperCase();
-        payload.partnerGameCode = v;
+        payload.partnerGameCode = String(body.partnerGameCode).trim();
     }
     if (body.isActive !== undefined) payload.isActive = toBoolean(body.isActive);
     if (body.order !== undefined) payload.order = Number(body.order);
@@ -143,12 +143,11 @@ export const getGames = async (req, res) => {
             query.isActive = { $ne: false };
         }
 
-        const games = await Game.find(query).sort({ order: 1, name: 1 }).lean();
-        const data = games.map((g) => ({
-            ...g,
-            launchUrl: resolveDirectLaunchTemplate(g.gameCode, g.launchUrl),
-        }));
-        return res.status(200).json({ success: true, data });
+        const games = await Game.find(query)
+            .select('-launchUrl')
+            .sort({ order: 1, name: 1 })
+            .lean();
+        return res.status(200).json({ success: true, data: games });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
     }
@@ -174,17 +173,15 @@ export const getGameByCode = async (req, res) => {
         const query = includeInactive
             ? { gameCode }
             : { gameCode, isActive: { $ne: false } };
-        const game = await Game.findOne(query).lean();
+        const game = await Game.findOne(query).select('-launchUrl').lean();
         if (!game) {
             return res.status(404).json({ success: false, message: 'Game not found' });
         }
 
+        const publicGame = game;
         return res.status(200).json({
             success: true,
-            data: {
-                ...game,
-                launchUrl: resolveDirectLaunchTemplate(game.gameCode, game.launchUrl),
-            },
+            data: publicGame,
         });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
@@ -263,11 +260,7 @@ export const deleteGame = async (req, res) => {
 export const launchGame = async (req, res) => {
     const routeGameCode = String(req.params.gameCode || '').trim().toUpperCase();
     try {
-        /**
-         * 1) Direct `launchUrl` on Game (or env fallback for ROULETTE/FUNTIMER/AVIATOR)
-         * 2) CraftDigital partner session launch when credentials are configured
-         * 3) 400 GAME_LAUNCH_NOT_CONFIGURED
-         */
+        /** Partner session launch via GAME_LAUNCH_URL (all catalog games). */
         const fromParams = routeGameCode;
         const fromBody =
             req.body?.gameCode != null ? String(req.body.gameCode).trim().toUpperCase() : '';
@@ -278,15 +271,26 @@ export const launchGame = async (req, res) => {
             });
         }
         const gameCode = fromParams || fromBody;
-        const externalPlayerId = String(
-            req.userId || req.body?.externalPlayerId || req.body?.playerId || ''
+        if (!req.userId) {
+            return res.status(401).json({
+                success: false,
+                message: 'Authentication required. Please log in.',
+                code: 'AUTH_REQUIRED',
+            });
+        }
+        const bodyPlayerId = String(
+            req.body?.externalPlayerId ?? req.body?.playerId ?? ''
         ).trim();
+        if (bodyPlayerId && bodyPlayerId !== String(req.userId)) {
+            return res.status(403).json({
+                success: false,
+                message: 'Player id in request does not match your session.',
+            });
+        }
+        const externalPlayerId = String(req.userId).trim();
 
         if (!gameCode) {
             return res.status(400).json({ success: false, message: 'gameCode is required' });
-        }
-        if (!externalPlayerId) {
-            return res.status(400).json({ success: false, message: 'externalPlayerId is required' });
         }
 
         const game = await Game.findOne({ gameCode, isActive: { $ne: false } }).lean();
@@ -299,43 +303,14 @@ export const launchGame = async (req, res) => {
         /** Code sent in partner payload: env map → Mongo `partnerGameCode` → catalog `gameCode`. */
         const partnerGameCode =
             getPartnerGameCodeFromEnvMap(gameCode)
-            || String(game.partnerGameCode || '').trim().toUpperCase()
+            || String(game.partnerGameCode || '').trim()
             || gameCode;
         const currency = String(req.body?.currency ?? process.env.CURRENCY ?? 'INR');
         const locale = String(req.body?.locale ?? 'en');
         const returnUrl =
             req.body && Object.prototype.hasOwnProperty.call(req.body, 'returnUrl')
-                ? String(req.body.returnUrl)
-                : (process.env.GAME_RETURN_URL !== undefined
-                    ? String(process.env.GAME_RETURN_URL)
-                    : '');
-
-        const templateReplacements = {
-            playerId: externalPlayerId,
-            externalPlayerId,
-            gameCode: String(game.gameCode),
-            partnerCode: String(partnerGameCode),
-            currency,
-            locale,
-        };
-
-        const directTemplate = resolveDirectLaunchTemplate(game.gameCode, game.launchUrl)?.trim();
-        if (directTemplate) {
-            const launchUrl = renderLaunchUrlTemplate(directTemplate, templateReplacements);
-            if (!isHttpUrl(launchUrl)) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Configured launchUrl must resolve to an http(s) URL after placeholders',
-                });
-            }
-            return res.status(200).json({
-                success: true,
-                gameCode: game.gameCode,
-                launchUrl: launchUrl.trim(),
-                source: 'direct',
-                embedAllowed,
-            });
-        }
+                ? String(req.body.returnUrl).trim()
+                : resolveDefaultGameReturnUrl();
 
         const { apiKey, apiSecret } = getLaunchApiCredentials();
         if (!apiKey || !apiSecret) {
@@ -343,7 +318,7 @@ export const launchGame = async (req, res) => {
                 success: false,
                 code: 'GAME_LAUNCH_NOT_CONFIGURED',
                 message:
-                    'This game has no launchUrl. Set launchUrl on the Game document, or configure GAME_LAUNCH_API_KEY and GAME_LAUNCH_API_SECRET for partner launch.',
+                    'Partner game launch is not configured. Set GAME_LAUNCH_URL, GAME_LAUNCH_API_KEY, and GAME_LAUNCH_API_SECRET in backend/.env.',
             });
         }
 
@@ -362,7 +337,8 @@ export const launchGame = async (req, res) => {
             'x-api-secret': apiSecret,
         };
         if (String(process.env.GAME_LAUNCH_BEARER || '').trim() === '1') {
-            const partnerToken = String(process.env.PARTNER_TOKEN || '').trim();
+            const rawToken = String(process.env.PARTNER_TOKEN || '').trim();
+            const partnerToken = rawToken.includes(',') ? rawToken.split(',')[0].trim() : rawToken;
             if (partnerToken) headers.Authorization = `Bearer ${partnerToken}`;
         }
 
@@ -383,7 +359,7 @@ export const launchGame = async (req, res) => {
         }
 
         const launchUrl = extractLaunchUrl(partnerBody);
-        if (!launchUrl) {
+        if (!launchUrl || !isHttpUrl(launchUrl)) {
             return res.status(502).json({
                 success: false,
                 message:
@@ -396,12 +372,27 @@ export const launchGame = async (req, res) => {
             });
         }
 
+        const trimmedLaunch = String(launchUrl).trim();
+        const partnerEmbedAllowed = deriveEmbedAllowed(partnerBody);
+        const useEmbedProxy = hostRequiresEmbedProxy(trimmedLaunch);
+        let embedUrl = trimmedLaunch;
+        let embedSessionToken = null;
+
+        if (useEmbedProxy) {
+            embedSessionToken = signEmbedSessionToken(externalPlayerId, trimmedLaunch);
+            embedUrl = buildEmbedProxyPath(trimmedLaunch, embedSessionToken);
+        }
+
         return res.status(200).json({
             success: true,
             gameCode,
-            launchUrl,
+            gameName: game.name,
+            launchUrl: trimmedLaunch,
+            embedUrl,
+            useEmbedProxy,
+            embedSessionToken,
             source: 'partner',
-            embedAllowed: deriveEmbedAllowed(partnerBody),
+            embedAllowed: useEmbedProxy ? true : partnerEmbedAllowed,
             data: partnerBody,
         });
     } catch (error) {
@@ -417,7 +408,7 @@ export const launchGame = async (req, res) => {
         let message = partnerError?.message || error.message || 'Game launch failed';
         if (partnerStatus === 401) {
             message =
-                'Partner API authentication failed (401). Check GAME_LAUNCH_API_KEY and GAME_LAUNCH_API_SECRET in backend/.env, or set launchUrl on this game for direct play.';
+                'Partner API authentication failed (401). Check GAME_LAUNCH_API_KEY and GAME_LAUNCH_API_SECRET in backend/.env.';
         } else if (partnerStatus === 403) {
             message =
                 'Partner API denied access (403). Verify your tenant is allowed to launch this game code.';

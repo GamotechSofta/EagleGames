@@ -6,6 +6,7 @@ import Market from '../models/market/market.js';
 import Admin from '../models/admin/admin.js';
 
 import { Wallet } from '../models/wallet/wallet.js';
+import { aggregateGameWiseRevenue } from '../services/gameWiseRevenueService.js';
 import HelpDesk from '../models/helpDesk/helpDesk.js';
 import { getBookieUserIds } from '../utils/bookieFilter.js';
 import { isBettingClosed } from '../utils/marketTiming.js';
@@ -231,6 +232,13 @@ export const getDashboardStats = async (req, res) => {
 
         const bookies = { total: bookiesTotal || 0, active: bookiesActive || 0 };
 
+        const gameRevenueOpts = {
+            userIds: bookieUserIds !== null ? bookieUserIds : null,
+            start: rangeStart,
+            end: rangeEnd,
+        };
+        const { gameWiseRevenue, gamesTotal } = await aggregateGameWiseRevenue(gameRevenueOpts);
+
         const revenue = totalRevenue[0]?.total || 0;
         const payouts = totalPayouts[0]?.total || 0;
         const netProfit = revenue - payouts;
@@ -308,6 +316,8 @@ export const getDashboardStats = async (req, res) => {
                 marketsPendingResult,
                 marketsPendingResultList,
                 marketWise,
+                gameWiseRevenue,
+                gamesTotal,
             },
         });
     } catch (error) {

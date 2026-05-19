@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import connectDB from './config/db_Connection.js';
+import { validateProductionEnv } from './config/validateEnv.js';
 import marketRoutes from './routes/market/marketRoutes.js';
 import adminRoutes from './routes/admin/adminRoutes.js';
 import bookieRoutes from './routes/bookie/bookieRoutes.js';
@@ -32,15 +33,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.join(__dirname, '.env') });
+validateProductionEnv();
+
 const app = express();
 const PORT = process.env.PORT || 3010;
 
-connectDB();
-
 app.set('trust proxy', 1);
-
-// In-house mini-games (inline scripts) — before helmet so CSP does not block scripts / iframe embed
-app.use('/games-static', express.static(path.join(__dirname, 'public/games')));
 
 app.use(helmet());
 
@@ -144,8 +142,15 @@ app.use('/api/v1/partner/wallet', genericWalletRoutes);
 /** Partner mock wallet contract: POST /wallet/balance|debit|credit (Bearer PARTNER_TOKEN, default partner-token) */
 app.use('/wallet', mockWalletRoutes);
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    // Start the midnight reset scheduler
-    startMidnightResetScheduler();
+const startServer = async () => {
+    await connectDB();
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+        startMidnightResetScheduler();
+    });
+};
+
+startServer().catch((err) => {
+    console.error('Failed to start server:', err);
+    process.exit(1);
 });
