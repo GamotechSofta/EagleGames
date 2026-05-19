@@ -63,7 +63,7 @@ const Section1 = () => {
           return {
             ...market,
             id: market._id,
-            gameName: getMarketDisplayName(market, language),
+            gameName: getMarketDisplayName(market, language, t),
             timeRange: `${formatTime(market.startingTime)} - ${formatTime(market.closingTime)}`,
             result: market.displayResult || '***-**-***',
             status: st.status,
@@ -89,7 +89,7 @@ const Section1 = () => {
     fetchMarkets();
     const dataInterval = setInterval(fetchMarkets, 30000);
     return () => clearInterval(dataInterval);
-  }, [language]);
+  }, [language, t]);
 
   useRefreshOnMarketReset(fetchMarkets);
 

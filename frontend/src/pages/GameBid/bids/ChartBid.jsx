@@ -256,7 +256,7 @@ const ChartBid = ({ market, title }) => {
                 <div className="flex flex-col md:flex-row gap-4 sm:gap-5 items-stretch md:items-start">
                     <div className="flex flex-col gap-3 w-full md:w-1/2 shrink-0 min-w-0">
                         <div>
-                            <div className="block text-[11px] sm:text-xs font-semibold text-gray-400 mb-2">Select Chart</div>
+                            <div className="block text-[11px] sm:text-xs font-semibold text-gray-400 mb-2">{bid.selectChart}</div>
                             <div className="grid grid-cols-3 sm:grid-cols-3 gap-2">
                                 {CHART_OPTIONS.map((ch) => {
                                     const selected = selectedChart === ch;
@@ -280,7 +280,7 @@ const ChartBid = ({ market, title }) => {
                         </div>
 
                         <div>
-                            <div className="block text-[11px] sm:text-xs font-semibold text-gray-400 mb-2">Select Digit</div>
+                            <div className="block text-[11px] sm:text-xs font-semibold text-gray-400 mb-2">{bid.selectDigit}</div>
                             <div className="grid grid-cols-5 gap-2">
                                 {DIGIT_ORDER.map((d) => {
                                     const ds = String(d);
@@ -305,13 +305,13 @@ const ChartBid = ({ market, title }) => {
                         </div>
 
                         <div className="flex flex-wrap items-center gap-2">
-                            <label className="shrink-0 w-20 sm:w-24 text-xs sm:text-sm font-semibold text-gray-300">Points</label>
+                            <label className="shrink-0 w-20 sm:w-24 text-xs sm:text-sm font-semibold text-gray-300">{bid.points}</label>
                             <input
                                 type="text"
                                 inputMode="numeric"
                                 value={pointsInput}
                                 onChange={(e) => setPointsInput((e.target.value ?? '').replace(/\D/g, '').slice(0, 6))}
-                                placeholder="Points"
+                                placeholder={bid.points}
                                 className="flex-1 min-w-[100px] min-h-[40px] h-10 sm:h-11 bg-[#111827] border border-[#374151] rounded-lg px-3 text-sm sm:text-base font-semibold text-white"
                             />
                             <button
@@ -319,7 +319,7 @@ const ChartBid = ({ market, title }) => {
                                 onClick={clearPointsOnly}
                                 className="min-h-[40px] h-10 px-4 rounded-md text-[11px] sm:text-xs font-semibold border-2 border-[#1a74e5]/30 text-white bg-[#111827] hover:bg-[#1a74e5]/5 active:scale-[0.98] transition-all shrink-0"
                             >
-                                Clear
+                                {bid.clear}
                             </button>
                         </div>
 
@@ -352,14 +352,14 @@ const ChartBid = ({ market, title }) => {
                                 onClick={handleAddRow}
                                 className="flex-1 min-h-[40px] h-10 py-2.5 rounded-lg bg-[#1a74e5] text-white font-semibold text-sm sm:text-base"
                             >
-                                Add to list
+                                {bid.addToList}
                             </button>
                             <button
                                 type="button"
                                 onClick={clearForm}
                                 className="min-h-[40px] h-10 px-4 rounded-lg border-2 border-[#374151] text-gray-200 font-semibold text-sm"
                             >
-                                Reset
+                                {bid.reset}
                             </button>
                         </div>
 
@@ -379,15 +379,15 @@ const ChartBid = ({ market, title }) => {
 
                     <div className="w-full md:w-1/2 flex-1 min-w-0">
                         <div className="grid grid-cols-4 gap-1 sm:gap-2 text-center text-white font-bold text-xs sm:text-sm mb-2 px-1">
-                            <div>Selection</div>
-                            <div>Point</div>
-                            <div>Type</div>
-                            <div>Delete</div>
+                            <div>{bid.selection}</div>
+                            <div>{bid.point}</div>
+                            <div>{bid.type}</div>
+                            <div>{bid.delete}</div>
                         </div>
                         <div className="h-px bg-[#1a74e5] w-full mb-2" />
                         <div className="max-h-[520px] sm:max-h-[560px] overflow-y-auto space-y-2 pr-0.5">
                             {generatedRows.length === 0 ? (
-                                <div className="py-6 text-center text-gray-400 text-sm">Add chart + digit + points</div>
+                                <div className="py-6 text-center text-gray-400 text-sm">{bid.chartEmptyHint}</div>
                             ) : (
                                 generatedRows.map((row) => (
                                     <div
@@ -404,13 +404,13 @@ const ChartBid = ({ market, title }) => {
                                                 className="w-full h-8 rounded-lg border border-[#374151] text-center font-bold text-white text-sm focus:outline-none focus:border-[#1a74e5]"
                                             />
                                         </div>
-                                        <div className="text-sm font-semibold text-white">Single</div>
+                                        <div className="text-sm font-semibold text-white">{bid.betTypeSingle}</div>
                                         <div className="flex justify-center">
                                             <button
                                                 type="button"
                                                 onClick={() => removeRow(row.id)}
                                                 className="p-2 text-red-500 hover:text-red-600 active:scale-95"
-                                                aria-label="Delete"
+                                                aria-label={bid.delete}
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -431,7 +431,7 @@ const ChartBid = ({ market, title }) => {
                 onSubmit={handleSubmitBet}
                 marketTitle={marketTitle}
                 dateText={dateText}
-                labelKey="Chart Game"
+                labelKey="bid_columnChartGame"
                 rows={reviewRows}
                 walletBefore={walletBefore}
                 totalBids={reviewRows.length}

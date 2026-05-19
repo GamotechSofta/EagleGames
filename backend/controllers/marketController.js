@@ -21,6 +21,7 @@ import {
 import { ensureResultsResetForNewDay } from '../utils/resultReset.js';
 import { getRatesMap } from '../models/rate/rate.js';
 import bcrypt from 'bcryptjs';
+import { resolveMarketLocalesForSave } from '../utils/autoMarketLocales.js';
 
 /** Normalize API/lang header to a supported ISO639-1 code. */
 function normalizeMarketLang(langRaw) {
@@ -127,19 +128,7 @@ const upsertMarketResultSnapshot = async (marketDoc, dateKey) => {
  */
 export const createMarket = async (req, res) => {
     try {
-        const {
-            marketName,
-            marketNameHi,
-            marketNameMr,
-            marketNameTe,
-            marketNameTa,
-            marketNameKn,
-            marketNameMl,
-            startingTime,
-            closingTime,
-            betClosureTime,
-            marketType,
-        } = req.body;
+        const { marketName, startingTime, closingTime, betClosureTime, marketType } = req.body;
         if (!marketName || !startingTime || !closingTime) {
             return res.status(400).json({
                 success: false,
@@ -148,13 +137,12 @@ export const createMarket = async (req, res) => {
         }
         const betClosureSec = betClosureTime != null && betClosureTime !== '' ? Number(betClosureTime) : null;
         const payload = { marketName, startingTime, closingTime, betClosureTime: betClosureSec, marketType: 'main' };
-        const optName = (v) => (v !== undefined ? (v && String(v).trim() ? String(v).trim() : null) : undefined);
-        if (marketNameHi !== undefined) payload.marketNameHi = optName(marketNameHi);
-        if (marketNameMr !== undefined) payload.marketNameMr = optName(marketNameMr);
-        if (marketNameTe !== undefined) payload.marketNameTe = optName(marketNameTe);
-        if (marketNameTa !== undefined) payload.marketNameTa = optName(marketNameTa);
-        if (marketNameKn !== undefined) payload.marketNameKn = optName(marketNameKn);
-        if (marketNameMl !== undefined) payload.marketNameMl = optName(marketNameMl);
+        const localePatch = await resolveMarketLocalesForSave({
+            body: req.body,
+            finalEnglishName: String(marketName).trim(),
+            existingMarket: null,
+        });
+        Object.assign(payload, localePatch);
         const market = new Market(payload);
         await market.save();
 
@@ -277,32 +265,36 @@ export const updateMarket = async (req, res) => {
         if (!existing) {
             return res.status(404).json({ success: false, message: 'Market not found' });
         }
-        const {
-            marketName,
-            marketNameHi,
-            marketNameMr,
-            marketNameTe,
-            marketNameTa,
-            marketNameKn,
-            marketNameMl,
-            startingTime,
-            closingTime,
-            betClosureTime,
-            marketType,
-        } = req.body;
+        const { marketName, startingTime, closingTime, betClosureTime, marketType } = req.body;
         const updates = {};
-        const optName = (v) => (v !== undefined ? (v && String(v).trim() ? String(v).trim() : null) : undefined);
         if (marketName !== undefined) updates.marketName = marketName;
-        if (marketNameHi !== undefined) updates.marketNameHi = optName(marketNameHi);
-        if (marketNameMr !== undefined) updates.marketNameMr = optName(marketNameMr);
-        if (marketNameTe !== undefined) updates.marketNameTe = optName(marketNameTe);
-        if (marketNameTa !== undefined) updates.marketNameTa = optName(marketNameTa);
-        if (marketNameKn !== undefined) updates.marketNameKn = optName(marketNameKn);
-        if (marketNameMl !== undefined) updates.marketNameMl = optName(marketNameMl);
         if (startingTime !== undefined) updates.startingTime = startingTime;
         if (closingTime !== undefined) updates.closingTime = closingTime;
         if (betClosureTime !== undefined) updates.betClosureTime = betClosureTime != null && betClosureTime !== '' ? Number(betClosureTime) : null;
         if (marketType !== undefined) updates.marketType = 'main';
+
+        const localeFields = [
+            'marketNameHi',
+            'marketNameMr',
+            'marketNameTe',
+            'marketNameTa',
+            'marketNameKn',
+            'marketNameMl',
+        ];
+        const anyLocaleInBody = localeFields.some((k) => Object.prototype.hasOwnProperty.call(req.body, k));
+        const shouldResolveLocales = marketName !== undefined || anyLocaleInBody;
+        if (shouldResolveLocales) {
+            const finalEnglishName =
+                updates.marketName !== undefined
+                    ? String(updates.marketName || '').trim()
+                    : String(existing.marketName || '').trim();
+            const localePatch = await resolveMarketLocalesForSave({
+                body: req.body,
+                finalEnglishName,
+                existingMarket: existing,
+            });
+            Object.assign(updates, localePatch);
+        }
 
         const market = await Market.findByIdAndUpdate(
             id,

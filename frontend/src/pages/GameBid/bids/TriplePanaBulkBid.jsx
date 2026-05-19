@@ -287,7 +287,7 @@ const TriplePanaBulkBid = ({ market, title }) => {
                                             onClick={clearAll}
                                             className="px-4 min-h-[40px] rounded-xl border-2 border-[#374151] bg-[#111827] text-white text-sm font-medium hover:border-[#1a74e5] active:scale-95"
                                         >
-                                            Clear
+                                            {bid.clear}
                                         </button>
                                     </div>
                                 </div>
@@ -304,7 +304,7 @@ const TriplePanaBulkBid = ({ market, title }) => {
                             </div>
                             <div className="grid grid-cols-2 gap-3 mb-5 sm:mb-6 md:grid-cols-2">
                                 <button type="button" onClick={handleAddBid} className="w-full bg-[#1a74e5] text-white font-bold py-3.5 min-h-[48px] rounded-lg shadow-md hover:bg-[#152842] transition-all active:scale-[0.98]">
-                                    Add to List
+                                    {bid.addToList}
                                 </button>
                                 <button type="button" disabled={!bids.length} onClick={() => bids.length && setIsReviewOpen(true)} className={submitBtnClass(!!bids.length)}>
                                     {bid.submitBet}

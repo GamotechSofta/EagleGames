@@ -1005,7 +1005,7 @@ const EasyModeBid = ({
                                             onClick={handleAddBid}
                                             className="w-full bg-[#1a74e5] text-white font-bold py-3.5 min-h-[48px] rounded-lg shadow-md hover:bg-[#152842] transition-all active:scale-[0.98]"
                                         >
-                                            Add to List
+                                            {t('bid_addToList')}
                                         </button>
                                         <button
                                             type="button"
@@ -1022,7 +1022,7 @@ const EasyModeBid = ({
                                         onClick={handleAddBid}
                                         className="w-full bg-[#1a74e5] text-white font-bold py-3.5 min-h-[48px] rounded-lg shadow-md hover:bg-[#152842] transition-all active:scale-[0.98] mb-5 sm:mb-6"
                                     >
-                                        Add to List
+                                        {t('bid_addToList')}
                                     </button>
                                 )}
 

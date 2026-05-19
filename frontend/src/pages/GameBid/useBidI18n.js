@@ -57,6 +57,14 @@ export function useBidI18n() {
             columnDigit: t('bid_columnDigit'),
             columnJodi: t('bid_columnJodi'),
             columnSangam: t('bid_columnSangam'),
+            addToList: t('bid_addToList'),
+            reset: t('bid_reset'),
+            selection: t('bid_selection'),
+            chartEmptyHint: t('bid_chartEmptyHint'),
+            betTypeSingle: t('bid_betTypeSingle'),
+            selectChart: t('bid_selectChart'),
+            selectDigit: t('bid_selectDigit'),
+            columnChartGame: t('bid_columnChartGame'),
         }),
         [t]
     );

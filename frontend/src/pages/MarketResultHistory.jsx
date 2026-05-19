@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../config/api';
 import ResultDatePicker from '../components/ResultDatePicker';
 import { useRefreshOnMarketReset } from '../hooks/useRefreshOnMarketReset';
+import { useLanguage } from '../context/LanguageContext';
+import { getMarketDisplayName } from '../utils/marketDisplayName';
 
 const toDateKeyIST = (d) => {
   try {
@@ -27,6 +29,7 @@ const formatDateLabel = (d) => {
 
 const MarketResultHistory = () => {
   const navigate = useNavigate();
+  const { language, t } = useLanguage();
   const [results, setResults] = useState([]);
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const todayKey = useMemo(() => toDateKeyIST(new Date()), []);
@@ -67,12 +70,12 @@ const MarketResultHistory = () => {
     const list = Array.isArray(results) ? results : [];
     const mapped = list.map((x) => ({
       id: x?._id || `${x?.marketId || ''}-${x?.dateKey || ''}`,
-      name: (x?.marketName || '').toString().trim(),
+      name: getMarketDisplayName({ marketName: (x?.marketName || '').toString().trim() }, language, t) || (x?.marketName || '').toString().trim(),
       result: (x?.displayResult || '***-**-***').toString().trim(),
     }));
     mapped.sort((a, b) => a.name.localeCompare(b.name));
     return mapped.filter((x) => x.name);
-  }, [results]);
+  }, [results, language, t]);
 
   return (
     <div className="min-h-screen bg-[#374151] text-white px-3 sm:px-4 pt-3 pb-28">

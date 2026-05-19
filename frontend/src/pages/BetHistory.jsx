@@ -167,7 +167,7 @@ const evaluateBet = ({ market, betNumberRaw, amount, session, ratesMap }) => {
 };
 
 const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const navigate = useNavigate();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedSessions, setSelectedSessions] = useState([]); // ['OPEN','CLOSE']
@@ -327,10 +327,10 @@ const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
     return uniq.map((englishLabel) => {
       const key = normalizeMarketName(englishLabel);
       const m = marketByName.get(key);
-      const label = m ? getMarketDisplayName(m, language) : englishLabel;
+      const label = m ? getMarketDisplayName(m, language, t) : getMarketDisplayName({ marketName: englishLabel }, language, t) || englishLabel;
       return { label, key };
     });
-  }, [markets, bets, language, marketByName, scope]);
+  }, [markets, bets, language, t, marketByName, scope]);
 
   const enriched = useMemo(() => {
     return flat.map(({ x, r, idx }) => {
@@ -339,7 +339,9 @@ const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
       const marketTitle = (x?.marketTitle || '').toString().trim() || 'MARKET';
       const key = normalizeMarketName(marketTitle);
       const fromList = marketByName.get(key);
-      const marketDisplayTitle = fromList ? getMarketDisplayName(fromList, language) : marketTitle;
+      const marketDisplayTitle = fromList
+        ? getMarketDisplayName(fromList, language, t)
+        : getMarketDisplayName({ marketName: marketTitle }, language, t) || marketTitle;
       const fromBet = x?.marketFromBet;
       const mergedMarket = {
         openingNumber: fromList?.openingNumber ?? fromBet?.openingNumber,
@@ -362,7 +364,7 @@ const BetHistory = ({ pageTitle = 'Bet History', marketScope = null } = {}) => {
 
       return { x, r, idx, points, session, marketTitle, marketDisplayTitle, computedVerdict: computed, verdict: finalVerdict };
     });
-  }, [flat, marketByName, ratesMap, language]);
+  }, [flat, marketByName, ratesMap, language, t]);
 
   const filtered = useMemo(() => {
     return (enriched || []).filter((row) => {

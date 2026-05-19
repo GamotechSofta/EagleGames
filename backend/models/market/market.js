@@ -40,7 +40,7 @@ const marketSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
-    /** Hindi display name for the market (editable, not auto-translated). */
+    /** Hindi display name (optional). Filled from catalog / Lingva on create when omitted. */
     marketNameHi: {
         type: String,
         default: null,

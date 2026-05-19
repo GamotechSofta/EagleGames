@@ -180,7 +180,7 @@ const evaluateBet = ({ market, betNumberRaw, amount, session, ratesMap }) => {
 };
 
 const Bids = () => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -545,7 +545,9 @@ const Bids = () => {
       const market = (b?.marketId?.marketName || '').toString().trim() || 'MARKET';
       const marketKey = normalizeMarketName(market);
       const fromList = marketByName.get(marketKey);
-      const marketDisplay = fromList ? getMarketDisplayName(fromList, language) : market;
+      const marketDisplay = fromList
+        ? getMarketDisplayName(fromList, language, t)
+        : getMarketDisplayName({ marketName: market }, language, t) || market;
       const fromBet = typeof b?.marketId === 'object' && b.marketId ? b.marketId : null;
       const mergedMarket = {
         openingNumber: fromList?.openingNumber ?? fromBet?.openingNumber,
@@ -584,7 +586,7 @@ const Bids = () => {
         statusLabel,
       };
     });
-  }, [apiBets, marketByName, ratesMap, language]);
+  }, [apiBets, marketByName, ratesMap, language, t]);
 
   const marketOptions = useMemo(() => {
     const fromApi = (markets || [])
@@ -604,10 +606,10 @@ const Bids = () => {
     return uniq.map((englishLabel) => {
       const key = normalizeMarketName(englishLabel);
       const m = marketByName.get(key);
-      const label = m ? getMarketDisplayName(m, language) : englishLabel;
+      const label = m ? getMarketDisplayName(m, language, t) : getMarketDisplayName({ marketName: englishLabel }, language, t) || englishLabel;
       return { label, key };
     });
-  }, [markets, desktopRows, isAnyHistoryPanel, historyScope, marketByName, language]);
+  }, [markets, desktopRows, isAnyHistoryPanel, historyScope, marketByName, language, t]);
 
   const filteredDesktopRows = useMemo(() => {
     const effectiveSelectedMarkets = isAnyHistoryPanel

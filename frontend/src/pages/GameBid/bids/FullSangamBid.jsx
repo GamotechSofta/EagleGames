@@ -218,7 +218,7 @@ const FullSangamBid = ({ market, title }) => {
                                                 window.requestAnimationFrame(() => pointsInputRef.current?.focus?.());
                                             }
                                         }}
-                                        placeholder="Pana"
+                                        placeholder={bid.enterPana}
                                         maxLength={3}
                                         className={`flex-1 min-w-0 bg-[#111827] border-2 border-[#374151] text-white placeholder-gray-400 rounded-xl py-2.5 min-h-[40px] px-4 text-left text-sm focus:ring-2 focus:outline-none ${
                                             openPanaInvalid ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'focus:ring-[#1B3150] focus:border-[#1a74e5]'
@@ -237,7 +237,7 @@ const FullSangamBid = ({ market, title }) => {
                                             setClosePana(next);
                                             setClosePanaInvalid(!!next && next.length === 3 && !isValidAnyPana(next));
                                         }}
-                                        placeholder="Pana"
+                                        placeholder={bid.enterPana}
                                         maxLength={3}
                                         className={`flex-1 min-w-0 bg-[#111827] border-2 border-[#374151] text-white placeholder-gray-400 rounded-xl py-2.5 min-h-[40px] px-4 text-left text-sm focus:ring-2 focus:outline-none ${
                                             closePanaInvalid ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'focus:ring-[#1B3150] focus:border-[#1a74e5]'
@@ -254,7 +254,7 @@ const FullSangamBid = ({ market, title }) => {
                                             inputMode="numeric"
                                             value={points}
                                             onChange={(e) => setPoints(sanitizePoints(e.target.value))}
-                                            placeholder="Points"
+                                            placeholder={bid.points}
                                             className="no-spinner w-full bg-[#111827] border-2 border-[#374151] text-white placeholder-gray-400 rounded-xl py-2.5 min-h-[40px] px-4 text-left text-sm focus:ring-2 focus:ring-[#1B3150] focus:border-[#1a74e5] focus:outline-none"
                                         />
                                         <button
@@ -262,7 +262,7 @@ const FullSangamBid = ({ market, title }) => {
                                             onClick={handleFormClear}
                                             className="px-4 min-h-[40px] rounded-xl border-2 border-[#374151] bg-[#111827] text-white text-sm font-medium hover:border-[#1a74e5] active:scale-95"
                                         >
-                                            Clear
+                                            {bid.clear}
                                         </button>
                                     </div>
                                 </div>
@@ -290,7 +290,7 @@ const FullSangamBid = ({ market, title }) => {
                                     onClick={handleAdd}
                                     className="w-full bg-[#1a74e5] text-white font-bold py-3.5 min-h-[48px] rounded-lg shadow-md hover:bg-[#152842] transition-all active:scale-[0.98]"
                                 >
-                                    Add to List
+                                    {bid.addToList}
                                 </button>
                                 <button type="button" onClick={openReview} disabled={!bids.length} className={submitBtnClass(!!bids.length)}>
                                     {bid.submitBet}
@@ -299,10 +299,10 @@ const FullSangamBid = ({ market, title }) => {
 
                             <div className="md:hidden">
                                 <div className="grid grid-cols-4 gap-1 sm:gap-2 text-center text-white font-bold text-xs sm:text-sm mb-2 px-1">
-                                    <div>Pana</div>
-                                    <div>Point</div>
-                                    <div>Type</div>
-                                    <div>Delete</div>
+                                    <div>{bid.columnPana}</div>
+                                    <div>{bid.point}</div>
+                                    <div>{bid.type}</div>
+                                    <div>{bid.delete}</div>
                                 </div>
                                 <div className="h-px bg-[#1a74e5] w-full mb-2" />
                                 <div className="space-y-2">
@@ -313,13 +313,15 @@ const FullSangamBid = ({ market, title }) => {
                                         >
                                             <div className="font-bold text-white">{b.number}</div>
                                             <div className="font-bold text-white">{b.points}</div>
-                                            <div className="text-sm text-gray-300">{b.type}</div>
+                                            <div className="text-sm text-gray-300">
+                                            {String(b.type || '').toUpperCase() === 'OPEN' ? bid.sessionOpen : bid.sessionClose}
+                                        </div>
                                             <div className="flex justify-center">
                                                 <button
                                                     type="button"
                                                     onClick={() => handleDelete(b.id)}
                                                     className="p-2 text-red-500 hover:text-red-600 active:scale-95"
-                                                    aria-label="Delete"
+                                                    aria-label={bid.delete}
                                                 >
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                         <path
@@ -338,10 +340,10 @@ const FullSangamBid = ({ market, title }) => {
 
                         <div className="hidden md:block">
                             <div className="grid grid-cols-4 gap-1 sm:gap-2 text-center text-white font-bold text-xs sm:text-sm mb-2 px-1">
-                                <div>Pana</div>
-                                <div>Point</div>
-                                <div>Type</div>
-                                <div>Delete</div>
+                                <div>{bid.columnPana}</div>
+                                <div>{bid.point}</div>
+                                <div>{bid.type}</div>
+                                <div>{bid.delete}</div>
                             </div>
                             <div className="h-px bg-[#1a74e5] w-full mb-2" />
                             <div className="space-y-2">
@@ -352,13 +354,15 @@ const FullSangamBid = ({ market, title }) => {
                                     >
                                         <div className="font-bold text-white">{b.number}</div>
                                         <div className="font-bold text-white">{b.points}</div>
-                                        <div className="text-sm text-gray-300">{b.type}</div>
+                                        <div className="text-sm text-gray-300">
+                                            {String(b.type || '').toUpperCase() === 'OPEN' ? bid.sessionOpen : bid.sessionClose}
+                                        </div>
                                         <div className="flex justify-center">
                                             <button
                                                 type="button"
                                                 onClick={() => handleDelete(b.id)}
                                                 className="p-2 text-red-500 hover:text-red-600 active:scale-95"
-                                                aria-label="Delete"
+                                                aria-label={bid.delete}
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                     <path
@@ -383,7 +387,7 @@ const FullSangamBid = ({ market, title }) => {
                 onSubmit={handleSubmitBet}
                 marketTitle={marketTitle}
                 dateText={dateText}
-                labelKey="Pana"
+                labelKey="bid_columnPana"
                 rows={bids}
                 walletBefore={walletBefore}
                 totalBids={bids.length}

@@ -261,7 +261,7 @@ const HalfSangamBBid = ({ market, title }) => {
                                 onClick={handleAdd}
                                 className="w-full bg-[#1a74e5] text-white font-bold py-3.5 min-h-[48px] rounded-lg shadow-md hover:bg-[#152842] transition-all active:scale-[0.98]"
                             >
-                                Add to List
+                                {bid.addToList}
                             </button>
 
                             <button

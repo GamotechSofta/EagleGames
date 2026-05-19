@@ -188,10 +188,10 @@ const HalfSangamBid = ({ market, title }) => {
     const easyBidsList = (
         <>
             <div className="grid grid-cols-4 gap-1 sm:gap-2 text-center text-white font-bold text-xs sm:text-sm mb-2 px-1">
-                <div>Pana</div>
-                <div>Point</div>
-                <div>Type</div>
-                <div>Delete</div>
+                <div>{bid.columnPana}</div>
+                <div>{bid.point}</div>
+                <div>{bid.type}</div>
+                <div>{bid.delete}</div>
             </div>
             <div className="h-px bg-[#1a74e5] w-full mb-2" />
             <div className="space-y-2">
@@ -208,7 +208,7 @@ const HalfSangamBid = ({ market, title }) => {
                                 type="button"
                                 onClick={() => handleDelete(bid.id)}
                                 className="p-2 text-red-500 hover:text-red-600 active:scale-95"
-                                aria-label="Delete"
+                                aria-label={bid.delete}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path
@@ -277,7 +277,7 @@ const HalfSangamBid = ({ market, title }) => {
                 onSubmit={handleSubmitBet}
                 marketTitle={marketTitle}
                 dateText={dateText}
-                labelKey="Pana"
+                labelKey="bid_columnPana"
                 rows={bids}
                 walletBefore={walletBefore}
                 totalBids={bids.length}
@@ -434,7 +434,7 @@ function HalfSangamEasyForm({
                         inputMode="numeric"
                         value={points}
                         onChange={(e) => setPoints(sanitizePoints(e.target.value))}
-                        placeholder="Points"
+                        placeholder={bid.points}
                         className={`no-spinner w-full bg-[#111827] border-2 border-[#374151] text-white placeholder-gray-400 rounded-xl py-2.5 min-h-[40px] px-4 text-left text-sm focus:ring-2 focus:ring-[#1B3150] focus:border-[#1a74e5] focus:outline-none`}
                     />
                     <button
@@ -467,7 +467,7 @@ function HalfSangamEasyForm({
                     onClick={handleAdd}
                     className="w-full bg-[#1a74e5] text-white font-bold py-3.5 min-h-[48px] rounded-lg shadow-md hover:bg-[#152842] transition-all active:scale-[0.98]"
                 >
-                    Add to List
+                    {bid.addToList}
                 </button>
                 <button type="button" disabled={!bidsLength} onClick={onSubmitClick} className={submitBtnClass(!!bidsLength)}>
                     {bid.submitBet}

@@ -1,5 +1,16 @@
 import { MARKET_DISPLAY_FALLBACK } from '../translations/marketNamesFallback';
 
+/** Maps English `marketName` to `player*.js` key `market_<slug>`. */
+export function marketNameToI18nKey(canonicalEn) {
+  const c = (canonicalEn || '').trim();
+  if (!c) return '';
+  const slug = c
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+  return slug ? `market_${slug}` : '';
+}
+
 function fallbackLabel(lang, canonicalEn) {
   const map = MARKET_DISPLAY_FALLBACK[lang];
   if (!map || !canonicalEn) return '';
@@ -12,9 +23,10 @@ function fallbackLabel(lang, canonicalEn) {
 
 /**
  * Localized market title for player UI (matches bookie `getMarketDisplayName`).
- * Uses admin `marketName*` fields, then API `name` (resolved for ?lang=), then optional UI fallback map.
+ * Uses admin `marketName*` fields, then API `name` (resolved for ?lang=), then optional `t` catalog keys `market_*`, then UI fallback map.
+ * @param {((key: string) => string) | undefined} t - optional `useLanguage().t` for client-side market name catalog.
  */
-export function getMarketDisplayName(market, language) {
+export function getMarketDisplayName(market, language, t) {
   if (!market) return '';
   const lang = (language || 'en').toString().toLowerCase().split('-')[0];
   const pick = (v) => (v != null && String(v).trim() ? String(v).trim() : '');
@@ -38,6 +50,15 @@ export function getMarketDisplayName(market, language) {
   // Backend applyLocalizedMarketFields sets `name` from ?lang= when DB has that locale.
   const resolved = pick(market.name);
   if (lang !== 'en' && resolved && canonical && resolved !== canonical) return resolved;
+
+  if (typeof t === 'function') {
+    const base = canonical || en;
+    const i18nKey = marketNameToI18nKey(base);
+    if (i18nKey) {
+      const translated = t(i18nKey);
+      if (translated && translated !== i18nKey) return translated;
+    }
+  }
 
   const fb = fallbackLabel(lang, canonical);
   if (fb) return fb;

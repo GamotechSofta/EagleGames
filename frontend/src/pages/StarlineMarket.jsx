@@ -131,7 +131,7 @@ const formatCountdown = (ms) => {
 const StarlineMarket = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const marketKey = (location.state?.marketKey || location.state?.key || '').toString().trim().toLowerCase();
   const marketLabel = (location.state?.marketLabel || location.state?.label || 'Starline').toString();
 
@@ -177,7 +177,7 @@ const StarlineMarket = () => {
             return {
               id: m._id,
               marketName: m.marketName || '',
-              displayLabel: getMarketDisplayName(m, language) || m.marketName || marketLabel,
+              displayLabel: getMarketDisplayName(m, language, t) || m.marketName || marketLabel,
               startingTime: st || null,
               closingTime: m.closingTime || m.startingTime || null,
               openingNumber: m.openingNumber || null,
@@ -196,7 +196,7 @@ const StarlineMarket = () => {
     };
     run();
     return () => { cancelled = true; };
-  }, [marketKey, marketLabel, language]);
+  }, [marketKey, marketLabel, language, t]);
 
   const title = marketLabel || 'Starline';
 

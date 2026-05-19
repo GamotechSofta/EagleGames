@@ -180,13 +180,13 @@ const BidOptions = () => {
   const { t, language } = useLanguage();
   const market = location.state?.market;
   const marketHeaderTitle = useMemo(
-    () => getMarketDisplayName(market, language) || market?.gameName || market?.marketName || '',
-    [market, language]
+    () => getMarketDisplayName(market, language, t) || market?.gameName || market?.marketName || '',
+    [market, language, t]
   );
   const marketType = (location.state?.marketType || '').toString().trim().toLowerCase();
   const inferredStarline = (() => {
-    const t = marketType;
-    if (t === 'starline' || t === 'startline' || t === 'star-line') return true;
+    const rawType = marketType;
+    if (rawType === 'starline' || rawType === 'startline' || rawType === 'star-line') return true;
     const mType = (market?.marketType || '').toString().trim().toLowerCase();
     if (mType === 'startline' || mType === 'starline') return true;
     const canonical = (market?.marketName || '').toString().toLowerCase();
