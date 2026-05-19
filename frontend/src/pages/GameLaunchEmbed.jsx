@@ -157,8 +157,13 @@ const GameLaunchEmbed = () => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
+            logoutOn401: false,
           }
         );
+        if (res.status === 401) {
+          if (!cancelled) setPhase('error');
+          return;
+        }
         const data = await res.json().catch(() => ({}));
         if (cancelled) return;
         const url =

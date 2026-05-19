@@ -41,12 +41,15 @@ export function clearUserSession() {
 }
 
 /**
- * Fetch with auth headers. On 401, clears session and redirects to login.
+ * Fetch with auth headers.
+ * On 401, clears session and redirects to login unless `logoutOn401: false`
+ * (use for game launch — partner errors must not be confused with JWT expiry).
  */
 export async function fetchWithAuth(url, options = {}) {
-  const headers = { ...getAuthHeaders(), ...(options.headers || {}) };
-  const res = await fetch(url, { ...options, headers });
-  if (res.status === 401) {
+  const { logoutOn401 = true, ...fetchOptions } = options;
+  const headers = { ...getAuthHeaders(), ...(fetchOptions.headers || {}) };
+  const res = await fetch(url, { ...fetchOptions, headers });
+  if (res.status === 401 && logoutOn401) {
     clearUserSession();
     return res;
   }

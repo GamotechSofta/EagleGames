@@ -39,6 +39,9 @@ connectDB();
 
 app.set('trust proxy', 1);
 
+// In-house mini-games (inline scripts) — before helmet so CSP does not block scripts / iframe embed
+app.use('/games-static', express.static(path.join(__dirname, 'public/games')));
+
 app.use(helmet());
 
 // CORS configuration

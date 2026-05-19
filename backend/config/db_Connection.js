@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { unsetLegacyGameSchemaFields, ensureDefaultGames } from '../utils/seedGames.js';
+import { ensureDefaultGames } from '../utils/seedGames.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,7 +14,6 @@ const connectDB = async () => {
     try {
         const conn = await mongoose.connect(MONGODB_URI);
         console.log(`MongoDB Connected: ${conn.connection.host}`);
-        await unsetLegacyGameSchemaFields();
         await ensureDefaultGames();
     } catch (error) {
         console.error('Error connecting to MongoDB:', error.message);

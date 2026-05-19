@@ -1,38 +1,42 @@
 import Game from '../models/games/games.js';
+import { getPublicGameBaseUrl } from './gameLaunchUrl.js';
 
-/** Fields removed from `games` schema; strip from existing documents (idempotent). */
+/** Fields removed from old schema; strip only via `node scripts/migrateGamesUnsetLegacyFields.js` (not on startup). */
 export async function unsetLegacyGameSchemaFields() {
     try {
         const res = await Game.collection.updateMany(
             {
                 $or: [
-                    { launchUrl: { $exists: true } },
-                    { partnerCode: { $exists: true } },
-                    { embedAllowed: { $exists: true } },
                     { launchMode: { $exists: true } },
                 ],
             },
-            { $unset: { launchUrl: '', partnerCode: '', embedAllowed: '', launchMode: '' } }
+            { $unset: { launchMode: '' } }
         );
         if (res.modifiedCount > 0) {
-            console.log(`[games] Removed legacy fields from ${res.modifiedCount} document(s).`);
+            console.log(`[games] Removed legacy launchMode from ${res.modifiedCount} document(s).`);
         }
     } catch (err) {
         console.error('[games] Legacy field $unset failed:', err.message);
     }
 }
 
-/** Fun Timer tile (square promo art). */
 const FUNTIMER_TILE_IMAGE =
     'https://res.cloudinary.com/dzd47mpdo/image/upload/v1776326982/FUN_TIMER_6_irmgjz.png';
 const LEGACY_FUNTIMER_TILE_IMAGE =
     'https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775804008/singledice_dizkld.png';
 
-/** Roulette tile (square promo art). */
 const ROULETTE_TILE_IMAGE =
     'https://res.cloudinary.com/dzd47mpdo/image/upload/v1776326983/FUN_TIMER_5_xn87ir.png';
 const LEGACY_ROULETTE_TILE_IMAGE =
-    'https://res.cloudinary.com/dwwt5xdsz/image/upload/q_auto/f_auto/v1775804007/roulletGame_a719um.jpg';
+    'https://res.cloudinary.com/dwwt5xdsz/image/upload/v1775804007/roulletGame_a719um.jpg';
+
+function inHouseLaunchUrls() {
+    const base = getPublicGameBaseUrl();
+    return {
+        ROULETTE: `${base}/games-static/roulette/index.html?player={playerId}`,
+        FUNTIMER: `${base}/games-static/funtimer/index.html?player={playerId}`,
+    };
+}
 
 const DEFAULT_GAMES = [
     {
@@ -41,6 +45,7 @@ const DEFAULT_GAMES = [
         image: 'https://res.cloudinary.com/dwwt5xdsz/image/upload/v1775804006/aviatorGame_qfug5k.jpg',
         category: 'instant',
         provider: 'partner',
+        launchUrl: '',
         isActive: true,
         order: 1,
     },
@@ -48,8 +53,10 @@ const DEFAULT_GAMES = [
         name: 'Fun Timer',
         gameCode: 'FUNTIMER',
         image: FUNTIMER_TILE_IMAGE,
-        category: 'instant',
-        provider: 'partner',
+        category: 'arcade',
+        provider: 'in-house',
+        launchUrl: '',
+        embedAllowed: true,
         isActive: true,
         order: 2,
     },
@@ -57,41 +64,59 @@ const DEFAULT_GAMES = [
         name: 'Roulette',
         gameCode: 'ROULETTE',
         image: ROULETTE_TILE_IMAGE,
-        category: 'instant',
-        provider: 'partner',
+        category: 'casino',
+        provider: 'in-house',
+        launchUrl: '',
+        embedAllowed: true,
         isActive: true,
         order: 3,
     },
 ];
 
-/** Migrate legacy Fun Timer thumbnail (dice placeholder) to branded tile. */
 async function migrateFunTimerTileImageIfLegacy() {
     const res = await Game.updateMany(
         { gameCode: 'FUNTIMER', image: LEGACY_FUNTIMER_TILE_IMAGE },
         { $set: { image: FUNTIMER_TILE_IMAGE } }
     );
     if (res.modifiedCount > 0) {
-        console.log('[games] Updated FUNTIMER catalog image to FUN_TIMER_6 tile.');
+        console.log('[games] Updated FUNTIMER catalog image.');
     }
 }
 
-/** One-time style migration: swap legacy Roulette thumbnail only if DB still has old Cloudinary id. */
 async function migrateRouletteTileImageIfLegacy() {
     const res = await Game.updateMany(
         { gameCode: 'ROULETTE', image: LEGACY_ROULETTE_TILE_IMAGE },
         { $set: { image: ROULETTE_TILE_IMAGE } }
     );
     if (res.modifiedCount > 0) {
-        console.log('[games] Updated ROULETTE catalog image to FUN_TIMER tile.');
+        console.log('[games] Updated ROULETTE catalog image.');
     }
 }
 
-/**
- * Ensures each default row exists (by gameCode). Inserts only missing games.
- * Set DISABLE_GAME_SEED=true to skip ensure.
- *
- * All launches use the CraftDigital session API (`gamesController.launchGame`).
- */
+/** Ensure ROULETTE / FUNTIMER have in-house launchUrl (partner optional for those titles). */
+async function syncInHouseLaunchUrls() {
+    const urls = inHouseLaunchUrls();
+    for (const [gameCode, launchUrl] of Object.entries(urls)) {
+        const res = await Game.updateOne(
+            { gameCode },
+            {
+                $set: {
+                    launchUrl,
+                    embedAllowed: true,
+                    provider: 'in-house',
+                },
+            }
+        );
+        if (res.matchedCount === 0) {
+            const doc = DEFAULT_GAMES.find((g) => g.gameCode === gameCode);
+            if (doc) {
+                await Game.create({ ...doc, launchUrl });
+            }
+        }
+    }
+    console.log('[games] Synced in-house launchUrl for ROULETTE and FUNTIMER.');
+}
+
 export async function ensureDefaultGames() {
     if (process.env.DISABLE_GAME_SEED === 'true') {
         return;
@@ -101,19 +126,22 @@ export async function ensureDefaultGames() {
         for (const doc of DEFAULT_GAMES) {
             const exists = await Game.exists({ gameCode: doc.gameCode });
             if (!exists) {
-                await Game.create(doc);
+                const urls = inHouseLaunchUrls();
+                const launchUrl = urls[doc.gameCode] || doc.launchUrl || '';
+                await Game.create({ ...doc, launchUrl });
                 added += 1;
             }
         }
         if (added > 0) {
-            console.log(`[games] Inserted ${added} missing default game(s) (by gameCode).`);
+            console.log(`[games] Inserted ${added} missing default game(s).`);
         }
+        await syncInHouseLaunchUrls();
         await migrateRouletteTileImageIfLegacy();
         await migrateFunTimerTileImageIfLegacy();
 
         const removed = await Game.deleteOne({ gameCode: 'CHICKEN_ROAD' });
         if (removed.deletedCount > 0) {
-            console.log('[games] Removed legacy CHICKEN_ROAD (replaced by FUNTIMER).');
+            console.log('[games] Removed legacy CHICKEN_ROAD.');
         }
     } catch (err) {
         console.error('[games] Default games ensure failed:', err.message);

@@ -108,9 +108,13 @@ const GamesHub = () => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
+          logoutOn401: false,
         }
       );
-      if (res.status === 401) return;
+      if (res.status === 401) {
+        setError(t('games_err_loginPlayer'));
+        return;
+      }
       const data = await res.json().catch(() => ({}));
 
       const launchUrl =
